@@ -1,0 +1,504 @@
+mappings:
+  - sqlType: bit
+    goType: bool
+    gqlType: Boolean
+    jsonType: Boolean
+    protobufType: bool
+    gureguType: null.Int
+    goNullableType: sql.NullBool
+    swaggerType: bool
+  - sqlType: bool
+    goType: bool
+    gqlType: Boolean
+    jsonType: Boolean
+    protobufType: bool
+    gureguType: null.Int
+    goNullableType: sql.NullBool
+    swaggerType: bool
+  - sqlType: tinyint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: int
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: smallint
+    size: 2
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: mediumint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: int4
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: int2
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: integer
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: bigint
+    goType: int64
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int64
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int64
+  - sqlType: int8
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int64
+  - sqlType: char
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: enum
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: varchar
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: nvarchar
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: longtext
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: mediumtext
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: text
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: tinytext
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: varchar2
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: inet
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: json
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: jsonb
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: nchar
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: date
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: google.protobuf.Timestamp
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: datetime2
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: google.protobuf.Timestamp
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: datetime
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: google.protobuf.Timestamp
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: time
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: google.protobuf.Timestamp
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: timestamp
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: uint64
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: timestamptz
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: uint64
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: smalldatetime
+    goType: time.Time
+    gqlType: Time
+    jsonType: Text
+    protobufType: google.protobuf.Timestamp
+    gureguType: null.Time
+    goNullableType: time.Time
+    swaggerType: time.Time
+  - sqlType: decimal
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: double
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: money
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: real
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: float4
+    goType: float32
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float32
+  - sqlType: float
+    goType: float32
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float32
+  - sqlType: float8
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: binary
+    goType: '[]byte'
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: '[]byte'
+    goNullableType: '[]byte'
+    swaggerType: '[]byte'
+  - sqlType: blob
+    goType: '[]byte'
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: '[]byte'
+    goNullableType: '[]byte'
+    swaggerType: '[]byte'
+  - sqlType: longblob
+    goType: '[]byte'
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: '[]byte'
+    goNullableType: '[]byte'
+    swaggerType: '[]byte'
+  - sqlType: mediumblob
+    goType: '[]byte'
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: '[]byte'
+    goNullableType: '[]byte'
+    swaggerType: '[]byte'
+  - sqlType: varbinary
+    goType: '[]byte'
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: '[]byte'
+    goNullableType: '[]byte'
+    swaggerType: '[]byte'
+  - sqlType: numeric
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: bpchar
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: tsvector
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: Text
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: bytea
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: USER_DEFINED
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: 'interface{}'
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: uuid
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: string
+    gureguType: null.String
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: ''
+    goType: string
+    gqlType: String
+    jsonType: Text
+    protobufType: bytes
+    gureguType: 'interface{}'
+    goNullableType: sql.NullString
+    swaggerType: string
+  - sqlType: utinyint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: uint32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: usmallint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: uint32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: umediumint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: uint32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: uint
+    goType: int
+    gqlType: Int
+    jsonType: Integer
+    protobufType: uint32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: ubigint
+    goType: uint64
+    gqlType: Int
+    jsonType: Integer
+    protobufType: uint64
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int64
+  - sqlType: udecimal
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: udouble
+    goType: float64
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float64
+  - sqlType: ufloat
+    goType: float32
+    gqlType: Float
+    jsonType: Float
+    protobufType: float
+    gureguType: null.Float
+    goNullableType: sql.NullFloat64
+    swaggerType: float32
+  - sqlType: smallserial
+    size: 2
+    custom: postgres
+    goType: int32
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: serial
+    size: 4
+    custom: postgres
+    goType: int32
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
+  - sqlType: bigserial
+    size: 8
+    custom: postgres
+    goType: int32
+    gqlType: Int
+    jsonType: Integer
+    protobufType: int32
+    gureguType: null.Int
+    goNullableType: sql.NullInt64
+    swaggerType: int
