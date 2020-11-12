@@ -1,4 +1,4 @@
-apps = 'server'
+apps = 'heidou'
 
 .PHONY: run
 run: wire
@@ -13,7 +13,7 @@ watch:
 
 .PHONY: wire
 wire:
-	wire ./cmd/server
+	wire ./cmd/$(apps)
 
 .PHONY: test
 test: 
@@ -29,19 +29,8 @@ assets_gen:
 		go generate -tags=dev ./assets ;\
 	done
 
-.PHONY: gql_gen
-gql_gen:
-	for app in $(apps) ;\
-	do \
-		rm -rf `pwd`/internal/gql/generated/models/* ;\
-		rm -rf `pwd`/internal/gql/generated/resolver/* ;\
-		mkdir -p `pwd`/internal/gql/generated/models ;\
-		mkdir -p `pwd`/internal/gql/generated/resolver ;\
-		go run -v github.com/99designs/gqlgen ;\
-	done
-
 .PHONY: build
-build: assets_gen gql_gen
+build: assets_gen
 	for app in $(apps) ;\
 	do \
 		GOOS=linux GOARCH="amd64" go build -o dist/$$app-linux-amd64 ./cmd/$$app/; \

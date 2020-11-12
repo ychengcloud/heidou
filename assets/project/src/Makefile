@@ -1,7 +1,7 @@
 apps = 'server'
 
 .PHONY: run
-run: wire
+run: 
 	for app in $(apps) ;\
 	do \
 		 go run ./cmd/$$app -c configs/$$app ;\
@@ -29,16 +29,8 @@ assets_gen:
 		go generate -tags=dev ./graphql... ;\
 	done
 
-.PHONY: gql_gen
-gql_gen:
-	for app in $(apps) ;\
-	do \
-		rm -rf ./internal/gql/generated ;\
-		go run -v github.com/99designs/gqlgen ;\
-	done
-
 .PHONY: build
-build: assets_gen gql_gen
+build: assets_gen wire
 	for app in $(apps) ;\
 	do \
 		GOOS=linux GOARCH="amd64" go build -o dist/$$app-linux-amd64 ./cmd/$$app/; \

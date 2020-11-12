@@ -1,13 +1,11 @@
 app:
   name: 
+  rootAccount: admin
 http:
   mode: debug
   # mode: release
   host: 127.0.0.1
   port: 7779
-  graphqlPath: graphql
-  playgroundPath: playground
-  isPlaygroundEnabled: true
   allowOrigins:
     - "*"
   allowMethods: 
@@ -28,6 +26,7 @@ db:
   port: 3306
   name: 
   charset: utf8mb4
+  debug: true
 log:
   filename: /tmp/.log
   maxSize: 500

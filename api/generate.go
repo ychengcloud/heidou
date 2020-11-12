@@ -1,11 +1,11 @@
 package api
 
 import (
-	"github.com/decker502/heidou/internal/gen"
-	"github.com/decker502/heidou/internal/loader"
+	"github.com/decker502/heidou"
+	"github.com/decker502/heidou/loader"
 )
 
-func Generate(cfg *gen.Config) error {
+func Generate(cfg *heidou.Config) error {
 	o := &loader.Options{
 		User:     cfg.DBConfig.User,
 		Password: cfg.DBConfig.Password,
@@ -14,6 +14,6 @@ func Generate(cfg *gen.Config) error {
 		Charset:  cfg.DBConfig.Charset,
 	}
 	loader := loader.NewMysqlSchemaLoader(o, cfg.DBConfig.Name)
-	g := gen.NewGenerator(cfg, loader)
+	g := heidou.NewGenerator(cfg, loader)
 	return g.Generate()
 }

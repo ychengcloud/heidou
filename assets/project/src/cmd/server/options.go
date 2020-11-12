@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	server "{{ . }}/internal"
-	"{{ . }}/internal/handlers"
+	"{{ . }}/internal"
+	"{{ . }}/pkg/auth"
 	"{{ . }}/pkg/database"
 	"{{ . }}/pkg/log"
 	"{{ . }}/pkg/transports/http"
@@ -27,22 +27,10 @@ func NewHttpOptions(v *viper.Viper) (*http.Options, error) {
 	return o, err
 }
 
-func NewServerOptions(v *viper.Viper, logger *zap.Logger) (*server.Options, error) {
+func NewServerOptions(v *viper.Viper, logger *zap.Logger) (*internal.Options, error) {
 	var err error
-	o := new(server.Options)
+	o := new(internal.Options)
 	if err = v.UnmarshalKey("app", o); err != nil {
-		return nil, errors.Wrap(err, "unmarshal app option error")
-	}
-
-	logger.Info("load application options success")
-
-	return o, err
-}
-
-func NewHandlersOptions(v *viper.Viper, logger *zap.Logger) (*handlers.Options, error) {
-	var err error
-	o := new(handlers.Options)
-	if err = v.UnmarshalKey("http", o); err != nil {
 		return nil, errors.Wrap(err, "unmarshal app option error")
 	}
 
@@ -77,4 +65,20 @@ func NewDatabaseOptions(v *viper.Viper, logger *zap.Logger) (*database.Options, 
 		zap.Int("Port", o.Port),
 	)
 	return o, err
+}
+
+func NewAuthOptions(v *viper.Viper, logger *zap.Logger) (*auth.Options, error) {
+
+	o := &auth.Options{}
+	if err := v.UnmarshalKey("jwt", o); err != nil {
+		return nil, errors.Wrap(err, "unmarshal jwt options error")
+	}
+
+	o.Logger = logger
+	logger.Info("load jwt options success",
+		zap.String("ClaimsKey", o.ClaimsKey),
+		zap.String("SigningKey", o.SigningKey),
+	)
+
+	return o, nil
 }

@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/decker502/heidou"
 	"github.com/decker502/heidou/api"
-	"github.com/decker502/heidou/internal/gen"
 )
 
 var configPath string
@@ -44,7 +44,7 @@ func init() {
 
 }
 
-func loadConfig(path string) *gen.Config {
+func loadConfig(path string) *heidou.Config {
 	viper.SetConfigFile(string(path))
 
 	viper.AddConfigPath(".")             // optionally look for config in the working directory
@@ -56,7 +56,7 @@ func loadConfig(path string) *gen.Config {
 		os.Exit(1)
 	}
 
-	cfg := &gen.Config{}
+	cfg := &heidou.Config{}
 
 	err = viper.Unmarshal(cfg)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/decker502/heidou/internal/gen"
+	"github.com/decker502/heidou"
 	"github.com/spf13/cobra"
 )
 
@@ -40,7 +40,7 @@ var initCmd = &cobra.Command{
 			return
 		}
 
-		err := gen.GenProject(projectName, pkgPath)
+		err := heidou.GenProject(projectName, pkgPath)
 		if err != nil {
 			fmt.Println("err:", err)
 		}
