@@ -65,7 +65,7 @@ enum {{.NameCamel}}ErrorCode {
 input {{.NameCamel}}FilterInput {
   {{- range .Fields}}
     {{- if .IsFilterable }}
-  {{.NameLowerCamel}}: [{{$modelNameCamel}}Op{{.NameCamel}}Input!]
+  {{.NameLowerCamel}}: [{{$modelNameCamel}}Op{{.NameCamel}}Input]
     {{- end}}
   {{- end}}
   AND: {{.NameCamel}}FilterInput

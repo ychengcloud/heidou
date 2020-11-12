@@ -5,9 +5,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	{{- if .IsStringsJoin }}
-	"strings"
-	{{- end}}
+	//{{- if .IsStringsJoin }}
+	//"strings"
+	//{{- end}}
 	
 	"gorm.io/gorm"
 
@@ -30,14 +30,14 @@ func (r *queryResolver) {{.NameLowerCamel}}Condition(ctx context.Context, {{- if
 	}
 	{{- end}}
 
-	{{- if .Filterable}}
-	if filter != nil {
-		where, clause := handle{{.NameCamel}}Filter(filter)
-		if where != "" && len(clause) > 0 {
-			db = db.Where(where, clause...)
-		}
-	}
-	{{- end}}
+	//{{- if .Filterable}}
+	//if filter != nil {
+	//	where, clause := handle{{.NameCamel}}Filter(filter)
+	//	if where != "" && len(clause) > 0 {
+	//		db = db.Where(where, clause...)
+	//	}
+	//}
+	//{{- end}}
 
 	return db, nil
 }
@@ -331,119 +331,119 @@ func (r *mutationResolver) {{.NameCamel}}Update(ctx context.Context, id int, inp
 }
 
 
-{{- if .Filterable}}
-// 处理  过滤条件
-// op 取值 OR, AND, NOT
-func handle{{.NameCamel}}Filter(filterInput *models.{{.NameCamel}}FilterInput) (where string, clause []interface{}) {
-	if filterInput == nil {
-		return
-	}
-	isFirst := true
-
-	clause = make([]interface{}, 0)
-	where = " ( "
-
-	{{- range .Fields}}
-	{{- if .IsFilterable }}
-	{{$filterName := .NameCamel}}
-	{{$filterLowerName := .NameLowerCamel}}
-	if filterInput.{{.NameCamel}} != nil {
-		if !isFirst {
-			where = where + " AND "
-		}
-		for _, {{$filterLowerName}} := range filterInput.{{$filterName}} {
-			{{- range .Operations}}
-			if {{$filterLowerName}}.{{.}} != nil {
-				{{- if eq . "Eq"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} = ?"
-				{{- end}}
-				{{- if eq . "Not"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} <> ?"
-				{{- end}}
-				{{- if eq . "In"}}
-				v := make([]string, 0, len({{$filterLowerName}}.{{.}}))
-				for _, one := range {{$filterLowerName}}.{{.}} {
-					clause = append(clause, *one)
-					v = append(v, "?")
-				}
-				where = where + "{{$filterLowerName}} IN (" + strings.Join(v, ",") + ")"
-				{{- end}}
-				{{- if eq . "Gt"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} > ?"
-				{{- end}}
-				{{- if eq . "Gte"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} >= ?"
-				{{- end}}
-				{{- if eq . "Lt"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} < ?"
-				{{- end}}
-				{{- if eq . "Lte"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} <= ?"
-				{{- end}}
-				{{- if eq . "Contains"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} LIKE (?)"
-				{{- end}}
-				{{- if eq . "StartsWith"}}
-				clause = append(clause, *{{$filterLowerName}}.{{.}})
-				where = where + "{{$filterLowerName}} LIKE (?%)"
-				{{- end}}
-				{{- if eq . "EndsWith"}}
-				where = where + "{{$filterLowerName}} LIKE (%?)"
-				{{- end}}
-			}
-			{{- end}}
-			isFirst = false
-
-		}
-	}
-	{{- end}}
-	{{- end}}
-
-	if filterInput.OR != nil {
-		w, c := handle{{.NameCamel}}Filter(filterInput.OR)
-		if w != "" && len(c) > 0 {
-			if !isFirst {
-				where = where + " OR "
-			}
-			clause = append(clause, c...)
-			where = where + w
-			isFirst = false
-		}
-
-	}
-
-	if filterInput.AND != nil {
-		w, c := handle{{.NameCamel}}Filter(filterInput.AND)
-		if w != "" && len(c) > 0 {
-			if !isFirst {
-				where = where + " AND "
-			}
-			clause = append(clause, c...)
-			where = where + w
-			isFirst = false
-		}
-	}
-
-	if filterInput.NOT != nil {
-		w, c := handle{{.NameCamel}}Filter(filterInput.NOT)
-		if w != "" && len(c) > 0 {
-			if !isFirst {
-				where = where + " AND NOT "
-			}
-			clause = append(clause, c...)
-			where = where + w
-		}
-	}
-	where = where + " ) "
-
-	return
-}
-{{- end}}
+//{{- if .Filterable}}
+//// 处理  过滤条件
+//// op 取值 OR, AND, NOT
+//func handle{{.NameCamel}}Filter(filterInput *models.{{.NameCamel}}FilterInput) (where string, //clause []interface{}) {
+//	if filterInput == nil {
+//		return
+//	}
+//	isFirst := true
+//
+//	clause = make([]interface{}, 0)
+//	where = " ( "
+//
+//	{{- range .Fields}}
+//	{{- if .IsFilterable }}
+//	{{$filterName := .NameCamel}}
+//	{{$filterLowerName := .NameLowerCamel}}
+//	if filterInput.{{.NameCamel}} != nil {
+//		if !isFirst {
+//			where = where + " AND "
+//		}
+//		for _, {{$filterLowerName}} := range filterInput.{{$filterName}} {
+//			{{- range .Operations}}
+//			if {{$filterLowerName}}.{{.}} != nil {
+//				{{- if eq . "Eq"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} = ?"
+//				{{- end}}
+//				{{- if eq . "Not"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} <> ?"
+//				{{- end}}
+//				{{- if eq . "In"}}
+//				v := make([]string, 0, len({{$filterLowerName}}.{{.}}))
+//				for _, one := range {{$filterLowerName}}.{{.}} {
+//					clause = append(clause, *one)
+//					v = append(v, "?")
+//				}
+//				where = where + "{{$filterLowerName}} IN (" + strings.Join(v, ",") + ")"
+//				{{- end}}
+//				{{- if eq . "Gt"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} > ?"
+//				{{- end}}
+//				{{- if eq . "Gte"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} >= ?"
+//				{{- end}}
+//				{{- if eq . "Lt"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} < ?"
+//				{{- end}}
+//				{{- if eq . "Lte"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} <= ?"
+//				{{- end}}
+//				{{- if eq . "Contains"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} LIKE (?)"
+//				{{- end}}
+//				{{- if eq . "StartsWith"}}
+//				clause = append(clause, *{{$filterLowerName}}.{{.}})
+//				where = where + "{{$filterLowerName}} LIKE (?%)"
+//				{{- end}}
+//				{{- if eq . "EndsWith"}}
+//				where = where + "{{$filterLowerName}} LIKE (%?)"
+//				{{- end}}
+//			}
+//			{{- end}}
+//			isFirst = false
+//
+//		}
+//	}
+//	{{- end}}
+//	{{- end}}
+//
+//	if filterInput.OR != nil {
+//		w, c := handle{{.NameCamel}}Filter(filterInput.OR)
+//		if w != "" && len(c) > 0 {
+//			if !isFirst {
+//				where = where + " OR "
+//			}
+//			clause = append(clause, c...)
+//			where = where + w
+//			isFirst = false
+//		}
+//
+//	}
+//
+//	if filterInput.AND != nil {
+//		w, c := handle{{.NameCamel}}Filter(filterInput.AND)
+//		if w != "" && len(c) > 0 {
+//			if !isFirst {
+//				where = where + " AND "
+//			}
+//			clause = append(clause, c...)
+//			where = where + w
+//			isFirst = false
+//		}
+//	}
+//
+//	if filterInput.NOT != nil {
+//		w, c := handle{{.NameCamel}}Filter(filterInput.NOT)
+//		if w != "" && len(c) > 0 {
+//			if !isFirst {
+//				where = where + " AND NOT "
+//			}
+//			clause = append(clause, c...)
+//			where = where + w
+//		}
+//	}
+//	where = where + " ) "
+//
+//	return
+//}
+//{{- end}}
 {{- end}}

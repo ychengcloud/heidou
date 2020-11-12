@@ -18,3 +18,4 @@ dist/*
 __debug*
 
 cmd/heidou/heidou
+assets/project_vfsdata.go
