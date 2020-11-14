@@ -68,8 +68,10 @@ func NewDatabaseOptions(v *viper.Viper, logger *zap.Logger) (*database.Options, 
 }
 
 func NewAuthOptions(v *viper.Viper, logger *zap.Logger) (*auth.Options, error) {
-
-	o := &auth.Options{}
+	var (
+		err error
+		o   = &auth.DefaultOptions
+	)
 	if err := v.UnmarshalKey("jwt", o); err != nil {
 		return nil, errors.Wrap(err, "unmarshal jwt options error")
 	}

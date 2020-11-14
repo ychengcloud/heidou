@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	gen "github.com/decker502/heidou"
+	"github.com/decker502/heidou"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 )
@@ -33,7 +33,7 @@ func NewMysqlSchemaLoader(o *Options, schemaName string) *MysqlSchemaLoader {
 	}
 }
 
-func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*gen.MetaTable, error) {
+func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/INFORMATION_SCHEMA?charset=%s", msl.User, msl.Password, msl.Host, msl.Port, msl.Charset)
 	db, err := sql.Open(DialectMysql, dsn)
 	if err != nil {
@@ -47,14 +47,14 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*gen.MetaTable, error) {
 		return nil, err
 	}
 
-	tables := make([]*gen.MetaTable, 0)
-	tablesIndex := make(map[string]*gen.MetaTable)
+	tables := make([]*heidou.MetaTable, 0)
+	tablesIndex := make(map[string]*heidou.MetaTable)
 
 	for rows.Next() {
 		var tableName, columnName, dataType, columnType, columnComment, columnKey string
 
 		if rows.Scan(&tableName, &columnName, &dataType, &columnType, &columnComment, &columnKey) == nil {
-			c := &gen.Column{
+			c := &heidou.Column{
 				Name:     columnName,
 				DataType: dataType,
 				Type:     columnType,
@@ -63,9 +63,9 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*gen.MetaTable, error) {
 			}
 			table, ok := tablesIndex[tableName]
 			if !ok {
-				table = &gen.MetaTable{
+				table = &heidou.MetaTable{
 					Name:    tableName,
-					Columns: make([]*gen.Column, 0),
+					Columns: make([]*heidou.Column, 0),
 				}
 				tablesIndex[tableName] = table
 

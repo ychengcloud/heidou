@@ -70,10 +70,6 @@ func (g *Generator) Generate() error {
 		g.Data.Tables = append(g.Data.Tables, table)
 	}
 
-	if err := genGql("./internal/", g.Data); err != nil {
-		return err
-	}
-
 	return nil
 }
 

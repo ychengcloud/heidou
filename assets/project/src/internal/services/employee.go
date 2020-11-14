@@ -86,11 +86,21 @@ func (s *DefaultEmployeeService) Create(c context.Context, employee *gm.Employee
 	}
 
 	enforcer := s.auth.Enforcer
-	enforcer.DeleteRolesForUser(employee.Username)
+	ok, err := enforcer.DeleteRolesForUser(employee.Username)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return fmt.Errorf("The user does have any roles")
+	}
 	for _, role := range employee.Roles {
 		roleIDStr := fmt.Sprintf("%d", role.Id)
-		enforcer.AddRoleForUser(employee.Username, roleIDStr)
+		_, err := enforcer.AddRoleForUser(employee.Username, roleIDStr)
+		if err != nil {
+			return err
+		}
 	}
+
 
 	return nil
 }

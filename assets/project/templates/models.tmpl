@@ -1,0 +1,23 @@
+package models
+
+import "time"
+
+//{{.ModelName}}
+type {{.ModelName}} struct {
+	{{- range .Properties}}
+    {{- if .IsAssociation }}
+    {{- if or (eq .ModelType "m2m") (eq .ModelType "many")}}
+    {{.ModelAliasCamelPlural}}      []*{{.ModelAssociationFieldName}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
+    {{- else}}
+    {{.ModelAliasLowerCamel}}      *{{.ModelAssociationFieldName}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
+    {{- end}}
+    {{- else}}
+    {{.ModelPropCamel}}      {{.ModelType}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
+    {{- end}}
+    {{- end}}
+}
+
+//TableName
+func (m *{{.ModelName}}) TableName() string {
+	return "{{.TableName}}"
+}

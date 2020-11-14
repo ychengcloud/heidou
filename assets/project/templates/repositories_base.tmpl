@@ -1,0 +1,51 @@
+package repositories
+
+import (
+  	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/google/wire"
+	"github.com/jinzhu/gorm"
+
+	"{{.AppPkg}}/gen/models"
+)
+
+var BaseProviderSet = wire.NewSet(
+    {{- range .Resources}}
+    NewGorm{{.ModelName}}Repository,
+    {{- end}}
+)
+
+func GetResourceCount(db *gorm.DB, orm interface{}, q *models.PaginationQuery) (uint, *gorm.DB) {
+	db = db.Model(orm)
+	conditions := strings.Split(q.Where, ",")
+	for _, val := range conditions {
+		w := strings.SplitN(val, ":", 2)
+		if len(w) == 2 {
+			bindKey, bindValue := w[0], w[1]
+			if intV, err := strconv.ParseInt(bindValue, 10, 64); err == nil {
+				// bind value is int
+				field := fmt.Sprintf("`%s` > ?", bindKey)
+				db = db.Where(field, intV)
+			} else if fV, err := strconv.ParseFloat(bindValue, 64); err == nil {
+				// bind value is float
+				field := fmt.Sprintf("`%s` > ?", bindKey)
+				db = db.Where(field, fV)
+			} else if bindValue != "" {
+				// bind value is string
+				field := fmt.Sprintf("`%s` LIKE ?", bindKey)
+				sV := fmt.Sprintf("%%%s%%", bindValue)
+				db = db.Where(field, sV)
+			}
+		}
+		w = strings.SplitN(val, "=", 2)
+		if len(w) == 2 {
+			field := fmt.Sprintf("`%s` = ?", w[0])
+			db = db.Where(field, w[1])
+		}
+	}
+	var count uint
+	db.Count(&count)
+	return count, db
+}

@@ -1,0 +1,9 @@
+package services
+
+import "github.com/google/wire"
+
+var BaseProviderSet = wire.NewSet(
+    {{- range .Resources}}
+    New{{.ModelName}}Service,
+    {{- end}}
+)

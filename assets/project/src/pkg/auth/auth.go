@@ -24,7 +24,7 @@ var (
 
 const defaultKey = "YOUCHENG"
 
-var defaultOptions = Options{
+var DefaultOptions = Options{
 	TokenHeader:   "Authorization",
 	TokenType:     "Bearer",
 	Expired:       7200,
@@ -99,9 +99,6 @@ type JWTAuth struct {
 
 // New 创建认证实例
 func New(enforcer *casbin.SyncedEnforcer, opts *Options) (*JWTAuth, error) {
-	if opts == nil {
-		opts = &defaultOptions
-	}
 	auth := &JWTAuth{
 		Options:  opts,
 		Enforcer: enforcer,
