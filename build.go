@@ -1,7 +1,6 @@
 package heidou
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,7 +16,7 @@ import (
 
 func GenProject(dest string, pkgPath string) error {
 
-	err := genSrc(dest, pkgPath)
+	err := genSkeleton(dest, pkgPath)
 	if err != nil {
 		return err
 	}
@@ -25,9 +24,9 @@ func GenProject(dest string, pkgPath string) error {
 	return nil
 }
 
-func genSrc(dest string, data interface{}) error {
+func genSkeleton(dest string, data interface{}) error {
 
-	err := build(assets.Project, "/src", dest, false, data)
+	err := build(assets.Project, "/skeleton", dest, false, data)
 	if err != nil {
 		return err
 	}
@@ -76,8 +75,6 @@ func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interfac
 			if err != nil {
 				return err
 			}
-			fmt.Println("test")
-
 		}
 
 		return nil
