@@ -44,6 +44,17 @@ func NewGenerator(cfg *Config, loader Loader) *Generator {
 	return gen
 }
 
+// getModel 根据表名，查找表对象
+func (g *Generator) getModel(name string) *Table {
+
+	for _, table := range g.Data.Tables {
+		if table.Name == name {
+			return table
+		}
+	}
+	return nil
+}
+
 // 根据配置信息和数据库表结构生成 Graphql 相关代码
 func (g *Generator) Generate() error {
 	metaTables, err := g.Loader.LoadMetaTable()
@@ -71,6 +82,14 @@ func (g *Generator) Generate() error {
 		g.Data.Tables = append(g.Data.Tables, table)
 	}
 
+	// 所有元表信息生成后，再处理关联字段的模型信息
+	for _, table := range g.Data.Tables {
+		for _, field := range table.Fields {
+			if field.JoinType != "" {
+				field.JoinTable = g.getModel(field.TableName)
+			}
+		}
+	}
 	if err := g.gen(); err != nil {
 		return err
 	}

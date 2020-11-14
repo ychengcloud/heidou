@@ -5,75 +5,74 @@ import (
 
 	"go.uber.org/zap"
 
-    "{{.AppPkg}}/gen/repositories"
-	"{{.AppPkg}}/gen/models"
+    "{{.PkgPath}}/internal/gen/repositories"
+	"{{.PkgPath}}/internal/gen/models"
 )
 
-{{- $primaryKeyColumnName := .PrimaryKeyColumnName}}
-{{- $primaryKeyColumnType := .PrimaryKeyColumnType}}
-{{- $primaryKeyLowerColumnName := .PrimaryKeyLowerColumnName}}
-type {{.ModelName}}Service interface {
-	List(c context.Context, q *models.PaginationQuery) (list []*models.{{.ModelName}}, total uint, err error)
-	Create(c context.Context, {{.HandlerName}} *models.{{.ModelName}}) error
-	Get(c context.Context, {{$primaryKeyColumnName}} {{$primaryKeyColumnType}}) (*models.{{.ModelName}}, error)
-	Update(c context.Context, {{.HandlerName}} *models.{{.ModelName}}) error
-	Delete(c context.Context, {{$primaryKeyColumnName}} {{$primaryKeyColumnType}}) error
-	BatchGet(c context.Context, {{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) ([]*models.{{.ModelName}}, error)
-	BatchDelete(c context.Context, {{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) error
+{{- $primaryKeyField := .PrimaryKeyField}}
+
+type {{.NameCamel}}Service interface {
+	List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total uint, err error)
+	Create(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error
+	Get(c context.Context, {{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) (*models.{{.NameCamel}}, error)
+	Update(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error
+	Delete(c context.Context, {{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) error
+	BulkGet(c context.Context, {{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) ([]*models.{{.NameCamel}}, error)
+	BulkDelete(c context.Context, {{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) error
 }
 
-type Default{{.ModelName}}Service struct {
+type Default{{.NameCamel}}Service struct {
 	logger     *zap.Logger
-	Repository repositories.{{.ModelName}}Repository
+	Repository repositories.{{.NameCamel}}Repository
 }
 
-func New{{.ModelName}}Service(logger *zap.Logger, r repositories.{{.ModelName}}Repository) {{.ModelName}}Service {
-	return &Default{{.ModelName}}Service{
-		logger:     logger.With(zap.String("type", "Default{{.ModelName}}sService")),
+func New{{.NameCamel}}Service(logger *zap.Logger, r repositories.{{.NameCamel}}Repository) {{.NameCamel}}Service {
+	return &Default{{.NameCamel}}Service{
+		logger:     logger.With(zap.String("type", "Default{{.NameCamel}}sService")),
 		Repository: r,
 	}
 }
 
-func (s *Default{{.ModelName}}Service) List(c context.Context, q *models.PaginationQuery) (list []*models.{{.ModelName}}, total uint, err error) {
+func (s *Default{{.NameCamel}}Service) List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total uint, err error) {
 
 	return s.Repository.List(q)
 }
 
-func (s *Default{{.ModelName}}Service) Create(c context.Context, {{.HandlerName}} *models.{{.ModelName}}) error {
+func (s *Default{{.NameCamel}}Service) Create(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error {
 
-	return s.Repository.Create({{.HandlerName}})
+	return s.Repository.Create({{.NameLowerCamel}})
 }
 
-func (s *Default{{.ModelName}}Service) Get(c context.Context, {{$primaryKeyColumnName}} {{$primaryKeyColumnType}}) ({{.HandlerName}} *models.{{.ModelName}}, err error) {
+func (s *Default{{.NameCamel}}Service) Get(c context.Context, {{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) ({{.NameLowerCamel}} *models.{{.NameCamel}}, err error) {
 
-	return s.Repository.Get({{$primaryKeyColumnName}})
+	return s.Repository.Get({{$primaryKeyField.NameLowerCamel}})
 }
 
 
-func (s *Default{{.ModelName}}Service) Update(c context.Context, {{.HandlerName}} *models.{{.ModelName}}) error {
-	if({{.HandlerName}}.{{$primaryKeyColumnName}} == 0) {
+func (s *Default{{.NameCamel}}Service) Update(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error {
+	if({{.NameLowerCamel}}.{{$primaryKeyField.NameLowerCamel}} == 0) {
 		return models.ErrBadParamInput
 	}
-	return s.Repository.Update({{.HandlerName}})
+	return s.Repository.Update({{.NameLowerCamel}})
 }
 
-func (s *Default{{.ModelName}}Service) Delete(c context.Context, {{$primaryKeyColumnName}} {{$primaryKeyColumnType}}) (err error) {
-	if({{$primaryKeyColumnName}} == 0) {
+func (s *Default{{.NameCamel}}Service) Delete(c context.Context, {{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) (err error) {
+	if({{$primaryKeyField.NameLowerCamel}} == 0) {
 		return models.ErrBadParamInput
 	}
-	return s.Repository.Delete({{$primaryKeyColumnName}})
+	return s.Repository.Delete({{$primaryKeyField.NameLowerCamel}})
 }
 
-func (s *Default{{.ModelName}}Service) BatchGet(c context.Context, {{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) ([]*models.{{.ModelName}}, error) {
+func (s *Default{{.NameCamel}}Service) BulkGet(c context.Context, {{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) ([]*models.{{.NameCamel}}, error) {
 
-	return s.Repository.BatchGet({{$primaryKeyLowerColumnName}}List)
+	return s.Repository.BulkGet({{$primaryKeyField.NameLowerCamel}}List)
 }
 
-func (s *Default{{.ModelName}}Service) BatchDelete(c context.Context, {{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) error {
-	for _, {{$primaryKeyColumnName}} := range {{$primaryKeyLowerColumnName}}List {
-		if({{$primaryKeyColumnName}} == 0) {
+func (s *Default{{.NameCamel}}Service) BulkDelete(c context.Context, {{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) error {
+	for _, {{$primaryKeyField.NameLowerCamel}} := range {{$primaryKeyField.NameLowerCamel}}List {
+		if({{$primaryKeyField.NameLowerCamel}} == 0) {
 			return models.ErrBadParamInput
 		}
 	}
-	return s.Repository.BatchDelete({{$primaryKeyLowerColumnName}}List)
+	return s.Repository.BulkDelete({{$primaryKeyField.NameLowerCamel}}List)
 }

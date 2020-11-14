@@ -19,7 +19,6 @@ var (
 	// functions used by the codegen.
 	Funcs = template.FuncMap{
 		"join":     join,
-		"getModel": getModel,
 		"receiver": receiver,
 	}
 	rules    = ruleset()
@@ -30,17 +29,6 @@ var (
 func join(a []string, sep string) string {
 	sort.Strings(a)
 	return strings.Join(a, sep)
-}
-
-// getModel 根据表名，查找表对象
-func getModel(tables []*Table, name string) *Table {
-
-	for _, table := range tables {
-		if table.Name == name {
-			return table
-		}
-	}
-	return nil
 }
 
 // plural a name.

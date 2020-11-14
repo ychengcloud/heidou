@@ -7,7 +7,23 @@ import (
 	"github.com/google/wire"
 	"gorm.io/gorm"
 
-	"{{.PkgPath}}/gen/models"
+	"{{.PkgPath}}/internal/gen/models"
+)
+
+const (
+	OpEq    = "eq"
+	OpIn    = "in"
+	OpNot   = "not"
+	OpNotIn = "notin"
+	OpGt    = "gt"
+	OpGte   = "gte"
+	OpLt    = "lt"
+	OpLte   = "lte"
+	OpLike  = "like"
+)
+
+const (
+	MaxLimitCount = 1000
 )
 
 var BaseProviderSet = wire.NewSet(

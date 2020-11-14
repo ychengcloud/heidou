@@ -1,72 +1,52 @@
 package repositories
 
 import (
-	"strings"
-
-	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 
-	"{{.AppPkg}}/gen/models"
+	"{{.PkgPath}}/internal/gen/models"
 )
 
-{{- $primaryKeyColumnName := .PrimaryKeyColumnName}}
-{{- $primaryKeyLowerColumnName := .PrimaryKeyLowerColumnName}}
-{{- $primaryKeyColumnType := .PrimaryKeyColumnType}}
-type {{.ModelName}}Repository interface {
-	List(q *models.PaginationQuery) (list []*models.{{.ModelName}}, total uint, err error)
-	Create({{.HandlerName}} *models.{{.ModelName}}) (err error)
-	Get({{$primaryKeyLowerColumnName}} {{$primaryKeyColumnType}}) ({{.HandlerName}} *models.{{.ModelName}}, err error)
-	Update({{.HandlerName}} *models.{{.ModelName}}) (err error)
-	Delete({{$primaryKeyLowerColumnName}} {{$primaryKeyColumnType}}) (err error)
-	BatchGet({{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) ([]*models.{{.ModelName}}, error)
-	BatchDelete({{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) (err error)
+{{- $primaryKeyField := .PrimaryKeyField}}
+
+type {{.NameCamel}}Repository interface {
+	List(q *models.Query) (list []*models.{{.NameCamel}}, total int64, err error)
+	Create({{.NameLowerCamel}} *models.{{.NameCamel}}) (err error)
+	Get({{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) ({{.NameLowerCamel}} *models.{{.NameCamel}}, err error)
+	Update({{.NameLowerCamel}} *models.{{.NameCamel}}) (err error)
+	Delete({{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) (err error)
+	BulkGet({{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) ([]*models.{{.NameCamel}}, error)
+	BulkDelete({{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) (err error)
 }
 
-type Gorm{{.ModelName}}Repository struct {
+type Gorm{{.NameCamel}}Repository struct {
 	logger *zap.Logger
 	db     *gorm.DB
 }
 
-func NewGorm{{.ModelName}}Repository(logger *zap.Logger, db *gorm.DB) {{.ModelName}}Repository {
-	return &Gorm{{.ModelName}}Repository{
-		logger: logger.With(zap.String("type", "{{.ModelName}}Repository")),
+func NewGorm{{.NameCamel}}Repository(logger *zap.Logger, db *gorm.DB) {{.NameCamel}}Repository {
+	return &Gorm{{.NameCamel}}Repository{
+		logger: logger.With(zap.String("type", "{{.NameCamel}}Repository")),
 		db:     db,
 	}
 }
 
 //List ...
-func (s *Gorm{{.ModelName}}Repository) List(q *models.PaginationQuery) (list []*models.{{.ModelName}}, total uint, err error) {
-	{{.ModelName}} := &models.{{.ModelName}}{}
+func (s *Gorm{{.NameCamel}}Repository) List(q *models.Query) (list []*models.{{.NameCamel}}, total int64, err error) {
+	{{.NameCamel}} := &models.{{.NameCamel}}{}
 
-	var db *gorm.DB
-	total, db = GetResourceCount(s.db, {{.ModelName}}, q)
-	if q.Fields != "" {
-		columns := strings.Split(q.Fields, ",")
-		if len(columns) > 0 {
-			db = db.Select(q.Fields)
-		}
-	}
-	if q.Order != "" {
-		db = db.Order(q.Order)
-	}
-	if q.Offset > 0 {
-		db = db.Offset(q.Offset)
-	}
-	if q.Limit > 1000 {
-		q.Limit = 1000
-	}
-	if q.Limit > 0 {
-		db = db.Limit(q.Limit)
-
+	db := Query(s.db, {{.NameCamel}}, q)
+	if err = db.Count(&total).Error; err != nil {
+		return
 	}
 
-	list = make([]*models.{{.ModelName}}, 0)
+	list = make([]*models.{{.NameCamel}}, 0)
 	err = db.Find(&list).Error
 	return list, total, err
 }
 
-func (s *Gorm{{.ModelName}}Repository) Create({{.HandlerName}} *models.{{.ModelName}}) (err error) {
+func (s *Gorm{{.NameCamel}}Repository) Create({{.NameLowerCamel}} *models.{{.NameCamel}}) (err error) {
 	tx := s.db.Begin()
 	defer func() {
 		if err != nil {
@@ -74,31 +54,82 @@ func (s *Gorm{{.ModelName}}Repository) Create({{.HandlerName}} *models.{{.ModelN
 		}
 	}()
 
-	err = tx.Create({{.HandlerName}}).Error
+	err = tx.Create({{.NameLowerCamel}}).Error
 	if err != nil {
 		return
 	}
 
-	{{- $handlerName := .HandlerName}}
-	{{- range .Properties}}
-    {{- if .IsAssociation }}
-	{{- if eq .ModelType "m2m"}}
-    {{.ModelPropLowerCamelPlural}} := make([]*models.{{.ModelPropCamel}}, 0, len({{$handlerName}}.{{.ModelAliasCamelPlural}}))
-	for _, m := range {{$handlerName}}.{{.ModelAliasCamelPlural}} {
-		{{.ModelPropLowerCamel}} := &models.{{.ModelPropCamel}}{}
-		err = tx.Where(&m).First({{.ModelPropLowerCamel}}).Error
+	{{- $handlerName := .NameLowerCamel}}
+	{{- range .Fields}}
+	{{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany") }}
+    {{.NameLowerCamelPlural}} := make([]*models.{{.MetaType.GoType}}, 0, len({{$handlerName}}.{{.NameCamelPlural}}))
+	for _, m := range {{$handlerName}}.{{.NameCamelPlural}} {
+		{{.NameLowerCamel}} := &models.{{.MetaType.GoType}}{}
+		err = tx.Where(&m).First({{.NameLowerCamel}}).Error
 		if err != nil {
 			tx.Rollback()
 			return err
 		}
-		if err = tx.Model({{$handlerName}}).Association("{{.ModelPropCamelPlural}}").Append({{.ModelPropLowerCamel}}).Error; err != nil {
+		if err = tx.Model({{$handlerName}}).Association("{{.NameCamelPlural}}").Append({{.NameLowerCamel}}).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
-		{{.ModelPropLowerCamelPlural}} = append({{.ModelPropLowerCamelPlural}}, {{.ModelPropLowerCamel}})
+		{{.NameLowerCamelPlural}} = append({{.NameLowerCamelPlural}}, {{.NameLowerCamel}})
 	}
-	{{$handlerName}}.{{.ModelAliasCamelPlural}} = {{.ModelPropLowerCamelPlural}}
+	{{$handlerName}}.{{.NameCamelPlural}} = {{.NameLowerCamelPlural}}
 	{{- end}}
+    {{- end}}
+
+	tx.Commit()
+	return
+}
+
+func (s *Gorm{{.NameCamel}}Repository) Get({{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) ({{.NameLowerCamel}} *models.{{.NameCamel}}, err error) {
+	{{.NameLowerCamel}} = &models.{{.NameCamel}}{}
+
+    db := s.db.Model({{.NameLowerCamel}})
+	{{- range .Fields}}
+	{{- if not (eq .JoinType "") }}
+    db = db.Preload("{{.NameCamelPlural}}")
+    {{- end}}
+    {{- end}}
+	if err = db.Where("{{$primaryKeyField.NameLowerCamel}} = ?", {{$primaryKeyField.NameLowerCamel}}).First({{.NameLowerCamel}}).Error; err != nil {
+		return nil, errors.Wrapf(err, "get {{.NameCamel}} error[id=%d]", {{$primaryKeyField.NameLowerCamel}})
+	}
+	return
+}
+
+func (s *Gorm{{.NameCamel}}Repository) Update({{.NameLowerCamel}} *models.{{.NameCamel}}) (err error) {
+	tx := s.db.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	err = tx.Model({{.NameLowerCamel}}).Updates({{.NameLowerCamel}}).Error
+	if err != nil {
+		return
+	}
+
+	{{- $handlerName := .NameLowerCamel}}
+	{{- range .Fields}}
+	{{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany") }}
+    {{.NameLowerCamelPlural}} := make([]*models.{{.NameCamel}}, 0, len({{$handlerName}}.{{.NameCamelPlural}}))
+	for _, m := range {{$handlerName}}.{{.NameCamelPlural}} {
+		{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
+		err = tx.Where(&m).First({{.NameLowerCamel}}).Error
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+		if err = tx.Model({{$handlerName}}).Association("{{.NameCamelPlural}}").Replace({{.NameLowerCamel}}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+		{{.NameLowerCamelPlural}} = append({{.NameLowerCamelPlural}}, {{.NameLowerCamel}})
+	}
+	{{$handlerName}}.{{.NameCamelPlural}} = {{.NameLowerCamelPlural}}
     {{- end}}
     {{- end}}
 
@@ -106,22 +137,7 @@ func (s *Gorm{{.ModelName}}Repository) Create({{.HandlerName}} *models.{{.ModelN
 	return
 }
 
-func (s *Gorm{{.ModelName}}Repository) Get({{$primaryKeyLowerColumnName}} {{$primaryKeyColumnType}}) ({{.HandlerName}} *models.{{.ModelName}}, err error) {
-	{{.HandlerName}} = &models.{{.ModelName}}{}
-
-    db := s.db.Model({{.HandlerName}})
-    {{- range .Properties}}
-    {{- if .IsAssociation }}
-    db = db.Preload("{{.ModelAliasCamelPlural}}")
-    {{- end}}
-    {{- end}}
-	if err = db.Where("{{$primaryKeyLowerColumnName}} = ?", {{$primaryKeyLowerColumnName}}).First({{.HandlerName}}).Error; err != nil {
-		return nil, errors.Wrapf(err, "get {{.ModelName}} error[id=%d]", {{$primaryKeyLowerColumnName}})
-	}
-	return
-}
-
-func (s *Gorm{{.ModelName}}Repository) Update({{.HandlerName}} *models.{{.ModelName}}) (err error) {
+func (s *Gorm{{.NameCamel}}Repository) Delete({{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) (err error) {
 	tx := s.db.Begin()
 	defer func() {
 		if err != nil {
@@ -129,70 +145,30 @@ func (s *Gorm{{.ModelName}}Repository) Update({{.HandlerName}} *models.{{.ModelN
 		}
 	}()
 
-	err = tx.Model({{.HandlerName}}).Update({{.HandlerName}}).Error
-	if err != nil {
-		return
-	}
-
-	{{- $handlerName := .HandlerName}}
-	{{- range .Properties}}
-    {{- if .IsAssociation }}
-	{{- if eq .ModelType "m2m"}}
-    {{.ModelPropLowerCamelPlural}} := make([]*models.{{.ModelPropCamel}}, 0, len({{$handlerName}}.{{.ModelAliasCamelPlural}}))
-	for _, m := range {{$handlerName}}.{{.ModelAliasCamelPlural}} {
-		{{.ModelPropLowerCamel}} := &models.{{.ModelPropCamel}}{}
-		err = tx.Where(&m).First({{.ModelPropLowerCamel}}).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err = tx.Model({{$handlerName}}).Association("{{.ModelPropCamelPlural}}").Replace({{.ModelPropLowerCamel}}).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-		{{.ModelPropLowerCamelPlural}} = append({{.ModelPropLowerCamelPlural}}, {{.ModelPropLowerCamel}})
-	}
-	{{$handlerName}}.{{.ModelAliasCamelPlural}} = {{.ModelPropLowerCamelPlural}}
-	{{- end}}
-    {{- end}}
-    {{- end}}
-
-	tx.Commit()
-	return
-}
-
-func (s *Gorm{{.ModelName}}Repository) Delete({{$primaryKeyLowerColumnName}} {{$primaryKeyColumnType}}) (err error) {
-	tx := s.db.Begin()
-	defer func() {
-		if err != nil {
-			tx.Rollback()
-		}
-	}()
-
-	if {{$primaryKeyLowerColumnName}} == 0 {
+	if {{$primaryKeyField.NameLowerCamel}} == 0 {
 		return models.ErrBadParamInput
 	}
 
-	{{.HandlerName}} := &models.{{.ModelName}}{ {{$primaryKeyColumnName}}: {{$primaryKeyLowerColumnName}} }
-	if err = tx.Delete({{.HandlerName}}).Error; err != nil {
-		return errors.Wrapf(err, "delete {{.ModelName}} error[id=%d]", {{$primaryKeyLowerColumnName}})
+	{{.NameLowerCamel}} := &models.{{.NameCamel}}{ {{$primaryKeyField.NameCamel}}: {{$primaryKeyField.NameLowerCamel}} }
+	if err = tx.Delete({{.NameLowerCamel}}).Error; err != nil {
+		return errors.Wrapf(err, "delete {{.NameCamel}} error[id=%d]", {{$primaryKeyField.NameLowerCamel}})
 	}
 
 	tx.Commit()
 	return
 }
 
-func (s *Gorm{{.ModelName}}Repository) BatchGet({{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) (list []*models.{{.ModelName}}, err error) {
-	list = make([]*models.{{.ModelName}}, 0, len({{$primaryKeyLowerColumnName}}List))
+func (s *Gorm{{.NameCamel}}Repository) BulkGet({{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) (list []*models.{{.NameCamel}}, err error) {
+	list = make([]*models.{{.NameCamel}}, 0, len({{$primaryKeyField.NameLowerCamel}}List))
 
-	db := s.db.Model(&models.{{.ModelName}}{})
-	if err = db.Where("id IN (?)", {{$primaryKeyLowerColumnName}}List).Find(&list).Error; err != nil {
-		return nil, errors.Wrapf(err, "get {{.ModelName}} error[id=%d]", len({{$primaryKeyLowerColumnName}}List))
+	db := s.db.Model(&models.{{.NameCamel}}{})
+	if err = db.Where("id IN (?)", {{$primaryKeyField.NameLowerCamel}}List).Find(&list).Error; err != nil {
+		return nil, errors.Wrapf(err, "get {{.NameCamel}} error[id=%d]", len({{$primaryKeyField.NameLowerCamel}}List))
 	}
 	return
 }
 
-func (s *Gorm{{.ModelName}}Repository) BatchDelete({{$primaryKeyLowerColumnName}}List []{{$primaryKeyColumnType}}) (err error) {
+func (s *Gorm{{.NameCamel}}Repository) BulkDelete({{$primaryKeyField.NameLowerCamel}}List []{{$primaryKeyField.MetaType.GoType}}) (err error) {
 	tx := s.db.Begin()
 	defer func() {
 		if err != nil {
@@ -200,14 +176,14 @@ func (s *Gorm{{.ModelName}}Repository) BatchDelete({{$primaryKeyLowerColumnName}
 		}
 	}()
 
-	for _, {{$primaryKeyLowerColumnName}} := range {{$primaryKeyLowerColumnName}}List {
-		if {{$primaryKeyLowerColumnName}} == 0 {
+	for _, {{$primaryKeyField.NameLowerCamel}} := range {{$primaryKeyField.NameLowerCamel}}List {
+		if {{$primaryKeyField.NameLowerCamel}} == 0 {
 			return models.ErrBadParamInput
 		}
 	}
 
-	if err = tx.Where("id IN (?)", {{$primaryKeyLowerColumnName}}List).Delete(&models.{{.ModelName}}{}).Error; err != nil {
-		return errors.Wrapf(err, "batch delete {{.ModelName}} error[len=%d]", len({{$primaryKeyLowerColumnName}}List))
+	if err = tx.Where("id IN (?)", {{$primaryKeyField.NameLowerCamel}}List).Delete(&models.{{.NameCamel}}{}).Error; err != nil {
+		return errors.Wrapf(err, "batch delete {{.NameCamel}} error[len=%d]", len({{$primaryKeyField.NameLowerCamel}}List))
 	}
 	tx.Commit()
 	return

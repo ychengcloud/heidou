@@ -5,14 +5,23 @@ import "time"
 //{{.NameCamel}}
 type {{.NameCamel}} struct {
 	{{- range .Fields}}
+    {{- $name := .NameCamel}}
+	{{- $type := ""}}
     {{- if eq .JoinType "" }}
-    {{.NameCamel}}      {{.MetaType.GoType}}        `{{.TagsHTML}}`
-    {{- end }}
-    {{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany")}}
-    {{.NameCamelPlural}}      []*{{.ModelAssociationFieldName}}        `{{.ModelTag}}`
-    {{- else}}
-    {{.NameCamel}}      *{{.ModelAssociationFieldName}}        `{{.ModelTag}}`
-    {{- end}}
+        {{- $type = .MetaType.GoType }}
+	{{- end }}
+
+    {{- if or (eq .JoinType "BelongTo") (eq .JoinType "HasOne") }}
+	    {{- $name = .NameCamel}}
+	    {{- $type = .JoinTable.NameCamel}}
+	{{- end}}
+	{{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany") }}
+	    {{- $name = .NameCamelPlural}}
+	    {{- $type = (printf "%s%s" "[]*" .JoinTable.NameCamel)}}
+	{{- end}}
+
+	{{$name}} {{$type}} `{{.TagsHTML}}`
+
     {{- end}}
 }
 

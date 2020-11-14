@@ -22,16 +22,16 @@ var (
 	ErrUnauthorized = errors.New("Unauthorized")
 )
 
-//PaginationQuery gin handler query binding struct
-type PaginationQuery struct {
-	Where  string `form:"where"`
-	Fields string `form:"fields"`
-	Order  string `form:"order"`
-	Offset uint   `form:"offset"`
-	Limit  uint   `form:"limit"`
+//Query gin handler query binding struct
+type Query struct {
+	Filter []string `form:"filter"`
+	Fields string   `form:"fields"`
+	Order  string   `form:"order"`
+	Offset int      `form:"offset"`
+	Limit  int      `form:"limit"`
 }
 
 //String to string
-func (pq *PaginationQuery) String() string {
-	return fmt.Sprintf("w=%v_f=%s_o=%s_of=%d_l=%d", pq.Where, pq.Fields, pq.Order, pq.Offset, pq.Limit)
+func (q *Query) String() string {
+	return fmt.Sprintf("w=%v_f=%s_o=%s_of=%d_l=%d", q.Filter, q.Fields, q.Order, q.Offset, q.Limit)
 }

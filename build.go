@@ -18,6 +18,11 @@ type templateNode struct {
 	FileName   string
 }
 
+var modelsBase = templateNode{
+	NameFormat: "gen/models/models.go",
+	FileName:   "templates/models_base.tmpl",
+}
+
 var controllersBase = templateNode{
 	NameFormat: "gen/controllers/controllers.go",
 	FileName:   "templates/controllers_base.tmpl",
@@ -54,6 +59,7 @@ var services = templateNode{
 }
 
 var parseBaseList = []templateNode{
+	modelsBase,
 	controllersBase,
 	repositoriesBase,
 	servicesBase,
