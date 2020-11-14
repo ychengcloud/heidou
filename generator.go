@@ -61,6 +61,7 @@ func (g *Generator) Generate() error {
 			continue
 		}
 		table.genName()
+		table.PkgPath = g.Data.PkgPath
 		if table.HasTimeField {
 			g.Data.HasTimeField = true
 		}
@@ -70,9 +71,51 @@ func (g *Generator) Generate() error {
 		g.Data.Tables = append(g.Data.Tables, table)
 	}
 
+	if err := g.gen(); err != nil {
+		return err
+	}
 	return nil
 }
 
+func GenProject(dest string, pkgPath string) error {
+
+	err := genSkeleton(dest, pkgPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func genSkeleton(dest string, data interface{}) error {
+
+	err := build(assets.Project, "/skeleton", dest, false, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (g *Generator) gen() error {
+	for _, node := range parseBaseList {
+		err := node.ParseExecute(assets.Project, "internal", "", g.Data)
+		if err != nil {
+			return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
+		}
+	}
+
+	for _, table := range g.Data.Tables {
+		tableName := table.Name
+		//generate model from table
+		for _, node := range parseRepeatList {
+			err := node.ParseExecute(assets.Project, "internal", tableName, table)
+			if err != nil {
+				return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
+			}
+		}
+	}
+	return nil
+}
 func must(sm *MetaTypes, err error) *MetaTypes {
 	if err != nil {
 		panic(err)

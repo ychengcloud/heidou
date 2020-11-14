@@ -2,22 +2,21 @@ package models
 
 import "time"
 
-//{{.ModelName}}
-type {{.ModelName}} struct {
-	{{- range .Properties}}
-    {{- if .IsAssociation }}
-    {{- if or (eq .ModelType "m2m") (eq .ModelType "many")}}
-    {{.ModelAliasCamelPlural}}      []*{{.ModelAssociationFieldName}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
+//{{.NameCamel}}
+type {{.NameCamel}} struct {
+	{{- range .Fields}}
+    {{- if eq .JoinType "" }}
+    {{.NameCamel}}      {{.MetaType.GoType}}        `{{.TagsHTML}}`
+    {{- end }}
+    {{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany")}}
+    {{.NameCamelPlural}}      []*{{.ModelAssociationFieldName}}        `{{.ModelTag}}`
     {{- else}}
-    {{.ModelAliasLowerCamel}}      *{{.ModelAssociationFieldName}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
-    {{- end}}
-    {{- else}}
-    {{.ModelPropCamel}}      {{.ModelType}}        _[BACKQUOTE]_{{.ModelTag}}_[BACKQUOTE]_
+    {{.NameCamel}}      *{{.ModelAssociationFieldName}}        `{{.ModelTag}}`
     {{- end}}
     {{- end}}
 }
 
 //TableName
-func (m *{{.ModelName}}) TableName() string {
-	return "{{.TableName}}"
+func (m *{{.NameCamel}}) TableName() string {
+	return "{{.Name}}"
 }

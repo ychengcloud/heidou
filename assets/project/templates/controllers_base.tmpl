@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"{{.}}/internal"
-	"{{.}}/internal/gen/models"
-	"{{.}}/pkg/transports/http"
-	"{{.}}/pkg/transports/http/middlewares/jwt"
+	"{{.PkgPath}}/internal"
+	"{{.PkgPath}}/internal/gen/models"
+	"{{.PkgPath}}/pkg/transports/http"
+	"{{.PkgPath}}/pkg/transports/http/middlewares/jwt"
 )
 
 type Controller struct {

@@ -1,6 +1,7 @@
 package heidou
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -10,27 +11,92 @@ import (
 
 	"github.com/shurcooL/httpfs/text/vfstemplate"
 	"github.com/shurcooL/httpfs/vfsutil"
-
-	"github.com/decker502/heidou/assets"
 )
 
-func GenProject(dest string, pkgPath string) error {
-
-	err := genSkeleton(dest, pkgPath)
-	if err != nil {
-		return err
-	}
-
-	return nil
+type templateNode struct {
+	NameFormat string
+	FileName   string
 }
 
-func genSkeleton(dest string, data interface{}) error {
+var controllersBase = templateNode{
+	NameFormat: "gen/controllers/controllers.go",
+	FileName:   "templates/controllers_base.tmpl",
+}
 
-	err := build(assets.Project, "/skeleton", dest, false, data)
+var repositoriesBase = templateNode{
+	NameFormat: "gen/repositories/repositories.go",
+	FileName:   "templates/repositories_base.tmpl",
+}
+
+var servicesBase = templateNode{
+	NameFormat: "gen/services/services.go",
+	FileName:   "templates/services_base.tmpl",
+}
+
+var controllers = templateNode{
+	NameFormat: "gen/controllers/%s.go",
+	FileName:   "templates/controllers.tmpl",
+}
+
+var models = templateNode{
+	NameFormat: "gen/models/%s.go",
+	FileName:   "templates/models.tmpl",
+}
+
+var repositories = templateNode{
+	NameFormat: "gen/repositories/%s.go",
+	FileName:   "templates/repositories.tmpl",
+}
+
+var services = templateNode{
+	NameFormat: "gen/services/%s.go",
+	FileName:   "templates/services.tmpl",
+}
+
+var parseBaseList = []templateNode{
+	controllersBase,
+	repositoriesBase,
+	servicesBase,
+}
+
+var parseRepeatList = []templateNode{
+	controllers,
+	models,
+	repositories,
+	services,
+}
+
+func (n *templateNode) ParseExecute(fs http.FileSystem, pathRoot, pathArg string, data interface{}) error {
+	var path string
+	if pathArg != "" {
+		path = fmt.Sprintf(n.NameFormat, pathArg)
+	} else {
+		path = n.NameFormat
+	}
+
+	path = filepath.Join(pathRoot, path)
+
+	mask := syscall.Umask(0)
+	defer syscall.Umask(mask)
+
+	err := os.MkdirAll(filepath.Dir(path), 0744)
 	if err != nil {
 		return err
 	}
-	return nil
+
+	name := filepath.Base(n.FileName)
+	t := template.New(name).Funcs(Funcs)
+	tmpl, err := vfstemplate.ParseFiles(fs, t, n.FileName)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return tmpl.Execute(file, data)
 }
 
 // suffix不为空时，去掉生成文件的匹配后缀名

@@ -1,51 +1,96 @@
 package repositories
 
 import (
-  	"fmt"
-	"strconv"
+	"fmt"
 	"strings"
 
 	"github.com/google/wire"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
-	"{{.AppPkg}}/gen/models"
+	"{{.PkgPath}}/gen/models"
 )
 
 var BaseProviderSet = wire.NewSet(
-    {{- range .Resources}}
-    NewGorm{{.ModelName}}Repository,
+    {{- range .Tables}}
+    NewGorm{{.NameCamel}}Repository,
     {{- end}}
 )
 
-func GetResourceCount(db *gorm.DB, orm interface{}, q *models.PaginationQuery) (uint, *gorm.DB) {
-	db = db.Model(orm)
-	conditions := strings.Split(q.Where, ",")
-	for _, val := range conditions {
-		w := strings.SplitN(val, ":", 2)
-		if len(w) == 2 {
-			bindKey, bindValue := w[0], w[1]
-			if intV, err := strconv.ParseInt(bindValue, 10, 64); err == nil {
-				// bind value is int
-				field := fmt.Sprintf("`%s` > ?", bindKey)
-				db = db.Where(field, intV)
-			} else if fV, err := strconv.ParseFloat(bindValue, 64); err == nil {
-				// bind value is float
-				field := fmt.Sprintf("`%s` > ?", bindKey)
-				db = db.Where(field, fV)
-			} else if bindValue != "" {
-				// bind value is string
-				field := fmt.Sprintf("`%s` LIKE ?", bindKey)
-				sV := fmt.Sprintf("%%%s%%", bindValue)
-				db = db.Where(field, sV)
-			}
+//result 返回为空串，表示不符合任何支持的操作符
+func operation(op string) (result string) {
+	switch strings.ToLower(op) {
+	case OpEq:
+		result = "= ?"
+	case OpNot:
+		result = "!= ?"
+	case OpGt:
+		result = "> ?"
+	case OpGte:
+		result = ">= ?"
+	case OpLt:
+		result = "< ?"
+	case OpLte:
+		result = "<= ?"
+	case OpLike:
+		result = "LIKE ?"
+	case OpIn:
+		result = "IN (?)"
+	case OpNotIn:
+		result = "NOT IN (?)"
+	}
+	return
+}
+
+func Query(db *gorm.DB, object interface{}, q *models.Query) *gorm.DB {
+	db = db.Model(object)
+	for _, filter := range q.Filter {
+		w := strings.SplitN(filter, ":", 3)
+		// 不满足条件三元组的格式, eg: id:eq:1
+		if len(w) != 3 {
+			continue
 		}
-		w = strings.SplitN(val, "=", 2)
-		if len(w) == 2 {
-			field := fmt.Sprintf("`%s` = ?", w[0])
-			db = db.Where(field, w[1])
+
+		name, op, value := w[0], w[1], w[2]
+		result := operation(op)
+		if len(result) == 0 {
+			continue
+		}
+		field := fmt.Sprintf("`%s` %s", name, result)
+		lowerOp := strings.ToLower(op)
+
+		if lowerOp == OpIn || lowerOp == OpNotIn {
+			args := strings.Split(value, ",")
+			fmt.Println("args:", value, len(args))
+			db = db.Where(field, args)
+			continue
+		}
+
+		args := value
+		if lowerOp == OpLike {
+			args = fmt.Sprintf("%%%s%%", value)
+		}
+		db = db.Where(field, args)
+
+	}
+
+	if q.Fields != "" {
+		columns := strings.Split(q.Fields, ",")
+		if len(columns) > 0 {
+			db = db.Select(q.Fields)
 		}
 	}
-	var count uint
-	db.Count(&count)
-	return count, db
+	if q.Order != "" {
+		db = db.Order(q.Order)
+	}
+	if q.Offset > 0 {
+		db = db.Offset(q.Offset)
+	}
+	if q.Limit > MaxLimitCount {
+		q.Limit = MaxLimitCount
+	}
+	if q.Limit > 0 {
+		db = db.Limit(q.Limit)
+
+	}
+	return db
 }

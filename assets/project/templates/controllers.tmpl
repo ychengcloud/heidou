@@ -6,137 +6,136 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"{{.AppPkg}}/gen/models"
-	"{{.AppPkg}}/gen/services"
+	"{{.PkgPath}}/internal/gen/models"
+	"{{.PkgPath}}/internal/gen/services"
 )
 
-{{- $primaryKeyColumnName := .PrimaryKeyColumnName}}
-{{- $primaryKeyLowerColumnName := .PrimaryKeyLowerColumnName}}
-{{- $primaryKeyColumnType := .PrimaryKeyColumnType}}
+{{- $primaryKeyField := .PrimaryKeyField}}
+{{- $receiver := receiver (printf "%sController" .NameCamel)}}
 
-type {{.ModelName}}BatchRequest struct {
-	Method string _[BACKQUOTE]_form:"method" json:"method"_[BACKQUOTE]_
-	{{$primaryKeyColumnName}}List []{{$primaryKeyColumnType}}  _[BACKQUOTE]_form:"{{$primaryKeyLowerColumnName}}List" json:"{{$primaryKeyLowerColumnName}}List"_[BACKQUOTE]_
+type {{.NameCamel}}BulkRequest struct {
+	Method string `form:"method" json:"method"`
+	{{$primaryKeyField.NameCamel}}List []{{$primaryKeyField.MetaType.GoType}}  `form:"{{$primaryKeyField.NameLowerCamel}}List" json:"{{$primaryKeyField.NameLowerCamel}}List"`
 
 } 
-type {{.ModelName}}Controller struct {
+type {{.NameCamel}}Controller struct {
     *Controller
-	service services.{{.ModelName}}Service
+	service services.{{.NameCamel}}Service
 }
 
-func New{{.ModelName}}Controller(logger *zap.Logger, s services.{{.ModelName}}Service) *{{.ModelName}}Controller {
-	return &{{.ModelName}}Controller{
+func New{{.NameCamel}}Controller(logger *zap.Logger, s services.{{.NameCamel}}Service) *{{.NameCamel}}Controller {
+	return &{{.NameCamel}}Controller{
 		Controller: &Controller{Logger:  logger},
 		service: s,
 	}
 }
 
 // List ...
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) List(c *gin.Context) {
+func ({{$receiver}} *{{.NameCamel}}Controller) List(c *gin.Context) {
 
-	query := &models.PaginationQuery{}
+	query := &models.Query{}
 	err := c.ShouldBindQuery(query)
 	if HandleError(c, err) {
 		return
 	}
 
-	list, total, err := {{.HandlerName}}Controller.service.List(c.Request.Context(), query)
+	list, total, err := {{$receiver}}.service.List(c.Request.Context(), query)
 	
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("List {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("List {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 
 	JsonPagination(c, list, total, query)
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) Create(c *gin.Context) {
-	{{.HandlerName}} := &models.{{.ModelName}}{}
-	err := c.ShouldBind({{.HandlerName}})
+func ({{$receiver}} *{{.NameCamel}}Controller) Create(c *gin.Context) {
+	{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
+	err := c.ShouldBind({{.NameLowerCamel}})
 	if HandleError(c, err) {
 		return
 	}
 
-	err = {{.HandlerName}}Controller.service.Create(c.Request.Context(), {{.HandlerName}})
+	err = {{$receiver}}.service.Create(c.Request.Context(), {{.NameLowerCamel}})
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("Create {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("Create {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 
-	JsonData(c, {{.HandlerName}})
+	JsonData(c, {{.NameLowerCamel}})
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) Get(c *gin.Context) {
-	{{$primaryKeyLowerColumnName}}, err := strconv.ParseUint(c.Param("{{$primaryKeyLowerColumnName}}"), 10, 64)
+func ({{$receiver}} *{{.NameCamel}}Controller) Get(c *gin.Context) {
+	{{$primaryKeyField.NameLowerCamel}}, err := strconv.ParseUint(c.Param("{{$primaryKeyField.NameLowerCamel}}"), 10, 64)
 	if HandleError(c, err) {
 		return
 	}
 
-	{{.HandlerName}}, err := {{.HandlerName}}Controller.service.Get(c.Request.Context(), {{$primaryKeyColumnType}}({{$primaryKeyLowerColumnName}}))
+	{{.NameLowerCamel}}, err := {{$receiver}}.service.Get(c.Request.Context(), {{$primaryKeyField.MetaType.GoType}}({{$primaryKeyField.NameLowerCamel}}))
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("Get {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("Get {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 
-	JsonData(c, {{.HandlerName}})
+	JsonData(c, {{.NameLowerCamel}})
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) Update(c *gin.Context) {
-	{{.HandlerName}} := &models.{{.ModelName}}{}
-	err := c.ShouldBind({{.HandlerName}})
+func ({{$receiver}} *{{.NameCamel}}Controller) Update(c *gin.Context) {
+	{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
+	err := c.ShouldBind({{.NameLowerCamel}})
 	if HandleError(c, err) {
 		return
 	}
 
-	err = {{.HandlerName}}Controller.service.Update(c.Request.Context(), {{.HandlerName}})
+	err = {{$receiver}}.service.Update(c.Request.Context(), {{.NameLowerCamel}})
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("Update {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("Update {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 
 	JsonData(c, nil)
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) Delete(c *gin.Context) {
-	{{$primaryKeyLowerColumnName}}, err := strconv.ParseUint(c.Param("{{$primaryKeyLowerColumnName}}"), 10, 64)
+func ({{$receiver}} *{{.NameCamel}}Controller) Delete(c *gin.Context) {
+	{{$primaryKeyField.NameLowerCamel}}, err := strconv.ParseUint(c.Param("{{$primaryKeyField.NameLowerCamel}}"), 10, 64)
 	if HandleError(c, err) {
 		return
 	}
 
-	err = {{.HandlerName}}Controller.service.Delete(c.Request.Context(), {{$primaryKeyColumnType}}({{$primaryKeyLowerColumnName}}))
+	err = {{$receiver}}.service.Delete(c.Request.Context(), {{$primaryKeyField.MetaType.GoType}}({{$primaryKeyField.NameLowerCamel}}))
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("Delete {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("Delete {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 
 	JsonData(c, nil)
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) BatchGet(c *gin.Context) {
-	batchRequest := &{{.ModelName}}BatchRequest{}
+func ({{$receiver}} *{{.NameCamel}}Controller) BulkGet(c *gin.Context) {
+	batchRequest := &{{.NameCamel}}BulkRequest{}
 	err := c.ShouldBind(batchRequest)
 	if HandleError(c, err) {
 		return
 	}
 
-	{{.HandlerName}}List, err := {{.HandlerName}}Controller.service.BatchGet(c.Request.Context(), batchRequest.{{$primaryKeyColumnName}}List)
+	{{.NameLowerCamel}}List, err := {{$receiver}}.service.BulkGet(c.Request.Context(), batchRequest.{{$primaryKeyField.NameCamel}}List)
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("BatchGet {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("BulkGet {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
-	JsonData(c, {{.HandlerName}}List)
+	JsonData(c, {{.NameLowerCamel}}List)
 }
 
-func ({{.HandlerName}}Controller *{{.ModelName}}Controller) BatchDelete(c *gin.Context) {
-	batchRequest := &{{.ModelName}}BatchRequest{}
+func ({{$receiver}} *{{.NameCamel}}Controller) BulkDelete(c *gin.Context) {
+	batchRequest := &{{.NameCamel}}BulkRequest{}
 	err := c.ShouldBind(batchRequest)
 	if HandleError(c, err) {
 		return
 	}
 
-	err = {{.HandlerName}}Controller.service.BatchDelete(c.Request.Context(), batchRequest.{{$primaryKeyColumnName}}List)
+	err = {{$receiver}}.service.BulkDelete(c.Request.Context(), batchRequest.{{$primaryKeyField.NameCamel}}List)
 	if HandleError(c, err) {
-		{{.HandlerName}}Controller.Logger.Error("BatchDelete {{.HandlerName}} error", zap.Error(err))
+		{{$receiver}}.Logger.Error("BulkDelete {{.NameLowerCamel}} error", zap.Error(err))
 		return
 	}
 

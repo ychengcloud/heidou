@@ -5,7 +5,10 @@ import (
 	"html/template"
 )
 
+var DefaultMethods = []string{"list", "create", "get", "update", "delete", "bulkGet", "bulkDelete"}
+
 type ErrorCode string
+type Method string
 
 // MetaTypes mappings for sql types to json, go etc
 type MetaTypes struct {
@@ -60,12 +63,13 @@ type MetaTable struct {
 
 type Table struct {
 	Name        string `yaml:"name"`
+	PkgPath     string `yaml:"pkgPath"`
 	Description string `yaml:"description"`
 	IsSkip      bool   `yaml:"isSkip"`
 
 	Fields     []*Field    `yaml:"fields"`
 	ErrorCodes []ErrorCode `yaml:"errorCodes"`
-	Methodes   []string    `yaml:"methodes"`
+	Methods    []string    `yaml:"methods"`
 
 	PrimaryKeyField *Field
 	Filterable      bool
@@ -151,6 +155,7 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 		}
 		table.Fields = append(table.Fields, field)
 	}
+	table.Methods = DefaultMethods
 
 	if tableInCfg != nil {
 		if len(tableInCfg.ErrorCodes) > 0 {
@@ -160,6 +165,10 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 
 		// 配置了跳过，则不生成此表的信息
 		table.IsSkip = tableInCfg.IsSkip
+
+		if len(tableInCfg.Methods) > 0 {
+			table.Methods = tableInCfg.Methods
+		}
 
 		// 生成配置中关联类型的字段
 		for _, field := range tableInCfg.Fields {

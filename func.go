@@ -5,6 +5,7 @@
 package heidou
 
 import (
+	"go/token"
 	"sort"
 	"strings"
 	"text/template"
@@ -19,6 +20,7 @@ var (
 	Funcs = template.FuncMap{
 		"join":     join,
 		"getModel": getModel,
+		"receiver": receiver,
 	}
 	rules    = ruleset()
 	acronyms = make(map[string]struct{})
@@ -135,4 +137,46 @@ func ruleset() *inflect.Ruleset {
 		rules.AddAcronym(w)
 	}
 	return rules
+}
+
+// receiver returns the receiver name of the given type.
+//
+//	[]T       => t
+//	[1]T      => t
+//	User      => u
+//	UserQuery => uq
+//
+func receiver(s string) (r string) {
+	// Trim invalid tokens for identifier prefix.
+	s = strings.Trim(s, "[]*&0123456789")
+	parts := strings.Split(snake(s), "_")
+	min := len(parts[0])
+	for _, w := range parts[1:] {
+		if len(w) < min {
+			min = len(w)
+		}
+	}
+
+	// for i := 1; i < min; i++ {
+	// 	r := parts[0][:i]
+	// 	for _, w := range parts[1:] {
+	// 		r += w[:i]
+	// 	}
+	// 	if _, ok := importPkg[r]; !ok {
+	// 		s = r
+	// 		break
+	// 	}
+	// }
+
+	//TODO 重复检测
+	s = parts[0][:1]
+	for _, w := range parts[1:] {
+		s += w[:1]
+	}
+
+	name := strings.ToLower(s)
+	if token.Lookup(name).IsKeyword() {
+		name = "_" + name
+	}
+	return name
 }
