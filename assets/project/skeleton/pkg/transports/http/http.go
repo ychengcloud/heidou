@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
+	"{{ . }}/assets"
 	"{{ . }}/pkg/transports/http/middlewares/ginprom"
 	netutil "{{ . }}/pkg/utils"
 )
@@ -74,7 +75,7 @@ func NewRouter(o *Options, logger *zap.Logger, baseInit BaseInitControllers, ini
 	r.Use(ginprom.New(r).Middleware()) // 添加prometheus 监控
 	// r.Use(ginhttp.Middleware(tracer))
 
-	r.Static("doc", "./doc")
+	r.StaticFS("doc", assets.Swagger)
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	pprof.Register(r)
 

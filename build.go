@@ -59,8 +59,13 @@ var services = templateNode{
 }
 
 var swagger = templateNode{
-	NameFormat: "doc/swagger.yaml",
+	NameFormat: "assets/doc/swagger.yaml",
 	FileName:   "templates/swagger.tmpl",
+}
+
+var assetsGenerate = templateNode{
+	NameFormat: "cmd/server/assets_generate.go",
+	FileName:   "templates/assets_generate.tmpl",
 }
 
 var parseBaseList = []templateNode{
@@ -69,6 +74,7 @@ var parseBaseList = []templateNode{
 	repositoriesBase,
 	servicesBase,
 	swagger,
+	assetsGenerate,
 }
 
 var parseRepeatList = []templateNode{

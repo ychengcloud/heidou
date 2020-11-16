@@ -103,6 +103,7 @@ tables:
       isRequired: true
       isFilterable: true
       operations: ["Eq", "In"]
+      tags: 'binding:"required,max=64"'
     - name: variant
       joinType: "HasMany"
       tableName: product_variant

@@ -26,11 +26,11 @@ test:
 assets_gen:
 	for app in $(apps) ;\
 	do \
-		go generate -tags=dev ./graphql... ;\
+		go generate -tags=dev ./assets... ;\
 	done
 
 .PHONY: build
-build: wire
+build: assets_gen wire
 	for app in $(apps) ;\
 	do \
 		GOOS=linux GOARCH="amd64" go build -o dist/$$app-linux-amd64 ./cmd/$$app/; \
