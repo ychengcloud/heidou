@@ -11,9 +11,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"{{ . }}/app/services"
-	gc "{{ . }}/gen/controllers"
-	genControllers "{{ . }}/gen/controllers"
+	
+	gc "{{ . }}/internal/gen/controllers"
+	genControllers "{{ . }}/internal/gen/controllers"
+	"{{ . }}/internal/services"
 )
 
 const (

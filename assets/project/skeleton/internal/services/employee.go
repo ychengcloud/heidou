@@ -7,18 +7,24 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
-	"{{ . }}/app/models"
-	"{{ . }}/app/repositories"
-	gm "{{ . }}/gen/models"
-	gr "{{ . }}/gen/repositories"
+	gm "{{ . }}/internal/gen/models"
+	gr "{{ . }}/internal/gen/repositories"
+	"{{ . }}/internal/models"
+	"{{ . }}/internal/repositories"
 	"{{ . }}/pkg/auth"
+)
+
+const (
+	ClaimsUserIDKey      = "userID"
+	ClaimsUsernameKey    = "userName"
+	ClaimsMerchantsIDKey = "merchantsID4"
 )
 
 type EmployeeService interface {
 	Login(c context.Context, employee *gm.Employee) (*models.LoginTokenInfo, error)
 	Create(c context.Context, employee *gm.Employee) error
-	Get(c context.Context, Id uint32) (*gm.Employee, error)
-	GetMenus(c context.Context, Id uint32) (menus []*models.Menu, err error)
+	Get(c context.Context, ID uint64) (*gm.Employee, error)
+	GetMenus(c context.Context, ID uint64) (menus []*models.Menu, err error)
 }
 
 type DefaultEmployeeService struct {
@@ -56,9 +62,9 @@ func (s *DefaultEmployeeService) Login(c context.Context, employee *gm.Employee)
 	}
 
 	claims := make(map[string]interface{})
-	claims["userId"] = a.Id
-	claims["userName"] = a.Username
-	claims["merchantsId"] = a.MerchantsId
+	claims[ClaimsUserIDKey] = a.ID
+	claims[ClaimsUsernameKey] = a.Username
+	claims[ClaimsMerchantsIDKey] = a.MerchantsID
 
 	token, err := s.auth.GenerateToken(claims)
 	if err != nil {
@@ -94,37 +100,36 @@ func (s *DefaultEmployeeService) Create(c context.Context, employee *gm.Employee
 		return fmt.Errorf("The user does have any roles")
 	}
 	for _, role := range employee.Roles {
-		roleIDStr := fmt.Sprintf("%d", role.Id)
+		roleIDStr := fmt.Sprintf("%d", role.ID)
 		_, err := enforcer.AddRoleForUser(employee.Username, roleIDStr)
 		if err != nil {
 			return err
 		}
 	}
 
-
 	return nil
 }
 
-func (s *DefaultEmployeeService) Get(c context.Context, Id uint32) (employee *gm.Employee, err error) {
+func (s *DefaultEmployeeService) Get(c context.Context, ID uint64) (employee *gm.Employee, err error) {
 
-	return s.employeeRepositorie.Get(Id)
+	return s.employeeRepositorie.Get(ID)
 }
 
 func toTree(menus []*gm.Menu) []*models.Menu {
-	menuMap := make(map[uint32]*models.Menu)
+	menuMap := make(map[uint64]*models.Menu)
 	var list []*models.Menu
 	for _, menu := range menus {
-		menuMap[menu.Id] = &models.Menu{Menu: menu}
-		if menu.ParentId == 0 {
-			list = append(list, menuMap[menu.Id])
+		menuMap[menu.ID] = &models.Menu{Menu: menu}
+		if menu.ParentID == 0 {
+			list = append(list, menuMap[menu.ID])
 		}
 	}
 
 	for _, menu := range menus {
-		if menu.ParentId == 0 {
+		if menu.ParentID == 0 {
 			continue
 		}
-		if item, ok := menuMap[menu.ParentId]; ok {
+		if item, ok := menuMap[menu.ParentID]; ok {
 			item.Children = append(item.Children, menu)
 		}
 	}
@@ -132,8 +137,8 @@ func toTree(menus []*gm.Menu) []*models.Menu {
 	return list
 }
 
-func (s *DefaultEmployeeService) GetMenus(c context.Context, Id uint32) ([]*models.Menu, error) {
-	employee, err := s.employeeRepositorie.Get(Id)
+func (s *DefaultEmployeeService) GetMenus(c context.Context, ID uint64) ([]*models.Menu, error) {
+	employee, err := s.employeeRepositorie.Get(ID)
 	if err != nil {
 		return nil, err
 	}
@@ -145,9 +150,9 @@ func (s *DefaultEmployeeService) GetMenus(c context.Context, Id uint32) ([]*mode
 		offset := 0
 		limit := 20
 		for {
-			ms, total, err := s.grMenu.List(&gm.PaginationQuery{
-				Offset: uint(offset),
-				Limit:  uint(limit),
+			ms, total, err := s.grMenu.List(&gm.Query{
+				Offset: int(offset),
+				Limit:  int(limit),
 			})
 			if err != nil {
 				return nil, err
@@ -159,14 +164,14 @@ func (s *DefaultEmployeeService) GetMenus(c context.Context, Id uint32) ([]*mode
 			}
 		}
 	} else {
-		var menuIds []uint32
+		var menuIDs []uint64
 		var err error
 		for _, role := range employee.Roles {
 			for _, resource := range role.Resources {
-				menuIds = append(menuIds, resource.MenuId)
+				menuIDs = append(menuIDs, resource.MenuID)
 			}
 		}
-		menus, err = s.grMenu.BatchGet(menuIds)
+		menus, err = s.grMenu.BulkGet(menuIDs)
 		if err != nil {
 			return nil, err
 		}

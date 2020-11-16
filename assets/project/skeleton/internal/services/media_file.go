@@ -17,7 +17,8 @@ import (
 
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"{{ . }}/app/models"
+	
+	"{{ . }}/internal/models"
 )
 
 type MediaFileService interface {

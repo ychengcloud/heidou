@@ -1,7 +1,7 @@
 package models
 
 import (
-	"{{ . }}/gen/models"
+	"{{ . }}/internal/gen/models"
 )
 
 //Menu

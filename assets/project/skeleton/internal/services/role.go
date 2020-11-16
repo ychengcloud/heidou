@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"{{ . }}/gen/models"
-	"{{ . }}/gen/repositories"
+	"{{ . }}/internal/gen/models"
+	"{{ . }}/internal/gen/repositories"
 	"{{ . }}/pkg/auth"
 )
 
@@ -58,13 +58,16 @@ func (s *DefaultRoleService) Update(c context.Context, role *models.Role) error 
 
 func (s *DefaultRoleService) Delete(c context.Context, id uint64) (err error) {
 
-	err = s.Repository.Delete(uint32(id))
+	err = s.Repository.Delete(id)
 	if err != nil {
 		return err
 	}
 	roleIDStr := fmt.Sprintf("%d", id)
 
-	ok := s.auth.Enforcer.DeletePermissionsForUser(roleIDStr)
+	ok, err := s.auth.Enforcer.DeletePermissionsForUser(roleIDStr)
+	if err != nil {
+		return err
+	}
 	if !ok {
 		s.logger.Info("AddPermissionForUser false")
 	}
@@ -72,12 +75,15 @@ func (s *DefaultRoleService) Delete(c context.Context, id uint64) (err error) {
 }
 
 func (s *DefaultRoleService) loadPolicy(c context.Context, role *models.Role) error {
-	roleIDStr := fmt.Sprintf("%d", role.Id)
+	roleIDStr := fmt.Sprintf("%d", role.ID)
 
 	s.logger.Info("DeletePermissionsForRole:",
 		zap.String("roleID", roleIDStr),
 	)
-	ok := s.auth.Enforcer.DeletePermissionsForUser(roleIDStr)
+	ok, err := s.auth.Enforcer.DeletePermissionsForUser(roleIDStr)
+	if err != nil {
+		return err
+	}
 	if !ok {
 		s.logger.Info("DeletePermissionsForUser false")
 	}
@@ -88,7 +94,10 @@ func (s *DefaultRoleService) loadPolicy(c context.Context, role *models.Role) er
 			zap.String("name", resource.Name),
 			zap.String("method", resource.Method),
 		)
-		ok := s.auth.Enforcer.AddPermissionForUser(roleIDStr, resource.Name, resource.Method)
+		ok, err := s.auth.Enforcer.AddPermissionForUser(roleIDStr, resource.Name, resource.Method)
+		if err != nil {
+			return err
+		}
 		if !ok {
 			s.logger.Info("AddPermissionForUser false")
 		}
@@ -97,4 +106,3 @@ func (s *DefaultRoleService) loadPolicy(c context.Context, role *models.Role) er
 
 	return nil
 }
-

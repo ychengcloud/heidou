@@ -34,14 +34,17 @@ func NewGorm{{.NameCamel}}Repository(logger *zap.Logger, db *gorm.DB) {{.NameCam
 
 //List ...
 func (s *Gorm{{.NameCamel}}Repository) List(q *models.Query) (list []*models.{{.NameCamel}}, total int64, err error) {
-	{{.NameCamel}} := &models.{{.NameCamel}}{}
+	{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
 
-	db := Query(s.db, {{.NameCamel}}, q)
+	db := s.db.Model({{.NameLowerCamel}})
+	db = Query(db, q)
 	if err = db.Count(&total).Error; err != nil {
 		return
 	}
 
 	list = make([]*models.{{.NameCamel}}, 0)
+	db = Select(db, q.Fields)
+	db = Expands(db, q.Expands)
 	err = db.Find(&list).Error
 	return list, total, err
 }
@@ -58,27 +61,6 @@ func (s *Gorm{{.NameCamel}}Repository) Create({{.NameLowerCamel}} *models.{{.Nam
 	if err != nil {
 		return
 	}
-
-	{{- $handlerName := .NameLowerCamel}}
-	{{- range .Fields}}
-	{{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany") }}
-    {{.NameLowerCamelPlural}} := make([]*models.{{.MetaType.GoType}}, 0, len({{$handlerName}}.{{.NameCamelPlural}}))
-	for _, m := range {{$handlerName}}.{{.NameCamelPlural}} {
-		{{.NameLowerCamel}} := &models.{{.MetaType.GoType}}{}
-		err = tx.Where(&m).First({{.NameLowerCamel}}).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err = tx.Model({{$handlerName}}).Association("{{.NameCamelPlural}}").Append({{.NameLowerCamel}}).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-		{{.NameLowerCamelPlural}} = append({{.NameLowerCamelPlural}}, {{.NameLowerCamel}})
-	}
-	{{$handlerName}}.{{.NameCamelPlural}} = {{.NameLowerCamelPlural}}
-	{{- end}}
-    {{- end}}
 
 	tx.Commit()
 	return
@@ -107,31 +89,10 @@ func (s *Gorm{{.NameCamel}}Repository) Update({{.NameLowerCamel}} *models.{{.Nam
 		}
 	}()
 
-	err = tx.Model({{.NameLowerCamel}}).Updates({{.NameLowerCamel}}).Error
+	err = tx.Model({{.NameLowerCamel}}).Session(&gorm.Session{FullSaveAssociations: true}).Updates({{.NameLowerCamel}}).Error
 	if err != nil {
 		return
 	}
-
-	{{- $handlerName := .NameLowerCamel}}
-	{{- range .Fields}}
-	{{- if or (eq .JoinType "ManyToMany") (eq .JoinType "HasMany") }}
-    {{.NameLowerCamelPlural}} := make([]*models.{{.NameCamel}}, 0, len({{$handlerName}}.{{.NameCamelPlural}}))
-	for _, m := range {{$handlerName}}.{{.NameCamelPlural}} {
-		{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
-		err = tx.Where(&m).First({{.NameLowerCamel}}).Error
-		if err != nil {
-			tx.Rollback()
-			return err
-		}
-		if err = tx.Model({{$handlerName}}).Association("{{.NameCamelPlural}}").Replace({{.NameLowerCamel}}).Error; err != nil {
-			tx.Rollback()
-			return err
-		}
-		{{.NameLowerCamelPlural}} = append({{.NameLowerCamelPlural}}, {{.NameLowerCamel}})
-	}
-	{{$handlerName}}.{{.NameCamelPlural}} = {{.NameLowerCamelPlural}}
-    {{- end}}
-    {{- end}}
 
 	tx.Commit()
 	return
@@ -153,6 +114,13 @@ func (s *Gorm{{.NameCamel}}Repository) Delete({{$primaryKeyField.NameLowerCamel}
 	if err = tx.Delete({{.NameLowerCamel}}).Error; err != nil {
 		return errors.Wrapf(err, "delete {{.NameCamel}} error[id=%d]", {{$primaryKeyField.NameLowerCamel}})
 	}
+
+	{{- $name := .NameLowerCamel}}
+    {{- range .BackReferenceInfos}}
+	if err = tx.Model({{$name}}).Association("{{.NameCamelPlural}}").Clear(); err != nil {
+		return errors.Wrapf(err, "delete {{.NameCamel}} Assocations {{.NameCamelPlural}} error[id=%d]", {{$primaryKeyField.NameLowerCamel}})
+	}
+	{{- end}}
 
 	tx.Commit()
 	return

@@ -6,30 +6,33 @@ import (
 	"github.com/google/wire"
 	"go.uber.org/zap"
 
-	"{{ . }}/gen/models"
+	"{{ . }}/internal/gen/models"
 	"{{ . }}/pkg/auth"
 	"{{ . }}/pkg/transports/http"
 	jwtmid "{{ . }}/pkg/transports/http/middlewares/jwt"
+
+	"{{ . }}/internal/services"
 )
 
 //ParseClaim ...
-func parseClaims(c *gin.Context, key string) (userID uint32, userName string, mid uint32, err error) {
+func parseClaims(c *gin.Context, key string) (userID uint64, userName string, mid uint64, err error) {
 	claims, ok := c.Get(key)
 	if !ok {
 		return 0, "", 0, models.ErrUnauthorized
 	}
 	claimsMap := claims.(jwt.MapClaims)
 
-	userName = claimsMap["userName"].(string)
+	userName = claimsMap[services.ClaimsUsernameKey].(string)
 	// jwt token中的数值默认序列化成了float64
-	userID = uint32(claimsMap["userId"].(float64))
-	mid = uint32(claimsMap["merchantsId"].(float64))
+	userID = uint64(claimsMap[services.ClaimsUserIDKey].(float64))
+	mid = uint64(claimsMap[services.ClaimsMerchantsIDKey].(float64))
 
 	return
 }
 
 func CreateInitControllersFn(
 	logger *zap.Logger,
+	ginJWT *jwtmid.GinJWT,
 	auth *auth.JWTAuth,
 	employee *EmployeeController,
 	role *RoleController,
@@ -37,19 +40,18 @@ func CreateInitControllersFn(
 ) http.InitControllers {
 	return func(r *gin.Engine) {
 		apiv1 := r.Group("/api/v1")
-		// apiv1.Use(jwtmid.New(r, auth, logger).Middleware())
 		{
 			apiv1.POST("/signin", employee.Signin)
-			apiv1.POST("/signout", employee.Signout)
 		}
-		apiv1.Use(jwtmid.New(r, auth, logger).Middleware())
+		apiv1.Use(ginJWT.Middleware())
 		{
-			apiv1.GET("/current/employee", employee.GetCurrentEmployee)
+			apiv1.POST("/signout", employee.Signout)
+			apiv1.GET("/current/employees", employee.GetCurrentEmployee)
 			apiv1.GET("/current/menus", employee.GetCurrentMenus)
-			apiv1.POST("/employee", employee.Create)
-			apiv1.POST("/role", role.Create)
-			apiv1.PATCH("/role", role.Update)
-			apiv1.DELETE("/role/:id", role.Delete)
+			apiv1.POST("/employees", employee.Create)
+			apiv1.POST("/roles", role.Create)
+			apiv1.PATCH("/roles", role.Update)
+			apiv1.DELETE("/roles/:id", role.Delete)
 			apiv1.POST("/upload", mediaFile.Upload)
 			apiv1.GET("/upload/sign", mediaFile.GetSign)
 		}

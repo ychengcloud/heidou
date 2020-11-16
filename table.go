@@ -61,6 +61,13 @@ type MetaTable struct {
 	Columns []*Column
 }
 
+type BackReferenceInfo struct {
+	Name                 string
+	NameCamel            string
+	NameCamelPlural      string
+	NameLowerCamelPlural string
+	JoinTableName        string
+}
 type Table struct {
 	Name        string `yaml:"name"`
 	PkgPath     string `yaml:"pkgPath"`
@@ -72,11 +79,13 @@ type Table struct {
 	Methods    []string    `yaml:"methods"`
 
 	PrimaryKeyField *Field
-	Filterable      bool
-	Sortable        bool
-	HasErrorCode    bool
-	HasTimeField    bool
-	IsStringsJoin   bool
+	//反向引用字段集
+	BackReferenceInfos []*BackReferenceInfo
+	Filterable         bool
+	Sortable           bool
+	HasErrorCode       bool
+	HasTimeField       bool
+	IsStringsJoin      bool
 
 	NameSnake            string
 	NameSnakePlural      string
@@ -150,9 +159,6 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 			table.HasTimeField = true
 		}
 
-		if table.Name == "product" {
-			fmt.Println("field:", field)
-		}
 		table.Fields = append(table.Fields, field)
 	}
 	table.Methods = DefaultMethods
@@ -165,7 +171,9 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 
 		// 配置了跳过，则不生成此表的信息
 		table.IsSkip = tableInCfg.IsSkip
-
+		if table.IsSkip {
+			fmt.Println("mergeTable:", table.Name)
+		}
 		if len(tableInCfg.Methods) > 0 {
 			table.Methods = tableInCfg.Methods
 		}
@@ -188,6 +196,10 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 
 			tags := `json:"` + field.NameLowerCamel + `" gorm:"` + field.NameLowerCamel
 
+			if field.JoinType == JoinTypeManyToMany || field.JoinType == JoinTypeHasMany {
+				tags = `json:"` + field.NameLowerCamelPlural + `" gorm:"` + field.NameLowerCamelPlural
+
+			}
 			if field.JoinTableName != "" {
 				tags += ";many2many:" + field.JoinTableName
 			}
@@ -212,12 +224,5 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 		}
 	}
 
-	if table.Name == "product" {
-
-		fmt.Println("Table:", table.Name)
-		for _, field := range table.Fields {
-			fmt.Println("Field:", field, field.MetaType)
-		}
-	}
 	return table
 }

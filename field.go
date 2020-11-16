@@ -1,7 +1,6 @@
 package heidou
 
 import (
-	"fmt"
 	"html/template"
 	"strconv"
 	"strings"
@@ -128,37 +127,28 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 
 	field.genName()
 
-	fmt.Println("shiftMetaField:", column, field.MetaType, isUnsigned, columnType)
+	// fmt.Println("shiftMetaField:", column, field.MetaType, isUnsigned, columnType)
 	if strings.ToUpper(column.Key) == "PRI" {
 		field.IsPrimaryKey = true
 		// field.MetaType.GqlType = "ID"
 		field.IsRequired = true
 	}
 
+	return field
+}
+
+func handleTags(field *Field) *Field {
 	tags := `json:"` + field.NameLowerCamel + `" gorm:"` + field.NameLowerCamel
 	if field.MaxLength > 0 {
 		tags += ";size:" + strconv.Itoa(field.MaxLength)
 	}
-	if field.JoinTableName != "" {
-		tags += ";many2many:" + field.JoinTableName
-	}
-	if field.ForeignKey != "" {
-		tags += ";foreignKey:" + field.ForeignKey
-	}
-	if field.References != "" {
-		tags += ";references:" + field.References
-	}
-	if field.JoinForeignKey != "" {
-		tags += ";joinForeignKey:" + field.JoinForeignKey
-	}
-	if field.JoinReferences != "" {
-		tags += ";joinReferences:" + field.JoinReferences
-	}
 	tags += `"`
+	if len(field.Tags) > 0 {
+		tags = tags + " " + field.Tags
+	}
 
-	fmt.Println("tags:", tags)
+	// fmt.Println("tags:", tags)
 	field.TagsHTML = template.HTML(tags)
-
 	return field
 }
 
@@ -209,6 +199,8 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	if fieldInCfg.JoinReferences != "" {
 		field.JoinReferences = fieldInCfg.JoinReferences
 	}
+
+	field = handleTags(field)
 
 	return field
 }

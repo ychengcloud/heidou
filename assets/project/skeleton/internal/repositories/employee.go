@@ -1,16 +1,16 @@
 package repositories
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"{{ . }}/gen/models"
+	"{{ . }}/internal/gen/models"
 )
 
 type EmployeeRepository interface {
 	GetByName(userName string) (employee *models.Employee, err error)
-	Get(id uint32) (employee *models.Employee, err error)
+	Get(id uint64) (employee *models.Employee, err error)
 }
 
 type GormEmployeeRepository struct {
@@ -31,7 +31,7 @@ func (s *GormEmployeeRepository) GetByName(userName string) (employee *models.Em
 	return
 }
 
-func (s *GormEmployeeRepository) Get(id uint32) (employee *models.Employee, err error) {
+func (s *GormEmployeeRepository) Get(id uint64) (employee *models.Employee, err error) {
 	employee = &models.Employee{}
 
 	db := s.db.Model(employee)

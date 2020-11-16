@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
 	"{{ . }}/pkg/transports/http/middlewares/ginprom"
@@ -37,10 +38,24 @@ type Server struct {
 	httpServer http.Server
 }
 
-type InitHandlers func(r *gin.Engine)
+func NewOptions(v *viper.Viper) (*Options, error) {
+	var (
+		err error
+		o   = new(Options)
+	)
+
+	if err = v.UnmarshalKey("http", o); err != nil {
+		return nil, err
+	}
+
+	return o, err
+}
+
+type BaseInitControllers func(r *gin.Engine)
+type InitControllers func(r *gin.Engine)
 
 // func NewRouter(o *Options, logger *zap.Logger, init InitControllers, tracer opentracing.Tracer) *gin.Engine {
-func NewRouter(o *Options, logger *zap.Logger, h InitHandlers) *gin.Engine {
+func NewRouter(o *Options, logger *zap.Logger, baseInit BaseInitControllers, init InitControllers) *gin.Engine {
 
 	// 配置gin
 	gin.SetMode(o.Mode)
@@ -63,7 +78,9 @@ func NewRouter(o *Options, logger *zap.Logger, h InitHandlers) *gin.Engine {
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	pprof.Register(r)
 
-	h(r)
+	baseInit(r)
+	init(r)
+
 	return r
 }
 

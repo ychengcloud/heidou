@@ -6,7 +6,7 @@ mappings:
     protobufType: bool
     gureguType: null.Int
     goNullableType: sql.NullBool
-    swaggerType: bool
+    swaggerType: boolean
   - sqlType: bool
     goType: bool
     gqlType: Boolean
@@ -14,7 +14,7 @@ mappings:
     protobufType: bool
     gureguType: null.Int
     goNullableType: sql.NullBool
-    swaggerType: bool
+    swaggerType: boolean
   - sqlType: tinyint
     goType: int
     gqlType: Int
@@ -22,7 +22,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: int
     goType: int
     gqlType: Int
@@ -30,7 +30,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: smallint
     size: 2
     goType: int
@@ -39,7 +39,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: mediumint
     goType: int
     gqlType: Int
@@ -47,7 +47,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: int4
     goType: int
     gqlType: Int
@@ -55,7 +55,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: int2
     goType: int
     gqlType: Int
@@ -63,7 +63,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: integer
     goType: int
     gqlType: Int
@@ -71,7 +71,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: bigint
     goType: int64
     gqlType: Int
@@ -79,7 +79,7 @@ mappings:
     protobufType: int64
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int64
+    swaggerType: integer
   - sqlType: int8
     goType: int
     gqlType: Int
@@ -87,7 +87,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int64
+    swaggerType: integer
   - sqlType: char
     goType: string
     gqlType: String
@@ -199,7 +199,7 @@ mappings:
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: datetime2
     goType: time.Time
     gqlType: Time
@@ -207,7 +207,7 @@ mappings:
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: datetime
     goType: time.Time
     gqlType: Time
@@ -215,7 +215,7 @@ mappings:
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: time
     goType: time.Time
     gqlType: Time
@@ -223,7 +223,7 @@ mappings:
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: timestamp
     goType: time.Time
     gqlType: Time
@@ -231,7 +231,7 @@ mappings:
     protobufType: uint64
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: timestamptz
     goType: time.Time
     gqlType: Time
@@ -239,7 +239,7 @@ mappings:
     protobufType: uint64
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: smalldatetime
     goType: time.Time
     gqlType: Time
@@ -247,7 +247,7 @@ mappings:
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
-    swaggerType: time.Time
+    swaggerType: string
   - sqlType: decimal
     goType: float64
     gqlType: Float
@@ -255,7 +255,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: double
     goType: float64
     gqlType: Float
@@ -263,7 +263,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: money
     goType: float64
     gqlType: Float
@@ -271,7 +271,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: real
     goType: float64
     gqlType: Float
@@ -279,7 +279,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: float4
     goType: float32
     gqlType: Float
@@ -287,7 +287,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float32
+    swaggerType: number
   - sqlType: float
     goType: float32
     gqlType: Float
@@ -295,7 +295,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float32
+    swaggerType: number
   - sqlType: float8
     goType: float64
     gqlType: Float
@@ -303,7 +303,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: binary
     goType: '[]byte'
     gqlType: String
@@ -311,7 +311,7 @@ mappings:
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
-    swaggerType: '[]byte'
+    swaggerType: string
   - sqlType: blob
     goType: '[]byte'
     gqlType: String
@@ -319,7 +319,7 @@ mappings:
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
-    swaggerType: '[]byte'
+    swaggerType: string
   - sqlType: longblob
     goType: '[]byte'
     gqlType: String
@@ -327,7 +327,7 @@ mappings:
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
-    swaggerType: '[]byte'
+    swaggerType: string
   - sqlType: mediumblob
     goType: '[]byte'
     gqlType: String
@@ -335,7 +335,7 @@ mappings:
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
-    swaggerType: '[]byte'
+    swaggerType: string
   - sqlType: varbinary
     goType: '[]byte'
     gqlType: String
@@ -343,7 +343,7 @@ mappings:
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
-    swaggerType: '[]byte'
+    swaggerType: string
   - sqlType: numeric
     goType: float64
     gqlType: Float
@@ -351,7 +351,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: bpchar
     goType: string
     gqlType: String
@@ -409,37 +409,37 @@ mappings:
     goNullableType: sql.NullString
     swaggerType: string
   - sqlType: utinyint
-    goType: int
+    goType: uint
     gqlType: Int
     jsonType: Integer
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: usmallint
-    goType: int
+    goType: uint
     gqlType: Int
     jsonType: Integer
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: umediumint
-    goType: int
+    goType: uint
     gqlType: Int
     jsonType: Integer
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: uint
-    goType: int
+    goType: uint
     gqlType: Int
     jsonType: Integer
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: ubigint
     goType: uint64
     gqlType: Int
@@ -447,7 +447,7 @@ mappings:
     protobufType: uint64
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int64
+    swaggerType: integer
   - sqlType: udecimal
     goType: float64
     gqlType: Float
@@ -455,7 +455,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: udouble
     goType: float64
     gqlType: Float
@@ -463,7 +463,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float64
+    swaggerType: number
   - sqlType: ufloat
     goType: float32
     gqlType: Float
@@ -471,7 +471,7 @@ mappings:
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
-    swaggerType: float32
+    swaggerType: number
   - sqlType: smallserial
     size: 2
     custom: postgres
@@ -481,7 +481,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: serial
     size: 4
     custom: postgres
@@ -491,7 +491,7 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer
   - sqlType: bigserial
     size: 8
     custom: postgres
@@ -501,4 +501,4 @@ mappings:
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
-    swaggerType: int
+    swaggerType: integer

@@ -24,11 +24,12 @@ var (
 
 //Query gin handler query binding struct
 type Query struct {
-	Filter []string `form:"filter"`
-	Fields string   `form:"fields"`
-	Order  string   `form:"order"`
-	Offset int      `form:"offset"`
-	Limit  int      `form:"limit"`
+	Filter  []string `form:"filter"`
+	Fields  string   `form:"fields"`
+	Expands string   `form:"expands"`
+	Order   string   `form:"order"`
+	Offset  int      `form:"offset"`
+	Limit   int      `form:"limit"`
 }
 
 //String to string

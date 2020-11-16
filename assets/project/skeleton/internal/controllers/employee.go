@@ -4,11 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"{{ . }}/app/services"
-	gc "{{ . }}/gen/controllers"
-	"{{ . }}/gen/models"
+	gc "{{ . }}/internal/gen/controllers"
+	"{{ . }}/internal/gen/models"
+	"{{ . }}/internal/services"
 )
-
 
 //LoginRequest ...
 type LoginRequest struct {
@@ -65,7 +64,7 @@ func (ctl *EmployeeController) GetCurrentEmployee(c *gin.Context) {
 		return
 	}
 
-	employee, err := ctl.service.Get(c.Request.Context(), uint32(id))
+	employee, err := ctl.service.Get(c.Request.Context(), id)
 	if gc.HandleError(c, err) {
 		ctl.Logger.Error("Get employee error", zap.Error(err))
 		return
@@ -81,7 +80,7 @@ func (ctl *EmployeeController) GetCurrentMenus(c *gin.Context) {
 		return
 	}
 
-	employee, err := ctl.service.GetMenus(c.Request.Context(), uint32(id))
+	employee, err := ctl.service.GetMenus(c.Request.Context(), id)
 	if gc.HandleError(c, err) {
 		ctl.Logger.Error("Get employee error", zap.Error(err))
 		return

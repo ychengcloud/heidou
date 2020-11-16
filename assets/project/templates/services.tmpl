@@ -12,7 +12,7 @@ import (
 {{- $primaryKeyField := .PrimaryKeyField}}
 
 type {{.NameCamel}}Service interface {
-	List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total uint, err error)
+	List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total int64, err error)
 	Create(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error
 	Get(c context.Context, {{$primaryKeyField.NameLowerCamel}} {{$primaryKeyField.MetaType.GoType}}) (*models.{{.NameCamel}}, error)
 	Update(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error
@@ -33,7 +33,7 @@ func New{{.NameCamel}}Service(logger *zap.Logger, r repositories.{{.NameCamel}}R
 	}
 }
 
-func (s *Default{{.NameCamel}}Service) List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total uint, err error) {
+func (s *Default{{.NameCamel}}Service) List(c context.Context, q *models.Query) (list []*models.{{.NameCamel}}, total int64, err error) {
 
 	return s.Repository.List(q)
 }
@@ -50,7 +50,7 @@ func (s *Default{{.NameCamel}}Service) Get(c context.Context, {{$primaryKeyField
 
 
 func (s *Default{{.NameCamel}}Service) Update(c context.Context, {{.NameLowerCamel}} *models.{{.NameCamel}}) error {
-	if({{.NameLowerCamel}}.{{$primaryKeyField.NameLowerCamel}} == 0) {
+	if({{.NameLowerCamel}}.{{$primaryKeyField.NameCamel}} == 0) {
 		return models.ErrBadParamInput
 	}
 	return s.Repository.Update({{.NameLowerCamel}})

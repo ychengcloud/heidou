@@ -91,6 +91,7 @@ db:
   port: 3306
   name: youcheng
   charset: utf8mb4
+
 tables:
   - name: product
     fields:
@@ -110,7 +111,28 @@ tables:
       tableName: category  
       joinTableName: product_category_relation
       errorCodes: [E1, E2]
-  - name: casbin_rule
+  - name: employee
+    methods: ["list", "update", "delete", "bulkGet", "bulkDelete"]
+    fields:
+    - name: role
+      joinType: "ManyToMany"
+      tableName: role  
+      joinTableName: employee_role_relation
+      errorCodes: [E1, E2]
+  - name: role
+    methods: ["list", "get", "bulkGet", "bulkDelete"]
+    fields:
+    - name: action
+      joinType: "ManyToMany"
+      tableName: action  
+      joinTableName: role_action_relation
+      errorCodes: [E1, E2]
+    - name: resource
+      joinType: "ManyToMany"
+      tableName: resource  
+      joinTableName: role_resource_relation
+      errorCodes: [E1, E2]
+  - name: casbin_rules
     isSkip: true
   - name: employee_role_relation
     isSkip: true
@@ -134,4 +156,5 @@ tables:
     isSkip: true
   - name: event_logs
     isSkip: true
+  
 `))

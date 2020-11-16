@@ -19,43 +19,48 @@ type templateNode struct {
 }
 
 var modelsBase = templateNode{
-	NameFormat: "gen/models/models.go",
+	NameFormat: "internal/gen/models/models.go",
 	FileName:   "templates/models_base.tmpl",
 }
 
 var controllersBase = templateNode{
-	NameFormat: "gen/controllers/controllers.go",
+	NameFormat: "internal/gen/controllers/controllers.go",
 	FileName:   "templates/controllers_base.tmpl",
 }
 
 var repositoriesBase = templateNode{
-	NameFormat: "gen/repositories/repositories.go",
+	NameFormat: "internal/gen/repositories/repositories.go",
 	FileName:   "templates/repositories_base.tmpl",
 }
 
 var servicesBase = templateNode{
-	NameFormat: "gen/services/services.go",
+	NameFormat: "internal/gen/services/services.go",
 	FileName:   "templates/services_base.tmpl",
 }
 
 var controllers = templateNode{
-	NameFormat: "gen/controllers/%s.go",
+	NameFormat: "internal/gen/controllers/%s.go",
 	FileName:   "templates/controllers.tmpl",
 }
 
 var models = templateNode{
-	NameFormat: "gen/models/%s.go",
+	NameFormat: "internal/gen/models/%s.go",
 	FileName:   "templates/models.tmpl",
 }
 
 var repositories = templateNode{
-	NameFormat: "gen/repositories/%s.go",
+	NameFormat: "internal/gen/repositories/%s.go",
 	FileName:   "templates/repositories.tmpl",
 }
 
 var services = templateNode{
-	NameFormat: "gen/services/%s.go",
+	NameFormat: "internal/gen/services/%s.go",
 	FileName:   "templates/services.tmpl",
+}
+
+var swagger = templateNode{
+	NameFormat: "doc/swagger.yaml",
+	FileName:   "templates/swagger.tmpl",
 }
 
 var parseBaseList = []templateNode{
@@ -63,6 +68,7 @@ var parseBaseList = []templateNode{
 	controllersBase,
 	repositoriesBase,
 	servicesBase,
+	swagger,
 }
 
 var parseRepeatList = []templateNode{
@@ -72,15 +78,13 @@ var parseRepeatList = []templateNode{
 	services,
 }
 
-func (n *templateNode) ParseExecute(fs http.FileSystem, pathRoot, pathArg string, data interface{}) error {
+func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data interface{}) error {
 	var path string
 	if pathArg != "" {
 		path = fmt.Sprintf(n.NameFormat, pathArg)
 	} else {
 		path = n.NameFormat
 	}
-
-	path = filepath.Join(pathRoot, path)
 
 	mask := syscall.Umask(0)
 	defer syscall.Umask(mask)

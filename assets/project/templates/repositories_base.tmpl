@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/go-openapi/inflect"
 	"github.com/google/wire"
 	"gorm.io/gorm"
 
@@ -24,6 +25,11 @@ const (
 
 const (
 	MaxLimitCount = 1000
+)
+
+var (
+	rules    = ruleset()
+	acronyms = make(map[string]struct{})
 )
 
 var BaseProviderSet = wire.NewSet(
@@ -57,8 +63,51 @@ func operation(op string) (result string) {
 	return
 }
 
-func Query(db *gorm.DB, object interface{}, q *models.Query) *gorm.DB {
-	db = db.Model(object)
+func isSeparator(r rune) bool {
+	return r == '_' || r == '-'
+}
+
+func pascalWords(words []string) string {
+	for i, w := range words {
+		upper := strings.ToUpper(w)
+		if _, ok := acronyms[upper]; ok {
+			words[i] = upper
+		} else {
+			words[i] = rules.Capitalize(w)
+		}
+	}
+	return strings.Join(words, "")
+}
+
+// pascal converts the given name into a PascalCase.
+//
+//	user_info 	=> UserInfo
+//	full_name 	=> FullName
+//	user_id   	=> UserID
+//	full-admin	=> FullAdmin
+//
+func pascal(s string) string {
+	words := strings.FieldsFunc(s, isSeparator)
+	return pascalWords(words)
+}
+
+func ruleset() *inflect.Ruleset {
+	rules := inflect.NewDefaultRuleset()
+	// Add common initialisms from golint and more.
+	for _, w := range []string{
+		"ACL", "API", "ASCII", "AWS", "CPU", "CSS", "DNS", "EOF", "GB", "GUID",
+		"HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "KB", "LHS", "MAC", "MB",
+		"QPS", "RAM", "RHS", "RPC", "SLA", "SMTP", "SQL", "SSH", "SSO", "TCP",
+		"TLS", "TTL", "UDP", "UI", "UID", "URI", "URL", "UTF8", "UUID", "VM",
+		"XML", "XMPP", "XSRF", "XSS",
+	} {
+		acronyms[w] = struct{}{}
+		rules.AddAcronym(w)
+	}
+	return rules
+}
+
+func Query(db *gorm.DB, q *models.Query) *gorm.DB {
 	for _, filter := range q.Filter {
 		w := strings.SplitN(filter, ":", 3)
 		// 不满足条件三元组的格式, eg: id:eq:1
@@ -89,12 +138,6 @@ func Query(db *gorm.DB, object interface{}, q *models.Query) *gorm.DB {
 
 	}
 
-	if q.Fields != "" {
-		columns := strings.Split(q.Fields, ",")
-		if len(columns) > 0 {
-			db = db.Select(q.Fields)
-		}
-	}
 	if q.Order != "" {
 		db = db.Order(q.Order)
 	}
@@ -108,5 +151,34 @@ func Query(db *gorm.DB, object interface{}, q *models.Query) *gorm.DB {
 		db = db.Limit(q.Limit)
 
 	}
+	return db
+}
+
+func Select(db *gorm.DB, fields string) *gorm.DB {
+	if fields == "" {
+		return db
+	}
+	columns := strings.Split(fields, ",")
+	if len(columns) > 0 {
+		db = db.Select(columns)
+	}
+	return db
+}
+func Expands(db *gorm.DB, expands string) *gorm.DB {
+	if len(expands) == 0 {
+		return db
+	}
+
+	expandsList := strings.Split(expands, ",")
+	for _, expand := range expandsList {
+		expandNameList := strings.Split(expand, ".")
+		var preloadList []string
+		for _, expandName := range expandNameList {
+			preloadList = append(preloadList, pascal(expandName))
+		}
+		preload := strings.Join(preloadList, ".")
+		db = db.Preload(preload)
+	}
+
 	return db
 }

@@ -30,7 +30,7 @@ assets_gen:
 	done
 
 .PHONY: build
-build: assets_gen wire
+build: wire
 	for app in $(apps) ;\
 	do \
 		GOOS=linux GOARCH="amd64" go build -o dist/$$app-linux-amd64 ./cmd/$$app/; \

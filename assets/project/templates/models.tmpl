@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 //{{.NameCamel}}
 type {{.NameCamel}} struct {
@@ -9,8 +13,10 @@ type {{.NameCamel}} struct {
 	{{- $type := ""}}
     {{- if eq .JoinType "" }}
         {{- $type = .MetaType.GoType }}
+        {{- if eq .NameCamel "DeletedAt"}}
+            {{- $type = "gorm.DeletedAt" }}
+	    {{- end }}
 	{{- end }}
-
     {{- if or (eq .JoinType "BelongTo") (eq .JoinType "HasOne") }}
 	    {{- $name = .NameCamel}}
 	    {{- $type = .JoinTable.NameCamel}}
@@ -19,9 +25,11 @@ type {{.NameCamel}} struct {
 	    {{- $name = .NameCamelPlural}}
 	    {{- $type = (printf "%s%s" "[]*" .JoinTable.NameCamel)}}
 	{{- end}}
-
 	{{$name}} {{$type}} `{{.TagsHTML}}`
+    {{- end}}
 
+    {{- range .BackReferenceInfos}}
+    {{.NameCamelPlural}} {{(printf "%s%s" "[]*" .NameCamel)}} `json:"-" gorm:"{{.NameLowerCamelPlural}};many2many:{{.JoinTableName}}"`
     {{- end}}
 }
 

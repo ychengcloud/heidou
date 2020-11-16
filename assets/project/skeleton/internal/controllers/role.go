@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	genControllers "{{ . }}/gen/controllers"
-	"{{ . }}/gen/models"
-	"{{ . }}/gen/services"
+	genControllers "{{ . }}/internal/gen/controllers"
+	"{{ . }}/internal/gen/models"
+	"{{ . }}/internal/gen/services"
 )
 
 type RoleController struct {
@@ -61,7 +61,7 @@ func (roleController *RoleController) Delete(c *gin.Context) {
 		return
 	}
 
-	err = roleController.service.Delete(c.Request.Context(), uint32(id))
+	err = roleController.service.Delete(c.Request.Context(), id)
 	if genControllers.HandleError(c, err) {
 		roleController.Logger.Error("List role error", zap.Error(err))
 		return
