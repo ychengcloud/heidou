@@ -2,7 +2,6 @@ package heidou
 
 import (
 	"fmt"
-	"html/template"
 )
 
 var DefaultMethods = []string{"list", "create", "get", "update", "delete", "bulkGet", "bulkDelete"}
@@ -85,7 +84,7 @@ type Table struct {
 	Sortable           bool
 	HasErrorCode       bool
 	HasTimeField       bool
-	IsStringsJoin      bool
+	IsImportStrings    bool
 
 	NameSnake            string
 	NameSnakePlural      string
@@ -120,6 +119,29 @@ func getTableInCfg(tables []*Table, name string) *Table {
 	return nil
 }
 
+func (t *Table) handleFlags(field *Field, metaTypes map[string]MetaType) {
+	if field.IsPrimaryKey {
+		t.PrimaryKeyField = field
+	}
+
+	if field.IsFilterable {
+		t.Filterable = true
+		for _, op := range field.Operations {
+			if op == "In" {
+				t.IsImportStrings = true
+			}
+		}
+	}
+
+	if field.IsSortable {
+		t.Sortable = true
+	}
+
+	if field.MetaType.GoType == "time.Time" {
+		t.HasTimeField = true
+	}
+}
+
 // 合并数据库定义和项目配置中的表信息, 构建为新表结构
 // 返回 nil 表示 不生成此表信息
 func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]MetaType) *Table {
@@ -138,27 +160,7 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 
 		field = mergeField(field, fieldInCfg)
 
-		if field.IsPrimaryKey {
-			table.PrimaryKeyField = field
-		}
-
-		if field.IsFilterable {
-			table.Filterable = true
-			for _, op := range field.Operations {
-				if op == "In" {
-					table.IsStringsJoin = true
-				}
-			}
-		}
-
-		if field.IsSortable {
-			table.Sortable = true
-		}
-
-		if field.MetaType.GoType == "time.Time" {
-			table.HasTimeField = true
-		}
-
+		table.handleFlags(field, metaTypes)
 		table.Fields = append(table.Fields, field)
 	}
 	table.Methods = DefaultMethods
@@ -180,45 +182,12 @@ func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 
 		// 生成配置中关联类型的字段
 		for _, field := range tableInCfg.Fields {
-			field.genName()
-
 			if field.JoinType == "" {
 				continue
 			}
 
-			if field.IsFilterable {
-				table.Filterable = true
-			}
-
-			if field.IsSortable {
-				table.Sortable = true
-			}
-
-			tags := `json:"` + field.NameLowerCamel + `" gorm:"` + field.NameLowerCamel
-
-			if field.JoinType == JoinTypeManyToMany || field.JoinType == JoinTypeHasMany {
-				tags = `json:"` + field.NameLowerCamelPlural + `" gorm:"` + field.NameLowerCamelPlural
-
-			}
-			if field.JoinTableName != "" {
-				tags += ";many2many:" + field.JoinTableName
-			}
-			if field.ForeignKey != "" {
-				tags += ";foreignKey:" + field.ForeignKey
-			}
-			if field.References != "" {
-				tags += ";references:" + field.References
-			}
-			if field.JoinForeignKey != "" {
-				tags += ";joinForeignKey:" + field.JoinForeignKey
-			}
-			if field.JoinReferences != "" {
-				tags += ";joinReferences:" + field.JoinReferences
-			}
-			tags += `"`
-
-			fmt.Println("tags:", tags)
-			field.TagsHTML = template.HTML(tags)
+			field.genName()
+			field.HandleAssociation()
 
 			table.Fields = append(table.Fields, field)
 		}

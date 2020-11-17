@@ -17,9 +17,9 @@ type Generator struct {
 }
 
 type Data struct {
-	PkgPath       string
-	HasTimeField  bool
-	IsStringsJoin bool
+	PkgPath         string
+	HasTimeField    bool
+	IsImportStrings bool
 
 	Tables []*Table
 }
@@ -135,8 +135,8 @@ func (g *Generator) Generate() error {
 		if table.HasTimeField {
 			g.Data.HasTimeField = true
 		}
-		if table.IsStringsJoin {
-			g.Data.IsStringsJoin = true
+		if table.IsImportStrings {
+			g.Data.IsImportStrings = true
 		}
 		g.Data.Tables = append(g.Data.Tables, table)
 	}

@@ -98,11 +98,9 @@ tables:
     - name: id
       isRequired: true
       isFilterable: true
-      operations: ["Eq", "In"]
     - name: name
       isRequired: true
       isFilterable: true
-      operations: ["Eq", "In"]
       tags: 'binding:"required,max=64"'
     - name: variant
       joinType: "HasMany"
@@ -111,7 +109,6 @@ tables:
       joinType: "ManyToMany"
       tableName: category  
       joinTableName: product_category_relation
-      errorCodes: [E1, E2]
   - name: employee
     methods: ["list", "update", "delete", "bulkGet", "bulkDelete"]
     fields:
@@ -119,7 +116,6 @@ tables:
       joinType: "ManyToMany"
       tableName: role  
       joinTableName: employee_role_relation
-      errorCodes: [E1, E2]
   - name: role
     methods: ["list", "get", "bulkGet", "bulkDelete"]
     fields:

@@ -1,6 +1,7 @@
 package heidou
 
 import (
+	"fmt"
 	"html/template"
 	"strconv"
 	"strings"
@@ -203,4 +204,36 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	field = handleTags(field)
 
 	return field
+}
+
+func (f *Field) HandleAssociation() {
+	if f.JoinType == "" {
+		return
+	}
+
+	tags := `json:"` + f.NameLowerCamel + `" gorm:"` + f.NameLowerCamel
+
+	if f.JoinType == JoinTypeManyToMany || f.JoinType == JoinTypeHasMany {
+		tags = `json:"` + f.NameLowerCamelPlural + `" gorm:"` + f.NameLowerCamelPlural
+
+	}
+	if f.JoinTableName != "" {
+		tags += ";many2many:" + f.JoinTableName
+	}
+	if f.ForeignKey != "" {
+		tags += ";foreignKey:" + f.ForeignKey
+	}
+	if f.References != "" {
+		tags += ";references:" + f.References
+	}
+	if f.JoinForeignKey != "" {
+		tags += ";joinForeignKey:" + f.JoinForeignKey
+	}
+	if f.JoinReferences != "" {
+		tags += ";joinReferences:" + f.JoinReferences
+	}
+	tags += `"`
+
+	fmt.Println("tags:", tags)
+	f.TagsHTML = template.HTML(tags)
 }
