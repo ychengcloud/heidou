@@ -45,6 +45,17 @@ func NewGenerator(cfg *Config, loader Loader) *Generator {
 }
 
 // getTable 根据表名，查找表对象
+func (g *Generator) getTableInCfg(name string) *Table {
+
+	for _, table := range g.Config.Tables {
+		if table.Name == name {
+			return table
+		}
+	}
+	return nil
+}
+
+// getTable 根据表名，查找表对象
 func (g *Generator) getTable(name string) *Table {
 
 	for _, table := range g.Data.Tables {
@@ -55,29 +66,20 @@ func (g *Generator) getTable(name string) *Table {
 	return nil
 }
 
-func handleBackReference(tables []*Table, table *Table, field *Field) error {
-	//生成many2many的反向引用
-	tableInCfg := getTableInCfg(tables, field.TableName)
-	backReferenceTable := field.JoinTable
-	if backReferenceTable == nil {
-		return fmt.Errorf("Something wrong, can't find %s", field.TableName)
-	}
+//生成many2many的反向引用
+func (g *Generator) handleBackReference(table *Table, backReferenceTable *Table) {
+
 	backReferenceInfo := &BackReferenceInfo{
 		Name:                 table.Name,
 		NameCamel:            table.NameCamel,
 		NameCamelPlural:      table.NameCamelPlural,
 		NameLowerCamelPlural: table.NameLowerCamelPlural,
-		JoinTableName:        field.JoinTableName,
+		JoinTableName:        table.Name,
 	}
-	//没有配置此表的反向多对多关联
-	if tableInCfg == nil {
-		fmt.Println("BackReferenceInfo:", backReferenceTable.Name, backReferenceInfo)
-		backReferenceTable.BackReferenceInfos = append(backReferenceTable.BackReferenceInfos, backReferenceInfo)
-		return nil
-	}
+
 	//配置了此表的反向多对多关联
 	find := false
-	for _, fieldInCfg := range tableInCfg.Fields {
+	for _, fieldInCfg := range backReferenceTable.Fields {
 		if fieldInCfg.JoinType == JoinTypeManyToMany && fieldInCfg.TableName == table.Name {
 			find = true
 			break
@@ -88,7 +90,7 @@ func handleBackReference(tables []*Table, table *Table, field *Field) error {
 		backReferenceTable.BackReferenceInfos = append(backReferenceTable.BackReferenceInfos, backReferenceInfo)
 	}
 
-	return nil
+	return
 }
 
 // 所有元表信息生成后，再处理关联字段的模型信息
@@ -103,9 +105,7 @@ func (g *Generator) handleAssociation() error {
 				return fmt.Errorf("Something wrong, can't find %s", field.TableName)
 			}
 			if field.JoinType == JoinTypeManyToMany {
-				if err := handleBackReference(g.Data.Tables, table, field); err != nil {
-					return err
-				}
+				g.handleBackReference(table, field.JoinTable)
 			}
 
 		}
@@ -124,8 +124,8 @@ func (g *Generator) Generate() error {
 		// if metaTable.Name != "product" && metaTable.Name != "category" && metaTable.Name != "product_variant" {
 		// 	continue
 		// }
-		tableInCfg := getTableInCfg(g.Config.Tables, metaTable.Name)
-		table := mergeTable(metaTable, tableInCfg, g.MetaTypes)
+		tableInCfg := g.getTableInCfg(metaTable.Name)
+		table := MergeTable(metaTable, tableInCfg, g.MetaTypes)
 		if table == nil || table.IsSkip {
 			continue
 		}

@@ -109,14 +109,32 @@ func (t *Table) genName() {
 
 }
 
-// 查找配置中的表信息
-func getTableInCfg(tables []*Table, name string) *Table {
-	for _, table := range tables {
-		if table.Name == name {
-			return table
-		}
+// 合并数据库定义和项目配置中的表信息, 构建为新表结构
+// 返回 nil 表示 不生成此表信息
+func MergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]MetaType) *Table {
+	table := &Table{
+		Name: metaTable.Name,
 	}
-	return nil
+
+	// 生成数据库定义的字段
+	for _, column := range metaTable.Columns {
+		field := shiftMetaField(column, metaTypes)
+
+		var fieldInCfg *Field
+		if tableInCfg != nil {
+			fieldInCfg = findField(tableInCfg.Fields, column.Name)
+		}
+
+		field = mergeField(field, fieldInCfg)
+
+		table.handleFlags(field, metaTypes)
+		table.Fields = append(table.Fields, field)
+	}
+	table.Methods = DefaultMethods
+
+	fmt.Println("handleCfgInfo:", table.Name, tableInCfg)
+	table.handleCfgInfo(tableInCfg)
+	return table
 }
 
 func (t *Table) handleFlags(field *Field, metaTypes map[string]MetaType) {
@@ -142,56 +160,35 @@ func (t *Table) handleFlags(field *Field, metaTypes map[string]MetaType) {
 	}
 }
 
-// 合并数据库定义和项目配置中的表信息, 构建为新表结构
-// 返回 nil 表示 不生成此表信息
-func mergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]MetaType) *Table {
-	table := &Table{
-		Name: metaTable.Name,
+func (t *Table) handleCfgInfo(tableInCfg *Table) {
+	// 合并配置文件中的表信息
+	if tableInCfg == nil {
+		return
+	}
+	if len(tableInCfg.ErrorCodes) > 0 {
+		t.HasErrorCode = true
+		t.ErrorCodes = append(t.ErrorCodes, tableInCfg.ErrorCodes...)
 	}
 
-	// 生成数据库定义的字段
-	for _, column := range metaTable.Columns {
-		field := shiftMetaField(column, metaTypes)
+	// 配置了跳过，则不生成此表的信息
+	t.IsSkip = tableInCfg.IsSkip
 
-		var fieldInCfg *Field
-		if tableInCfg != nil {
-			fieldInCfg = findField(tableInCfg.Fields, column.Name)
-		}
-
-		field = mergeField(field, fieldInCfg)
-
-		table.handleFlags(field, metaTypes)
-		table.Fields = append(table.Fields, field)
+	if t.IsSkip {
+		fmt.Println("IsSkip:", t.Name)
 	}
-	table.Methods = DefaultMethods
-
-	if tableInCfg != nil {
-		if len(tableInCfg.ErrorCodes) > 0 {
-			table.HasErrorCode = true
-			table.ErrorCodes = append(table.ErrorCodes, tableInCfg.ErrorCodes...)
-		}
-
-		// 配置了跳过，则不生成此表的信息
-		table.IsSkip = tableInCfg.IsSkip
-		if table.IsSkip {
-			fmt.Println("mergeTable:", table.Name)
-		}
-		if len(tableInCfg.Methods) > 0 {
-			table.Methods = tableInCfg.Methods
-		}
-
-		// 生成配置中关联类型的字段
-		for _, field := range tableInCfg.Fields {
-			if field.JoinType == "" {
-				continue
-			}
-
-			field.genName()
-			field.HandleAssociation()
-
-			table.Fields = append(table.Fields, field)
-		}
+	if len(tableInCfg.Methods) > 0 {
+		t.Methods = tableInCfg.Methods
 	}
 
-	return table
+	// 生成配置中关联类型的字段
+	for _, field := range tableInCfg.Fields {
+		if field.JoinType == "" {
+			continue
+		}
+
+		field.genName()
+		field.HandleAssociation()
+
+		t.Fields = append(t.Fields, field)
+	}
 }
