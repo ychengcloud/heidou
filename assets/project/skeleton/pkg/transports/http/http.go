@@ -10,9 +10,10 @@ import (
 	"github.com/gin-contrib/pprof"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing-contrib/go-gin/ginhttp"
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 
 	"{{ . }}/assets"
@@ -20,10 +21,23 @@ import (
 	netutil "{{ . }}/pkg/utils"
 )
 
+var (
+	DefaultAllowMethods = []string{
+		"PUT", "GET", "POST", "HEAD", "PATCH", "OPTIONS", "DELETE",
+	}
+	DefaultAllowOrigins = []string{"*"}
+	DefaultAllowHeaders = []string{"*"}
+)
+
 type Options struct {
-	Host         string
-	Port         int
-	Mode         string
+	Host      string
+	Port      int
+	Mode      string
+	Tracing   bool
+	Promtheus bool
+	Doc       bool
+	Pprof     bool
+
 	AllowOrigins []string
 	AllowMethods []string
 	AllowHeaders []string
@@ -39,24 +53,19 @@ type Server struct {
 	httpServer http.Server
 }
 
-func NewOptions(v *viper.Viper) (*Options, error) {
-	var (
-		err error
-		o   = new(Options)
-	)
-
-	if err = v.UnmarshalKey("http", o); err != nil {
-		return nil, err
-	}
-
-	return o, err
-}
-
 type BaseInitControllers func(r *gin.Engine)
 type InitControllers func(r *gin.Engine)
 
-// func NewRouter(o *Options, logger *zap.Logger, init InitControllers, tracer opentracing.Tracer) *gin.Engine {
-func NewRouter(o *Options, logger *zap.Logger, baseInit BaseInitControllers, init InitControllers) *gin.Engine {
+func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseInit BaseInitControllers, init InitControllers) *gin.Engine {
+	if len(o.AllowMethods) == 0 {
+		o.AllowMethods = DefaultAllowMethods
+	}
+	if len(o.AllowOrigins) == 0 {
+		o.AllowOrigins = DefaultAllowOrigins
+	}
+	if len(o.AllowHeaders) == 0 {
+		o.AllowHeaders = DefaultAllowHeaders
+	}
 
 	// 配置gin
 	gin.SetMode(o.Mode)
@@ -72,12 +81,23 @@ func NewRouter(o *Options, logger *zap.Logger, baseInit BaseInitControllers, ini
 		// 	AllowCredentials: true,
 		// 	MaxAge:           12 * time.Hour,
 	}))
-	r.Use(ginprom.New(r).Middleware()) // 添加prometheus 监控
-	// r.Use(ginhttp.Middleware(tracer))
 
-	r.StaticFS("doc", assets.Swagger)
-	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	pprof.Register(r)
+	// if o.Tracing {
+	// 	r.Use(ginhttp.Middleware(tracer))
+	// }
+
+	if o.Promtheus {
+		r.Use(ginprom.New(r).Middleware()) // 添加prometheus 监控
+		r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	}
+
+	if o.Doc {
+		r.StaticFS("doc", assets.Swagger)
+	}
+
+	if o.Pprof {
+		pprof.Register(r)
+	}
 
 	baseInit(r)
 	init(r)

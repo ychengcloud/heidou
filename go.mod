@@ -7,6 +7,7 @@ require (
 	github.com/go-openapi/inflect v0.19.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gogf/gf v1.14.3
+	github.com/google/wire v0.4.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749

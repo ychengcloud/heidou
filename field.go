@@ -127,6 +127,7 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 	// fmt.Printf("shiftMetaField: %s -- %s -- %s -- %s -- %s -- %s -- %#v\n", column.Name, column.Type, column.DataType, column.Comment, columnType, metaTypes[columnType], field)
 
 	field.genName()
+	field.handleTags()
 
 	// fmt.Println("shiftMetaField:", column, field.MetaType, isUnsigned, columnType)
 	if strings.ToUpper(column.Key) == "PRI" {
@@ -138,19 +139,18 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 	return field
 }
 
-func handleTags(field *Field) *Field {
-	tags := `json:"` + field.NameLowerCamel + `" gorm:"` + field.NameLowerCamel
-	if field.MaxLength > 0 {
-		tags += ";size:" + strconv.Itoa(field.MaxLength)
+func (f *Field) handleTags() {
+	tags := `json:"` + f.NameLowerCamel + `" gorm:"` + f.NameLowerCamel
+	if f.MaxLength > 0 {
+		tags += ";size:" + strconv.Itoa(f.MaxLength)
 	}
 	tags += `"`
-	if len(field.Tags) > 0 {
-		tags = tags + " " + field.Tags
+	if len(f.Tags) > 0 {
+		tags = tags + " " + f.Tags
 	}
 
 	// fmt.Println("tags:", tags)
-	field.TagsHTML = template.HTML(tags)
-	return field
+	f.TagsHTML = template.HTML(tags)
 }
 
 func mergeField(field *Field, fieldInCfg *Field) *Field {
@@ -201,7 +201,7 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 		field.JoinReferences = fieldInCfg.JoinReferences
 	}
 
-	field = handleTags(field)
+	field.handleTags()
 
 	return field
 }

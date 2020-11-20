@@ -14,6 +14,13 @@
 - 表结构更改可多次生成代码
 - 资源内嵌，一个二进制文件即可启动
 
+- 安全特性
+    - JWT
+    - Casbin Permission
+    - CSRF
+    - XSS
+    - CORS
+
 
 # 项目参考
 

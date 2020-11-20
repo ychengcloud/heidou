@@ -2,22 +2,34 @@ app:
   name: 
   rootAccount: admin
 http:
+  # 运行模式 1. debug 2. release， 默认 release
   mode: debug
-  # mode: release
+  # 是否开启 opentracing, 默认 false
+  tracing: true
+  # 是否开启 Prometheus, 默认 false
+  promtheus: true
+  # 是否能访问Api文档, 默认 false
+  doc: true
+  # 是否能访问Golang Pprof, 默认 false
+  pprof: true
+  # 绑定 IP
   host: 127.0.0.1
+  # 绑定 Port
   port: 7779
-  allowOrigins:
-    - "*"
-  allowMethods: 
-    - "PUT"
-    - "GET"
-    - "POST"
-    - "HEAD"
-    - "PATCH"
-    - "OPTIONS"
-    - "DELETE"
-  allowHeaders:
-    - "*"
+
+  # 下面选项默认已经设置，如需要修改，则打开注释进行修改
+  # allowOrigins:
+  #   - "*"
+  # allowMethods: 
+  #   - "PUT"
+  #   - "GET"
+  #   - "POST"
+  #   - "HEAD"
+  #   - "PATCH"
+  #   - "OPTIONS"
+  #   - "DELETE"
+  # allowHeaders:
+  #   - "*"
 db:
   dialect: mysql
   user: root

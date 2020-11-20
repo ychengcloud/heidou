@@ -16,16 +16,14 @@ type Callback interface {
 
 // GinPermission  struct
 type GinPermission struct {
-	engine   *gin.Engine
 	auth     *auth.JWTAuth
 	logger   *zap.Logger
 	callback Callback
 }
 
 // Init 初始化数据库
-func New(e *gin.Engine, a *auth.JWTAuth, logger *zap.Logger, cb Callback) *GinPermission {
+func New(a *auth.JWTAuth, logger *zap.Logger, cb Callback) *GinPermission {
 	ginPermission := &GinPermission{
-		engine:   e,
 		auth:     a,
 		logger:   logger,
 		callback: cb,

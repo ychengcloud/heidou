@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"github.com/uber/jaeger-client-go/config"
 	"go.uber.org/zap"
 
 	"{{ . }}/internal"
@@ -83,4 +84,19 @@ func NewAuthOptions(v *viper.Viper, logger *zap.Logger) (*auth.Options, error) {
 	)
 
 	return o, nil
+}
+
+func NewJaegerConfig(v *viper.Viper, logger *zap.Logger) (*config.Configuration, error) {
+	var (
+		err error
+		c   = new(config.Configuration)
+	)
+
+	if err = v.UnmarshalKey("jaeger", c); err != nil {
+		return nil, errors.Wrap(err, "unmarshal jaeger configuration error")
+	}
+
+	logger.Info("load jaeger configuration success")
+
+	return c, nil
 }

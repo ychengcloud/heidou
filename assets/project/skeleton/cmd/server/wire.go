@@ -17,25 +17,25 @@ import (
 	"{{ . }}/pkg/auth/casbin"
 	"{{ . }}/pkg/config"
 	"{{ . }}/pkg/database"
+	"{{ . }}/pkg/jaeger"
 	"{{ . }}/pkg/log"
 	"{{ . }}/pkg/transports/http"
 	"{{ . }}/pkg/transports/http/middlewares/jwt"
+	"{{ . }}/pkg/transports/http/middlewares/permission"
 	"{{ . }}/pkg/validator"
 )
 
 var providerSet = wire.NewSet(
-	NewHttpOptions,
-	NewServerOptions,
-	NewLogOptions,
-	NewDatabaseOptions,
-	NewAuthOptions,
-	log.New,
 	config.New,
-	// jaeger.New, jaeger.NewConfiguration,
-	database.New,
+	NewHttpOptions, http.New, http.NewRouter,
+	NewServerOptions, internal.NewServer,
+	NewLogOptions, log.New,
+	NewDatabaseOptions, database.New,
+	NewAuthOptions, auth.ProviderSet,
+	NewJaegerConfig, jaeger.New,
 	validator.New,
-	auth.ProviderSet,
 	jwt.ProviderSet,
+	permission.ProviderSet,
 	casbin.ProviderSet,
 	http.New, http.NewRouter,
 	genRepositories.BaseProviderSet,
@@ -46,7 +46,6 @@ var providerSet = wire.NewSet(
 	services.ProviderSet,
 	internal.NewJWTCallback,
 	internal.NewAuthCallback,
-	internal.NewServer,
 )
 
 func CreateApp(cf string) (*app.Application, error) {
