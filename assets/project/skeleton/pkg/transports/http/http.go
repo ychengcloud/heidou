@@ -82,9 +82,9 @@ func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseIn
 		// 	MaxAge:           12 * time.Hour,
 	}))
 
-	// if o.Tracing {
-	// 	r.Use(ginhttp.Middleware(tracer))
-	// }
+	if o.Tracing {
+		r.Use(ginhttp.Middleware(tracer))
+	}
 
 	if o.Promtheus {
 		r.Use(ginprom.New(r).Middleware()) // 添加prometheus 监控

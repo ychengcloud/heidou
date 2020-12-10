@@ -4,6 +4,4 @@ import (
 	"github.com/google/wire"
 )
 
-var ProviderSet = wire.NewSet(
-	NewGormEmployeeRepository,
-)
+var ProviderSet = wire.NewSet()

@@ -3,8 +3,10 @@ package internal
 import (
 	"github.com/gin-gonic/gin"
 
-	"{{ . }}/pkg/transports/http/middlewares/jwt"
+
+
 	permission "{{ . }}/pkg/transports/http/middlewares/permission"
+	"{{ . }}/pkg/transports/http/middlewares/jwt"
 )
 
 type JWTCallback struct {

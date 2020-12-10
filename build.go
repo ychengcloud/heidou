@@ -1,7 +1,9 @@
 package heidou
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -11,6 +13,7 @@ import (
 
 	"github.com/shurcooL/httpfs/text/vfstemplate"
 	"github.com/shurcooL/httpfs/vfsutil"
+	"golang.org/x/tools/imports"
 )
 
 type templateNode struct {
@@ -84,6 +87,24 @@ var parseRepeatList = []templateNode{
 	services,
 }
 
+// format
+func format(filename string, content []byte) error {
+	ext := filepath.Ext(filename)
+	data := content
+	if ext == ".go" {
+		var err error
+		data, err = imports.Process(filename, content, nil)
+		if err != nil {
+			return fmt.Errorf("format file %s: %v", filename, err)
+		}
+
+	}
+	if err := ioutil.WriteFile(filename, data, 0644); err != nil {
+		return fmt.Errorf("write file %s: %v", filename, err)
+	}
+	return nil
+}
+
 func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data interface{}) error {
 	var path string
 	if pathArg != "" {
@@ -107,12 +128,22 @@ func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data int
 		return err
 	}
 
-	file, err := os.Create(path)
-	if err != nil {
+	// file, err := os.Create(path)
+	// if err != nil {
+	// 	return err
+	// }
+	// defer file.Close()
+
+	b := bytes.NewBuffer(nil)
+
+	if err := tmpl.Execute(b, data); err != nil {
 		return err
 	}
-	defer file.Close()
-	return tmpl.Execute(file, data)
+
+	if err := format(path, b.Bytes()); err != nil {
+		return err
+	}
+	return nil
 }
 
 // suffix不为空时，去掉生成文件的匹配后缀名
@@ -147,16 +178,22 @@ func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interfac
 				suffix := filepath.Ext(target)
 				target = strings.TrimSuffix(target, suffix)
 			}
-			file, err := os.Create(target)
-			if err != nil {
-				return err
-			}
-			defer file.Close()
+			// file, err := os.Create(target)
+			// if err != nil {
+			// 	return err
+			// }
+			// defer file.Close()
 
-			err = tmpl.Execute(file, data)
-			if err != nil {
+			b := bytes.NewBuffer(nil)
+			if err := tmpl.Execute(b, data); err != nil {
 				return err
 			}
+
+			if err := format(target, b.Bytes()); err != nil {
+				return err
+			}
+			return nil
+
 		}
 
 		return nil

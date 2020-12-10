@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/casbin/casbin/v2"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
@@ -89,16 +88,20 @@ type Options struct {
 	signingMethod jwt.SigningMethod
 }
 
+type Enforcer interface {
+	Enforce(vals ...interface{}) (bool, error)
+}
+
 // JWTAuth jwt认证
 type JWTAuth struct {
 	*Options
 
 	signingKey interface{}
-	Enforcer   *casbin.SyncedEnforcer
+	Enforcer   Enforcer
 }
 
 // New 创建认证实例
-func New(enforcer *casbin.SyncedEnforcer, opts *Options) (*JWTAuth, error) {
+func New(enforcer Enforcer, opts *Options) (*JWTAuth, error) {
 	auth := &JWTAuth{
 		Options:  opts,
 		Enforcer: enforcer,
@@ -155,16 +158,12 @@ func (a *JWTAuth) GenerateToken(claims jwt.MapClaims) (TokenInfo, error) {
 // 解析令牌
 func (a *JWTAuth) parseToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, a.keyfunc)
-	fmt.Println("parseToken:", token, err)
 	if !token.Valid {
 		return nil, err
 	}
-	fmt.Println("parseToken:", token, err)
 
 	if token != nil {
 		if claims, ok := token.Claims.(*jwt.MapClaims); ok && token.Valid {
-			fmt.Println("parseToken:", claims, ok)
-
 			return *claims, nil
 		}
 	}

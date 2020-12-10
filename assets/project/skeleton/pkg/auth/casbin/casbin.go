@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+
+	"{{ . }}/pkg/auth"
 )
 
 // Options is  configuration of database
@@ -28,7 +30,7 @@ func NewOptions(v *viper.Viper, logger *zap.Logger) (*Options, error) {
 }
 
 // Init 初始化数据库
-func New(db *gorm.DB, o *Options) (*casbin.SyncedEnforcer, error) {
+func New(db *gorm.DB, o *Options) (auth.Enforcer, error) {
 	adapter, err := adapter.NewAdapterByDB(db)
 	if err != nil {
 		return nil, err

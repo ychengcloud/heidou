@@ -37,7 +37,6 @@ var providerSet = wire.NewSet(
 	jwt.ProviderSet,
 	permission.ProviderSet,
 	casbin.ProviderSet,
-	http.New, http.NewRouter,
 	genRepositories.BaseProviderSet,
 	genControllers.BaseProviderSet,
 	genServices.BaseProviderSet,
