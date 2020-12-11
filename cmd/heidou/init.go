@@ -9,8 +9,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/decker502/heidou"
 	"github.com/spf13/cobra"
+
+	"github.com/horcus/heidou"
 )
 
 var configFilename string
@@ -49,7 +50,7 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
-	initCmd.Flags().StringVarP(&configFilename, "config", "c", "heidou.yml", "config file name")
+	initCmd.Flags().StringVarP(&configFilename, "config", "c", "heidou-example.yml", "config file name")
 	initCmd.Flags().StringVarP(&pkgPath, "pkg-name", "p", "", "package name")
 	err := initCmd.MarkFlagRequired("pkg-name")
 	if err != nil {
@@ -61,7 +62,7 @@ func init() {
 
 func genConfig(name string, pkgPath string) error {
 	if name == "" {
-		name = "heidou.yml"
+		name = "heidou-example.yml"
 	}
 
 	if err := os.MkdirAll(filepath.Dir(name), 0755); err != nil {
@@ -85,11 +86,11 @@ var configTemplate = template.Must(template.New("name").Parse(
 
 db:
   dialect: mysql
-  user: root
-  password: ""
+  user: dbuser
+  password: dbpass
   host: "127.0.0.1"
   port: 3306
-  name: youcheng
+  name: dbname
   charset: utf8mb4
 
 tables:

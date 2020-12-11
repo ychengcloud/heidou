@@ -128,12 +128,6 @@ func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data int
 		return err
 	}
 
-	// file, err := os.Create(path)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer file.Close()
-
 	b := bytes.NewBuffer(nil)
 
 	if err := tmpl.Execute(b, data); err != nil {
@@ -178,11 +172,6 @@ func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interfac
 				suffix := filepath.Ext(target)
 				target = strings.TrimSuffix(target, suffix)
 			}
-			// file, err := os.Create(target)
-			// if err != nil {
-			// 	return err
-			// }
-			// defer file.Close()
 
 			b := bytes.NewBuffer(nil)
 			if err := tmpl.Execute(b, data); err != nil {

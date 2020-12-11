@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/decker502/heidou/assets"
+	"github.com/horcus/heidou/assets"
 	"github.com/shurcooL/httpfs/vfsutil"
 )
 

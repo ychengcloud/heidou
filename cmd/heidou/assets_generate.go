@@ -5,9 +5,9 @@ package main
 import (
 	"log"
 
-	"github.com/decker502/heidou/assets"
-
 	"github.com/shurcooL/vfsgen"
+
+	"github.com/horcus/heidou/assets"
 )
 
 func main() {

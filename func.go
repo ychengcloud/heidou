@@ -145,17 +145,6 @@ func receiver(s string) (r string) {
 		}
 	}
 
-	// for i := 1; i < min; i++ {
-	// 	r := parts[0][:i]
-	// 	for _, w := range parts[1:] {
-	// 		r += w[:i]
-	// 	}
-	// 	if _, ok := importPkg[r]; !ok {
-	// 		s = r
-	// 		break
-	// 	}
-	// }
-
 	//TODO 重复检测
 	s = parts[0][:1]
 	for _, w := range parts[1:] {

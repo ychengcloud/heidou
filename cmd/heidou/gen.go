@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/decker502/heidou"
-	"github.com/decker502/heidou/api"
+	"github.com/horcus/heidou"
+	"github.com/horcus/heidou/api"
 )
 
 var configPath string

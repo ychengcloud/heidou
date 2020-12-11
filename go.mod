@@ -1,4 +1,4 @@
-module github.com/decker502/heidou
+module github.com/horcus/heidou
 
 go 1.15
 

@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/decker502/heidou"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
+
+	"github.com/horcus/heidou"
 )
 
 const (

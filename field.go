@@ -25,7 +25,7 @@ const (
 type JoinType string
 
 const (
-	JoinTypeNone       = ""
+	JoinTypeNone       = "None"
 	JoinTypeBelongTo   = "BelongTo"
 	JoinTypeHasOne     = "HasOne"
 	JoinTypeHasMany    = "HasMany"
@@ -103,7 +103,6 @@ func parseColumnLength(columnType string) (maxLength int) {
 		}
 	}
 
-	// fmt.Printf("columnType: %-20s %-20s %d\n", columnType, columnType, maxLength)
 	return maxLength
 }
 
@@ -124,15 +123,12 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 		MetaType:    metaTypes[columnType], //meta
 		MaxLength:   maxLength,
 	}
-	// fmt.Printf("shiftMetaField: %s -- %s -- %s -- %s -- %s -- %s -- %#v\n", column.Name, column.Type, column.DataType, column.Comment, columnType, metaTypes[columnType], field)
 
 	field.genName()
 	field.handleTags()
 
-	// fmt.Println("shiftMetaField:", column, field.MetaType, isUnsigned, columnType)
 	if strings.ToUpper(column.Key) == "PRI" {
 		field.IsPrimaryKey = true
-		// field.MetaType.GqlType = "ID"
 		field.IsRequired = true
 	}
 

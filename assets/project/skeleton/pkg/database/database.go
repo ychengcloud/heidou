@@ -20,28 +20,6 @@ type Options struct {
 	Debug    bool
 }
 
-// // GormLogger struct
-// type GormLogger struct{}
-
-// // Print - Log Formatter
-// func (*GormLogger) Print(v ...interface{}) {
-// 	switch v[0] {
-// 	case "sql":
-// 		log.WithFields(
-// 			log.Fields{
-// 				"module":        "gorm",
-// 				"type":          "sql",
-// 				"rows_returned": v[5],
-// 				"src":           v[1],
-// 				"values":        v[4],
-// 				"duration":      v[2],
-// 			},
-// 		).Info(v[3])
-// 	case "log":
-// 		log.WithFields(log.Fields{"module": "gorm", "type": "log"}).Print(v[2])
-// 	}
-// }
-
 // Init 初始化数据库
 func New(o *Options) (*gorm.DB, error) {
 	var err error

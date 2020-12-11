@@ -71,7 +71,7 @@ func (s *Gorm{{.NameCamel}}Repository) Get({{$primaryKeyField.NameLowerCamel}} {
 
     db := s.db.Model({{.NameLowerCamel}})
 	{{- range .Fields}}
-	{{- if not (eq .JoinType "") }}
+	{{- if not (eq .JoinType "None") }}
     db = db.Preload("{{.NameCamelPlural}}")
     {{- end}}
     {{- end}}
