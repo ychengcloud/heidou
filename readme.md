@@ -1,14 +1,14 @@
 # Heidou
 
 ## 理念 
-专为提效管理后台而生
+提效管理后台,自动化生成必要代码，CRUD交给我，业务交给你
 
 ## 特性
 
 - 生成符合 Golang 设计哲学的工程框架，包括基础功能(JWT, OpenTracing, ZapLog, Promtheus)
 - 依赖注入
 - 根据数据库生成对应 CRUD 方法
-- 支持查询过滤、排序、分页、指定返回字段、批量查询、批量删除
+- 支持查询过滤、排序、分页、指定返回字段、批量查询、批量更新、批量删除
 - 支持 BelongTo \ HasOne \ HasMany \ ManyToMany 关联配置
 - 支持配置校验信息
 - 支持 Swagger 文档自动生成
@@ -28,13 +28,26 @@
 ### TODO
 - 批量更新
 - 针对管理系统和应用的权限配置
+- docker-compose
 
+## 依赖
+
+- make
+- golang
+
+## 编译
+
+    make build
+
+## 安装
+
+    make install
 
 ## 生成项目
 
 ### 初始化项目
 
-    heidou-linux-amd64 init -p {PackageName} {ProjectName}
+    heidou init -p {PackageName} {ProjectName}
 
 ### 配置项目
 
@@ -45,7 +58,7 @@
 
 ### 生成项目代码
     
-    heidou-linux-amd64 generate -c heidou.yaml
+    heidou generate -c heidou.yaml
 
 ## 运行项目
 

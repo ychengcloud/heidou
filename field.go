@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"strconv"
 	"strings"
+
+	"github.com/jinzhu/inflection"
 )
 
 const (
@@ -25,11 +27,11 @@ const (
 type JoinType string
 
 const (
-	JoinTypeNone       = "None"
-	JoinTypeBelongTo   = "BelongTo"
-	JoinTypeHasOne     = "HasOne"
-	JoinTypeHasMany    = "HasMany"
-	JoinTypeManyToMany = "ManyToMany"
+	JoinTypeNone       JoinType = "None"
+	JoinTypeBelongTo   JoinType = "BelongTo"
+	JoinTypeHasOne     JoinType = "HasOne"
+	JoinTypeHasMany    JoinType = "HasMany"
+	JoinTypeManyToMany JoinType = "ManyToMany"
 )
 
 type Field struct {
@@ -69,13 +71,13 @@ type Field struct {
 func (f *Field) genName() {
 	name := f.Name
 	f.NameSnake = snake(name)
-	f.NameSnakePlural = plural(f.NameSnake)
+	f.NameSnakePlural = inflection.Plural(f.NameSnake)
 	f.NameKebab = snake(name)
-	f.NameKebabPlural = plural(f.NameKebab)
+	f.NameKebabPlural = inflection.Plural(f.NameKebab)
 	f.NameCamel = pascal(name)
-	f.NameCamelPlural = plural(f.NameCamel)
+	f.NameCamelPlural = inflection.Plural(f.NameCamel)
 	f.NameLowerCamel = camel(name)
-	f.NameLowerCamelPlural = plural(f.NameLowerCamel)
+	f.NameLowerCamelPlural = inflection.Plural(f.NameLowerCamel)
 }
 
 func findField(fields []*Field, name string) *Field {
@@ -122,6 +124,7 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 		Description: column.Comment,
 		MetaType:    metaTypes[columnType], //meta
 		MaxLength:   maxLength,
+		JoinType:    JoinTypeNone,
 	}
 
 	field.genName()
@@ -165,9 +168,12 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	if fieldInCfg.Tags != "" {
 		field.Tags = fieldInCfg.Tags
 	}
-	if fieldInCfg.JoinType != "" {
-		field.JoinType = fieldInCfg.JoinType
+	if fieldInCfg.JoinType == "" {
+		fieldInCfg.JoinType = JoinTypeNone
 	}
+
+	field.JoinType = fieldInCfg.JoinType
+	
 	if fieldInCfg.IsSkip {
 		field.IsSkip = fieldInCfg.IsSkip
 	}
@@ -203,7 +209,7 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 }
 
 func (f *Field) HandleAssociation() {
-	if f.JoinType == "" {
+	if f.JoinType == JoinTypeNone {
 		return
 	}
 

@@ -11,7 +11,7 @@ type {{.NameCamel}} struct {
 	{{- range .Fields}}
     {{- $name := .NameCamel}}
 	{{- $type := ""}}
-    {{- if eq .0 "None" }}
+    {{- if eq .JoinType "None" }}
         {{- $type = .MetaType.GoType }}
         {{- if eq .NameCamel "DeletedAt"}}
             {{- $type = "gorm.DeletedAt" }}

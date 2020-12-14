@@ -158,6 +158,9 @@ func (a *JWTAuth) GenerateToken(claims jwt.MapClaims) (TokenInfo, error) {
 // 解析令牌
 func (a *JWTAuth) parseToken(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, a.keyfunc)
+	if err != nil {
+		return nil, err
+	}
 	if !token.Valid {
 		return nil, err
 	}

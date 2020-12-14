@@ -4,10 +4,9 @@ go 1.15
 
 require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
-	github.com/go-openapi/inflect v0.19.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gogf/gf v1.14.3
-	github.com/google/wire v0.4.0 // indirect
+	github.com/iancoleman/strcase v0.1.2
+	github.com/jinzhu/inflection v1.0.0
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749
@@ -20,5 +19,4 @@ require (
 	golang.org/x/tools v0.0.0-20201019175715-b894a3290fff
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v2 v2.3.0
-	honnef.co/go/tools v0.0.1-2019.2.3
 )

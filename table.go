@@ -2,6 +2,8 @@ package heidou
 
 import (
 	"fmt"
+
+	"github.com/jinzhu/inflection"
 )
 
 var DefaultMethods = []string{"list", "create", "get", "update", "delete", "bulkGet", "bulkDelete"}
@@ -97,16 +99,15 @@ type Table struct {
 }
 
 func (t *Table) genName() {
-	name := rules.Singularize(t.Name)
+	name := inflection.Singular(t.Name)
 	t.NameSnake = snake(name)
-	t.NameSnakePlural = plural(t.NameSnake)
+	t.NameSnakePlural = inflection.Plural(t.NameSnake)
 	t.NameKebab = snake(name)
-	t.NameKebabPlural = plural(t.NameKebab)
+	t.NameKebabPlural = inflection.Plural(t.NameKebab)
 	t.NameCamel = pascal(name)
-	t.NameCamelPlural = plural(t.NameCamel)
+	t.NameCamelPlural = inflection.Plural(t.NameCamel)
 	t.NameLowerCamel = camel(name)
-	t.NameLowerCamelPlural = plural(t.NameLowerCamel)
-
+	t.NameLowerCamelPlural = inflection.Plural(t.NameLowerCamel)
 }
 
 // 合并数据库定义和项目配置中的表信息, 构建为新表结构
@@ -126,8 +127,11 @@ func MergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 		}
 
 		field = mergeField(field, fieldInCfg)
-
+		if field.IsSkip {
+			continue
+		}
 		table.handleFlags(field, metaTypes)
+		fmt.Println("merge :", field, fieldInCfg)
 		table.Fields = append(table.Fields, field)
 	}
 	table.Methods = DefaultMethods
@@ -182,7 +186,8 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 
 	// 生成配置中关联类型的字段
 	for _, field := range tableInCfg.Fields {
-		if field.JoinType == "" {
+		fmt.Println("handleCfgInfo :", field)
+		if field.JoinType == JoinTypeNone {
 			continue
 		}
 

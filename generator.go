@@ -97,12 +97,12 @@ func (g *Generator) handleBackReference(table *Table, backReferenceTable *Table)
 func (g *Generator) handleAssociation() error {
 	for _, table := range g.Data.Tables {
 		for _, field := range table.Fields {
-			if field.JoinType == "" {
+			if field.JoinType == JoinTypeNone {
 				continue
 			}
 			field.JoinTable = g.getTable(field.TableName)
 			if field.JoinTable == nil {
-				return fmt.Errorf("Something wrong, can't find %s", field.TableName)
+				return fmt.Errorf("Something wrong, can't find %s", field)
 			}
 			if field.JoinType == JoinTypeManyToMany {
 				g.handleBackReference(table, field.JoinTable)
