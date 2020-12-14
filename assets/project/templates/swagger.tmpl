@@ -21,9 +21,9 @@ paths:
       summary: "get all {{.NameLowerCamelPlural}} by pagination"
       description: ""
       parameters:
-      - name: "where"
+      - name: "filter"
         in: "query"
-        description: "column:value will use sql LIKE for search eg:id:67 will where id >67 eg2: name:eric => where name LIKE '%eric%'"
+        description: "column:op:value will use sql LIKE for search eg: id:eq:1 will where id=1 eg2: name:link:eric => where name LIKE '%eric%', op: 'eq' 'in' 'not' 'notin' 'gt' 'gte' 'lt' 'lte' 'like'"
         required: false
         schema:
           type: "array"
@@ -31,7 +31,13 @@ paths:
             type: "string"
       - name: "fields"
         in: "query"
-        description: "{$tableColumn},{$tableColumn}... "
+        description: "field1,field2... "
+        required: false
+        schema:
+          type: "string"
+      - name: "expands"
+        in: "query"
+        description: "expands resources , field1,field2... , eg: categories, variant.attributeValue"
         required: false
         schema:
           type: "string"
