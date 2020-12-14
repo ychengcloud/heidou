@@ -58,7 +58,7 @@
 
 ### 生成项目代码
     
-    heidou generate -c heidou.yaml
+    heidou generate -c heidou.yml
 
 ## 运行项目
 
