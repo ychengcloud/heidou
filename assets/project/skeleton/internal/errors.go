@@ -13,7 +13,8 @@ const (
 
 const (
 	RetCodeOK                  = 2000
-	RetCodeUnauthorized        = 4001
+	RetCodeBadToken            = 4001
+	RetCodeUnauthorized        = 4003
 	RetCodeNotFound            = 4004
 	RetCodeConflict            = 4005
 	RetCodeBadParamInput       = 4006
@@ -32,10 +33,12 @@ func GetStatusCode(err error) int {
 		return RetCodeNotFound
 	case models.ErrConflict:
 		return RetCodeConflict
+	case models.ErrBadToken:
+		return RetCodeBadToken
 	case models.ErrTokenExpried:
-		return RetCodeUnauthorized
+		return RetCodeBadToken
 	case models.ErrBadPassword:
-		return RetCodeUnauthorized
+		return RetCodeBadToken
 	case models.ErrBadParamInput:
 		return RetCodeBadParamInput
 	case models.ErrUnauthorized:

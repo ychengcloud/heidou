@@ -21,6 +21,12 @@ var (
 	ErrInvalidToken = errors.New("invalid token")
 )
 
+const (
+	ClaimsUserIDKey      = "userID"
+	ClaimsUsernameKey    = "userName"
+	ClaimsMerchantsIDKey = "merchantsID"
+)
+
 const defaultKey = "YOUCHENG"
 
 var DefaultOptions = Options{
@@ -81,6 +87,7 @@ type Options struct {
 	Issuer        string
 	ClaimsKey     string
 	SigningKey    string
+	RootAccount   string
 
 	Logger *zap.Logger
 
@@ -192,7 +199,7 @@ func (a *JWTAuth) authentication(c *gin.Context) (claims jwt.MapClaims, err erro
 	}
 
 	if token == "" {
-		err = models.ErrUnauthorized
+		err = models.ErrBadToken
 		return nil, err
 	}
 
@@ -202,7 +209,7 @@ func (a *JWTAuth) authentication(c *gin.Context) (claims jwt.MapClaims, err erro
 		case jwt.ValidationErrorExpired:
 			err = models.ErrTokenExpried
 		default:
-			err = models.ErrUnauthorized
+			err = models.ErrBadToken
 		}
 	}
 	log.Println("jwt claims:", auth, claims, err)
@@ -215,8 +222,20 @@ func (a *JWTAuth) Authorization(c *gin.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	
+	userName := strings.TrimSpace(claims[ClaimsUsernameKey].(string))
+	account := strings.TrimSpace(a.RootAccount)
+	//超级管理员不需认证
+	if len(account) >0 && account == userName {
+		return true, nil
+	}
+	ok, err := a.Enforcer.Enforce(userName, c.Request.URL.Path, c.Request.Method)
+	if !ok || err != nil {
+		err = models.ErrUnauthorized
+		return false, err
+	}
 
-	return a.Enforcer.Enforce(claims["username"], c.Request.URL.Path, c.Request.Method)
+	return true, nil
 }
 
 var ProviderSet = wire.NewSet(New)
