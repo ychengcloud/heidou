@@ -10,8 +10,6 @@ import (
 	"{{ . }}/pkg/auth"
 	"{{ . }}/pkg/transports/http"
 	jwtmid "{{ . }}/pkg/transports/http/middlewares/jwt"
-
-	"{{ . }}/internal/services"
 )
 
 //ParseClaim ...
@@ -22,10 +20,10 @@ func parseClaims(c *gin.Context, key string) (userID uint64, userName string, mi
 	}
 	claimsMap := claims.(jwt.MapClaims)
 
-	userName = claimsMap[services.ClaimsUsernameKey].(string)
+	userName = claimsMap[auth.ClaimsUsernameKey].(string)
 	// jwt token中的数值默认序列化成了float64
-	userID = uint64(claimsMap[services.ClaimsUserIDKey].(float64))
-	mid = uint64(claimsMap[services.ClaimsMerchantsIDKey].(float64))
+	userID = uint64(claimsMap[auth.ClaimsUserIDKey].(float64))
+	mid = uint64(claimsMap[auth.ClaimsMerchantsIDKey].(float64))
 
 	return
 }

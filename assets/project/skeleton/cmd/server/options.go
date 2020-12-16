@@ -83,6 +83,12 @@ func NewAuthOptions(v *viper.Viper, logger *zap.Logger) (*auth.Options, error) {
 		zap.String("SigningKey", o.SigningKey),
 	)
 
+	var account string
+	if err = v.UnmarshalKey("app.rootAccount", &account); err != nil {
+		return nil, err
+	}
+	o.RootAccount = account
+	
 	return o, nil
 }
 

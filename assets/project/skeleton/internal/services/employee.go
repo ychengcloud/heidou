@@ -14,12 +14,6 @@ import (
 	"{{ . }}/pkg/auth"
 )
 
-const (
-	ClaimsUserIDKey      = "userID"
-	ClaimsUsernameKey    = "userName"
-	ClaimsMerchantsIDKey = "merchantsID4"
-)
-
 type EmployeeService interface {
 	Login(c context.Context, employee *gm.Employee) (*models.LoginTokenInfo, error)
 	Create(c context.Context, employee *gm.Employee) error
