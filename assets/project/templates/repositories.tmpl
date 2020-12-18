@@ -37,11 +37,12 @@ func (s *Gorm{{.NameCamel}}Repository) List(q *models.Query) (list []*models.{{.
 	{{.NameLowerCamel}} := &models.{{.NameCamel}}{}
 
 	db := s.db.Model({{.NameLowerCamel}})
-	db = Query(db, q)
+	db = Filter(db, q)
 	if err = db.Count(&total).Error; err != nil {
 		return
 	}
 
+	db = Query(db, q)
 	list = make([]*models.{{.NameCamel}}, 0)
 	db = Select(db, q.Fields)
 	db = Expands(db, q.Expands)
