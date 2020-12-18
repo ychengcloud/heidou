@@ -58,7 +58,7 @@ func operation(op string) (result string) {
 	return
 }
 
-func Query(db *gorm.DB, q *models.Query) *gorm.DB {
+func Filter(db *gorm.DB, q *models.Query) *gorm.DB {
 	for _, filter := range q.Filter {
 		w := strings.SplitN(filter, ":", 3)
 		// 不满足条件三元组的格式, eg: id:eq:1
@@ -88,7 +88,10 @@ func Query(db *gorm.DB, q *models.Query) *gorm.DB {
 		db = db.Where(field, args)
 
 	}
+	return db
+}
 
+func Query(db *gorm.DB, q *models.Query) *gorm.DB {
 	if q.Order != "" {
 		db = db.Order(q.Order)
 	}
