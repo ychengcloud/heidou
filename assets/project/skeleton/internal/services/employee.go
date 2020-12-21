@@ -80,6 +80,7 @@ func (s *DefaultEmployeeService) Create(c context.Context, employee *gm.Employee
 	}
 	s.logger.Info("create Admin", zap.String("name", employee.Username))
 
+	employee.Password = hashAndSalt([]byte(employee.Password))
 	err := s.grEmployee.Create(employee)
 	if err != nil {
 		return err
