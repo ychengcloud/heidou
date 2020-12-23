@@ -118,6 +118,8 @@
 
 本项目的产生离不开这些优秀项目的启发， 如有遗漏欢迎补充指正
 
+https://github.com/LyricTian/gin-admin
+
 https://github.com/cmelgarejo/go-gql-server
 
 https://github.com/8treenet/freedom
