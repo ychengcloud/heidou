@@ -52,6 +52,8 @@ func New(o *Options) (*gorm.DB, error) {
 		return nil, errors.Wrap(err, "gorm open database connection error")
 	}
 
+	_ = db.Use(&OpentracingPlugin{})
+
 	if o.Debug {
 		db = db.Debug()
 	}
