@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -12,13 +11,12 @@ import (
 	"github.com/google/wire"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
-
-	"{{ . }}/internal/gen/models"
 )
 
 // 定义错误
 var (
 	ErrInvalidToken = errors.New("invalid token")
+	ErrUnauthorized = errors.New("Unauthorized")
 )
 
 const (
@@ -199,7 +197,7 @@ func (a *JWTAuth) authentication(c *gin.Context) (claims jwt.MapClaims, err erro
 	}
 
 	if token == "" {
-		err = models.ErrBadToken
+		err = ErrInvalidToken
 		return nil, err
 	}
 
@@ -207,9 +205,9 @@ func (a *JWTAuth) authentication(c *gin.Context) (claims jwt.MapClaims, err erro
 	if err != nil {
 		switch err.(*jwt.ValidationError).Errors {
 		case jwt.ValidationErrorExpired:
-			err = models.ErrTokenExpried
+			err = ErrInvalidToken
 		default:
-			err = models.ErrBadToken
+			err = ErrInvalidToken
 		}
 	}
 	log.Println("jwt claims:", auth, claims, err)
@@ -222,16 +220,16 @@ func (a *JWTAuth) Authorization(c *gin.Context) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	
+
 	userName := strings.TrimSpace(claims[ClaimsUsernameKey].(string))
 	account := strings.TrimSpace(a.RootAccount)
 	//超级管理员不需认证
-	if len(account) >0 && account == userName {
+	if len(account) > 0 && account == userName {
 		return true, nil
 	}
 	ok, err := a.Enforcer.Enforce(userName, c.Request.URL.Path, c.Request.Method)
 	if !ok || err != nil {
-		err = models.ErrUnauthorized
+		err = ErrUnauthorized
 		return false, err
 	}
 
