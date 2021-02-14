@@ -46,7 +46,7 @@ func ({{$receiver}} *{{.NameCamel}}Controller) List(c *gin.Context) {
 		return
 	}
 
-	JsonPagination(c, list, total, query)
+	JsonPagination(c, list, total)
 }
 
 func ({{$receiver}} *{{.NameCamel}}Controller) Create(c *gin.Context) {

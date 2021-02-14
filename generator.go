@@ -102,7 +102,7 @@ func (g *Generator) handleAssociation() error {
 			}
 			field.JoinTable = g.getTable(field.TableName)
 			if field.JoinTable == nil {
-				return fmt.Errorf("Something wrong, can't find %s", field)
+				return fmt.Errorf("Something wrong, can't find1 : %#v\n", field)
 			}
 			if field.JoinType == JoinTypeManyToMany {
 				g.handleBackReference(table, field.JoinTable)

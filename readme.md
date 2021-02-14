@@ -71,6 +71,11 @@
     cp config/server-example.yaml config/server.yaml
     vim config/server.yaml
 
+### 安装依赖
+
+go get github.com/google/wire/cmd/wire
+go get github.com/silenceper/gowatch
+
 ### 编译
     make build
 

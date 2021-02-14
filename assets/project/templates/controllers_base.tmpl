@@ -39,12 +39,10 @@ func JsonData(c *gin.Context, data interface{}) {
     	c.JSON(200, gin.H{internal.RetCode: internal.RetCodeOK, "data": data})
     }
 }
-func JsonPagination(c *gin.Context, list interface{}, total int64, query *models.Query) {
+func JsonPagination(c *gin.Context, list interface{}, total int64) {
 	data := map[string]interface{}{
 		"list":   list,
 		"total":  total,
-		"offset": query.Offset,
-		"limit":  query.Limit,
 	}
 	c.JSON(200, gin.H{internal.RetCode: internal.RetCodeOK, "data": data})
 }
