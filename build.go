@@ -3,22 +3,25 @@ package heidou
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"syscall"
 	"text/template"
 
-	"github.com/shurcooL/httpfs/text/vfstemplate"
-	"github.com/shurcooL/httpfs/vfsutil"
 	"golang.org/x/tools/imports"
 )
 
 type templateNode struct {
 	NameFormat string
 	FileName   string
+}
+
+var goModBase = templateNode{
+	NameFormat: "go.mod",
+	FileName:   "templates/go.mod.tmpl",
 }
 
 var modelsBase = templateNode{
@@ -72,6 +75,7 @@ var assetsGenerate = templateNode{
 }
 
 var parseBaseList = []templateNode{
+	goModBase,
 	modelsBase,
 	controllersBase,
 	repositoriesBase,
@@ -105,7 +109,7 @@ func format(filename string, content []byte) error {
 	return nil
 }
 
-func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data interface{}) error {
+func (n *templateNode) ParseExecute(dir fs.FS, pathArg string, data interface{}) error {
 	var path string
 	if pathArg != "" {
 		path = fmt.Sprintf(n.NameFormat, pathArg)
@@ -123,7 +127,7 @@ func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data int
 
 	name := filepath.Base(n.FileName)
 	t := template.New(name).Funcs(Funcs)
-	tmpl, err := vfstemplate.ParseFiles(fs, t, n.FileName)
+	tmpl, err := t.ParseFS(dir, n.FileName)
 	if err != nil {
 		return err
 	}
@@ -141,8 +145,10 @@ func (n *templateNode) ParseExecute(fs http.FileSystem, pathArg string, data int
 }
 
 // suffix不为空时，去掉生成文件的匹配后缀名
-func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interface{}) error {
-	walkFn := func(path string, fi os.FileInfo, err error) error {
+func build(dir fs.FS, root, dest string, trimSuffix bool, data interface{}) error {
+	
+	walkFn := func(path string, entry fs.DirEntry, err error) error {
+
 		if err != nil {
 			return err
 		}
@@ -155,15 +161,15 @@ func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interfac
 			return err
 		}
 		target := filepath.Join(dest, relPath)
-
-		if fi.IsDir() {
+		// target := filepath.Join(dest, path)
+		if entry.IsDir() {
 			err = os.MkdirAll(target, 0744)
 			if err != nil {
 				return err
 			}
 		} else {
 			t := template.New(filepath.Base(path)).Funcs(Funcs)
-			tmpl, err := vfstemplate.ParseFiles(fs, t, path)
+			tmpl, err := t.ParseFS(dir, path)
 			if err != nil {
 				return err
 			}
@@ -184,11 +190,11 @@ func build(fs http.FileSystem, root, dest string, trimSuffix bool, data interfac
 			return nil
 
 		}
-
 		return nil
 	}
 
-	err := vfsutil.Walk(fs, root, walkFn)
+	// err := vfsutil.Walk(fs, root, walkFn)
+	err := fs.WalkDir(dir, root, walkFn)
 	if err != nil {
 		return err
 	}

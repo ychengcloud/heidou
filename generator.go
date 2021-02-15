@@ -2,11 +2,9 @@ package heidou
 
 import (
 	"fmt"
+	"io/fs"
 
 	"gopkg.in/yaml.v2"
-
-	"github.com/horcus/heidou/assets"
-	"github.com/shurcooL/httpfs/vfsutil"
 )
 
 type Generator struct {
@@ -35,7 +33,7 @@ func NewGenerator(cfg *Config, loader Loader) *Generator {
 		Loader: loader,
 	}
 
-	mappings := must(loadMappings("/mappings.yaml"))
+	mappings := must(loadMappings("mappings.yaml"))
 
 	gen.MetaTypes = make(map[string]MetaType, len(mappings.MetaTypes))
 	for _, v := range mappings.MetaTypes {
@@ -161,17 +159,25 @@ func GenProject(dest string, pkgPath string) error {
 }
 
 func genSkeleton(dest string, data interface{}) error {
-
-	err := build(assets.Project, "/skeleton", dest, false, data)
+	sub, err := fs.Sub(Assets, "_assets")
 	if err != nil {
+		return err
+	}
+	err = build(sub, "skeleton", dest, false, data)
+	if err != nil {
+		fmt.Println("err:", err, dest)
 		return err
 	}
 	return nil
 }
 
 func (g *Generator) gen() error {
+	sub, err := fs.Sub(Assets, "_assets")
+	if err != nil {
+		return err
+	}
 	for _, node := range parseBaseList {
-		err := node.ParseExecute(assets.Project, "", g.Data)
+		err := node.ParseExecute(sub, "", g.Data)
 		if err != nil {
 			return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
 		}
@@ -181,7 +187,7 @@ func (g *Generator) gen() error {
 		tableName := table.Name
 		//generate model from table
 		for _, node := range parseRepeatList {
-			err := node.ParseExecute(assets.Project, tableName, table)
+			err := node.ParseExecute(sub, tableName, table)
 			if err != nil {
 				return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
 			}
@@ -198,7 +204,12 @@ func must(sm *MetaTypes, err error) *MetaTypes {
 
 // 加载 SQL 类型映射文件数据
 func loadMappings(mappingFileName string) (*MetaTypes, error) {
-	byteValue, err := vfsutil.ReadFile(assets.Project, mappingFileName)
+	sub, err := fs.Sub(Assets, "_assets")
+	if err != nil {
+		return nil, err
+	}
+
+	byteValue, err := fs.ReadFile(sub, mappingFileName)
 	if err != nil {
 		fmt.Printf("Error loading mapping file %s error: %v\n", mappingFileName, err)
 		return nil, err
