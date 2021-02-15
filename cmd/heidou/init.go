@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -74,7 +73,7 @@ func genConfig(name string, pkgPath string) error {
 		panic(err)
 	}
 
-	if err := ioutil.WriteFile(name, buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(name, buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("unable to write cfg file: " + err.Error())
 	}
 

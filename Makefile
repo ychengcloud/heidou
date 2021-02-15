@@ -9,15 +9,8 @@ test:
 		go test ./... -covermode=count -coverprofile=dist/cover-$$app.out ;\
 	done
 
-.PHONY: assets_gen
-assets_gen:
-	for app in $(apps) ;\
-	do \
-		go generate -tags=dev ./assets ;\
-	done
-
 .PHONY: build
-build: assets_gen
+build: 
 	for app in $(apps) ;\
 	do \
 		go build -o dist/$$app ./cmd/$$app/; \
