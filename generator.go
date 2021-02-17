@@ -7,6 +7,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	AssetsRoot = "_assets"
+)
 type Generator struct {
 	Config    *Config
 	Data      *Data
@@ -159,7 +162,7 @@ func GenProject(dest string, pkgPath string) error {
 }
 
 func genSkeleton(dest string, data interface{}) error {
-	sub, err := fs.Sub(Assets, "_assets")
+	sub, err := fs.Sub(Assets, AssetsRoot)
 	if err != nil {
 		return err
 	}
@@ -172,7 +175,7 @@ func genSkeleton(dest string, data interface{}) error {
 }
 
 func (g *Generator) gen() error {
-	sub, err := fs.Sub(Assets, "_assets")
+	sub, err := fs.Sub(Assets, AssetsRoot)
 	if err != nil {
 		return err
 	}
@@ -204,7 +207,7 @@ func must(sm *MetaTypes, err error) *MetaTypes {
 
 // 加载 SQL 类型映射文件数据
 func loadMappings(mappingFileName string) (*MetaTypes, error) {
-	sub, err := fs.Sub(Assets, "_assets")
+	sub, err := fs.Sub(Assets, AssetsRoot)
 	if err != nil {
 		return nil, err
 	}
