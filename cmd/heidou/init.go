@@ -10,7 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/horcus/heidou"
+	"github.com/ychengcloud/heidou"
 )
 
 var configFilename string

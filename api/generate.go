@@ -1,8 +1,8 @@
 package api
 
 import (
-	"github.com/horcus/heidou"
-	"github.com/horcus/heidou/loader"
+	"github.com/ychengcloud/heidou"
+	"github.com/ychengcloud/heidou/loader"
 )
 
 func Generate(cfg *heidou.Config) error {

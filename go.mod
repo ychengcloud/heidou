@@ -1,4 +1,4 @@
-module github.com/horcus/heidou
+module github.com/ychengcloud/heidou
 
 go 1.16
 

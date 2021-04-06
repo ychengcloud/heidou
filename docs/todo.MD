@@ -9,7 +9,7 @@ mysql -h 127.0.0.1 -u root todo < db/table.sql
 
 ### 初始化项目
 
-heidou init -p github.com/horcus/heidou/example/todo backend
+heidou init -p github.com/ychengcloud/heidou/example/todo backend
 
 
 ### 修改 heidou 配置文件， 生成项目代码

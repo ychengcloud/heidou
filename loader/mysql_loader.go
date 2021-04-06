@@ -7,7 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sirupsen/logrus"
 
-	"github.com/horcus/heidou"
+	"github.com/ychengcloud/heidou"
 )
 
 const (
