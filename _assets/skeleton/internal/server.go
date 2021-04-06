@@ -4,8 +4,8 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"{{ . }}/pkg/app"
-	"{{ . }}/pkg/transports/http"
+	"{{ .Extra.pkgpath }}/pkg/app"
+	"{{ .Extra.pkgpath }}/pkg/transports/http"
 )
 
 type Options struct {

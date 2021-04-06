@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"{{.PkgPath}}/internal/gen/models"
+	"{{ .Extra.pkgpath }}/internal/gen/models"
 )
 
 {{- $primaryKeyField := .PrimaryKeyField}}

@@ -1,0 +1,117 @@
+
+projectName: {{.}}
+
+# Extra 为用户自定义变量，以 map 结构读取，golang 中 map的key 不区分大小写，所以引用时全部以小写形式引用，例如 ： .Extra.pkgpath
+extra:
+  pkgPath: github.com/ychengcloud/auth
+  skipFields: 
+    - CreatedAt
+    - DeletedAt
+    - UpdateBy
+    - UpdatedAt
+    - CreateBy
+
+# Golang 的默认变量标识符与模板中的变量标识符相同时，需要修改成不同的
+#delim:
+#  left: "@@"
+#  right: "@@"
+
+db:
+  dialect: mysql
+  user: root
+  password: ""
+  host: "127.0.0.1"
+  port: 3306
+  name: test
+  charset: utf8mb4
+
+# NameFormat 目标路径
+# Path 模板路径名，以 templates为相对路径
+templates:
+  - NameFormat: "src/pages/%s"
+    Path:   "pages"
+  - NameFormat: "src/locales/en-us/%s.ts"
+    Path:   "locale_en.ts.tmpl"
+  - NameFormat: "src/locales/zh-cn/%s.ts"
+    Path:   "locale_zh.ts.tmpl"
+# templates:
+#   - NameFormat: "internal/gen/controllers/%s.go"
+#     Path:   "controllers.tmpl"
+#   - NameFormat: "internal/gen/models/%s.go"
+#     Path:   "models.tmpl"
+#   - NameFormat: "internal/gen/repositories/%s.go"
+#     Path:   "repositories.tmpl"
+#   - NameFormat: "internal/gen/services/%s.go"
+#     Path:   "services.tmpl"
+
+tables:
+  - name: project
+    fields:
+    - name: name
+      isRequired: true
+      isFilterable: true
+  - name: product
+    fields:
+    - name: id
+      isRequired: true
+      isFilterable: true
+    - name: name
+      isRequired: true
+      isFilterable: true
+      tags: `binding:"required,max=64"`
+    - name: variant
+      joinType: "HasMany"
+      tableName: product_variant
+    - name: category
+      joinType: "ManyToMany"
+      tableName: category  
+      joinTableName: product_category_relation
+  - name: employee
+    methods: ["list", "update", "delete", "bulkGet", "bulkDelete"]
+    fields:
+    - name: role
+      joinType: "ManyToMany"
+      tableName: role  
+      joinTableName: employee_role_relation
+  - name: role
+    methods: ["list", "get", "bulkGet", "bulkDelete"]
+    fields:
+    - name: action
+      joinType: "ManyToMany"
+      tableName: action  
+      joinTableName: role_action_relation
+      errorCodes: [E1, E2]
+    - name: resource
+      joinType: "ManyToMany"
+      tableName: resource  
+      joinTableName: role_resource_relation
+      errorCodes: [E1, E2]
+  - name: casbin_rules
+    isSkip: true
+  - name: employee_role_relation
+    isSkip: true
+  - name: migrations
+    isSkip: true
+  - name: product_attribute_value_relation
+    isSkip: true
+  - name: product_category_relation
+    isSkip: true
+  - name: product_collection_relation
+    isSkip: true
+  - name: product_midea_file_relation
+    isSkip: true
+  - name: product_type_variant_attribute_relation
+    isSkip: true
+  - name: product_variant_attribute_value_relation
+    isSkip: true
+  - name: role_action_relation
+    isSkip: true
+  - name: role_resource_relation
+    isSkip: true
+  - name: user_group_relation
+    isSkip: true
+  - name: user_org_node_relation
+    isSkip: true
+  - name: event_logs
+    isSkip: true
+  

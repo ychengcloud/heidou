@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"{{ . }}/pkg/transports/http"
+	"{{ .Extra.pkgpath }}/pkg/transports/http"
 )
 
 type Application struct {

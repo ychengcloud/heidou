@@ -5,8 +5,8 @@ import (
 
 	"go.uber.org/zap"
 
-    "{{.PkgPath}}/internal/gen/repositories"
-	"{{.PkgPath}}/internal/gen/models"
+    "{{ .Extra.pkgpath }}/internal/gen/repositories"
+	"{{ .Extra.pkgpath }}/internal/gen/models"
 )
 
 {{- $primaryKeyField := .PrimaryKeyField}}

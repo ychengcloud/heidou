@@ -30,6 +30,9 @@ type MetaType struct {
 	// JSONType mapped json type
 	JSONType string `yaml:"jsonType"`
 
+	// tsType mapped typescript type
+	TSType string `yaml:"tsType"`
+
 	// ProtobufType mapped protobuf type
 	ProtobufType string `yaml:"protobufType"`
 
@@ -70,10 +73,10 @@ type BackReferenceInfo struct {
 	JoinTableName        string
 }
 type Table struct {
-	Name        string `yaml:"name"`
-	PkgPath     string `yaml:"pkgPath"`
-	Description string `yaml:"description"`
-	IsSkip      bool   `yaml:"isSkip"`
+	Name        string      `yaml:"name"`
+	Description string      `yaml:"description"`
+	IsSkip      bool        `yaml:"isSkip"`
+	Extra       interface{} `yaml:"extra"`
 
 	Fields     []*Field    `yaml:"fields"`
 	ErrorCodes []ErrorCode `yaml:"errorCodes"`

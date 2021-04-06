@@ -3,11 +3,25 @@ package heidou
 import "text/template"
 
 type Config struct {
-	PkgPath  string   `yaml:"pkgPath"`
-	DBConfig DBConfig `yaml:"db" mapstructure:"db"`
-	Tables   []*Table `yaml:"tables"`
+	ProjectName string      `yaml:"projectName"`
+	Extra       interface{} `yaml:"extra"`
+	DBConfig    DBConfig    `yaml:"db" mapstructure:"db"`
+	Tables      []*Table    `yaml:"tables"`
+	Templates   []*Template `yaml:"templates"`
+	Delim       Delim       `yaml:"delim"`
 
-	Funcs template.FuncMap
+	TemplatesPath string
+	Funcs         template.FuncMap
+}
+
+type Delim struct {
+	Left  string `yaml:"left"`
+	Right string `yaml:"right"`
+}
+
+type Template struct {
+	NameFormat string `yaml:"nameFormat"`
+	Path       string `yaml:"path"`
 }
 
 type DBConfig struct {

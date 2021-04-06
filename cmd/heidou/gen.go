@@ -14,11 +14,12 @@ import (
 )
 
 var configPath string
+var tplPath string
 
 var generateCmd = &cobra.Command{
 	Use:     "generate [flags]",
 	Short:   "generate go code for the database schema",
-	Example: `heidou generate -c ./config.yml`,
+	Example: `heidou generate -c ./config.yml -t tpl_path`,
 	Args: func(_ *cobra.Command, args []string) error {
 		return nil
 	},
@@ -27,6 +28,9 @@ var generateCmd = &cobra.Command{
 		logrus.Println(cfg, cfg.DBConfig, cfg.Tables)
 		for _, table := range cfg.Tables {
 			logrus.Println(table)
+		}
+		if len(tplPath) > 0 {
+			cfg.TemplatesPath = tplPath
 		}
 		err := api.Generate(cfg)
 		if err != nil {
@@ -38,6 +42,7 @@ var generateCmd = &cobra.Command{
 
 func init() {
 	generateCmd.Flags().StringVarP(&configPath, "config", "c", "./config.yml", "config file path")
+	generateCmd.Flags().StringVarP(&tplPath, "templates", "t", "", "template path")
 
 	cobra.OnInitialize()
 	rootCmd.AddCommand(generateCmd)

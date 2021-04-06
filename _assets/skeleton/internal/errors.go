@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"{{ . }}/internal/gen/models"
+	"{{ .Extra.pkgpath }}/internal/gen/models"
 )
 
 const (
@@ -33,8 +33,6 @@ func GetStatusCode(err error) int {
 		return RetCodeNotFound
 	case models.ErrConflict:
 		return RetCodeConflict
-	case models.ErrBadToken:
-		return RetCodeBadToken
 	case models.ErrTokenExpried:
 		return RetCodeBadToken
 	case models.ErrBadPassword:

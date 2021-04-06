@@ -14,6 +14,9 @@ func Generate(cfg *heidou.Config) error {
 		Charset:  cfg.DBConfig.Charset,
 	}
 	loader := loader.NewMysqlSchemaLoader(o, cfg.DBConfig.Name)
-	g := heidou.NewGenerator(cfg, loader)
+	g, err := heidou.NewGenerator(cfg, loader)
+	if err != nil {
+		return err
+	}
 	return g.Generate()
 }

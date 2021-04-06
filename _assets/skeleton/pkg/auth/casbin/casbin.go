@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 
-	"{{ . }}/pkg/auth"
+	"{{ .Extra.pkgpath }}/pkg/auth"
 )
 
 // Options is  configuration of database

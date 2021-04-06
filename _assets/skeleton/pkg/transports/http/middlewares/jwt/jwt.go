@@ -5,7 +5,7 @@ import (
 	"github.com/google/wire"
 	"go.uber.org/zap"
 
-	"{{ . }}/pkg/auth"
+	"{{ .Extra.pkgpath }}/pkg/auth"
 )
 
 type Callback interface {

@@ -5,8 +5,8 @@ import (
 	"github.com/google/wire"
 	"go.uber.org/zap"
 
-	"{{ . }}/pkg/transports/http"
-	"{{ . }}/internal/services"
+	"{{ .Extra.pkgpath }}/pkg/transports/http"
+	"{{ .Extra.pkgpath }}/internal/services"
 )
 
 func CreateInitControllersFn(

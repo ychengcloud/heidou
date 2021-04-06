@@ -8,11 +8,11 @@ import (
 	"github.com/uber/jaeger-client-go/config"
 	"go.uber.org/zap"
 
-	"{{ . }}/internal"
-	"{{ . }}/pkg/auth"
-	"{{ . }}/pkg/database"
-	"{{ . }}/pkg/log"
-	"{{ . }}/pkg/transports/http"
+	"{{ .Extra.pkgpath }}/internal"
+	"{{ .Extra.pkgpath }}/pkg/auth"
+	"{{ .Extra.pkgpath }}/pkg/database"
+	"{{ .Extra.pkgpath }}/pkg/log"
+	"{{ .Extra.pkgpath }}/pkg/transports/http"
 )
 
 func NewHttpOptions(v *viper.Viper) (*http.Options, error) {

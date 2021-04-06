@@ -3,6 +3,7 @@ mappings:
     goType: bool
     gqlType: Boolean
     jsonType: Boolean
+    tsType: boolean
     protobufType: bool
     gureguType: null.Int
     goNullableType: sql.NullBool
@@ -11,6 +12,7 @@ mappings:
     goType: bool
     gqlType: Boolean
     jsonType: Boolean
+    tsType: boolean
     protobufType: bool
     gureguType: null.Int
     goNullableType: sql.NullBool
@@ -19,6 +21,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -27,6 +30,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -36,6 +40,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -44,6 +49,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -52,6 +58,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -60,6 +67,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -68,6 +76,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -76,6 +85,7 @@ mappings:
     goType: int64
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int64
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -84,6 +94,7 @@ mappings:
     goType: int
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -92,6 +103,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -100,6 +112,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -108,6 +121,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -116,6 +130,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -124,6 +139,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -132,6 +148,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -140,6 +157,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -148,6 +166,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -156,6 +175,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -164,6 +184,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -172,6 +193,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -180,6 +202,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -188,6 +211,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -196,6 +220,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
@@ -204,6 +229,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
@@ -212,6 +238,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
@@ -220,6 +247,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
@@ -228,6 +256,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: uint64
     gureguType: null.Time
     goNullableType: time.Time
@@ -236,6 +265,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: uint64
     gureguType: null.Time
     goNullableType: time.Time
@@ -244,6 +274,7 @@ mappings:
     goType: time.Time
     gqlType: Time
     jsonType: Text
+    tsType: string
     protobufType: google.protobuf.Timestamp
     gureguType: null.Time
     goNullableType: time.Time
@@ -252,6 +283,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -260,6 +292,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -268,6 +301,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -276,6 +310,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -284,6 +319,7 @@ mappings:
     goType: float32
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -292,6 +328,7 @@ mappings:
     goType: float32
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -300,6 +337,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -308,6 +346,7 @@ mappings:
     goType: '[]byte'
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
@@ -316,6 +355,7 @@ mappings:
     goType: '[]byte'
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
@@ -324,6 +364,7 @@ mappings:
     goType: '[]byte'
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
@@ -332,6 +373,7 @@ mappings:
     goType: '[]byte'
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
@@ -340,6 +382,7 @@ mappings:
     goType: '[]byte'
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: '[]byte'
     goNullableType: '[]byte'
@@ -348,6 +391,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -356,6 +400,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -364,6 +409,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -372,6 +418,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -380,6 +427,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -388,6 +436,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: 'interface{}'
     goNullableType: sql.NullString
@@ -396,6 +445,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: string
     gureguType: null.String
     goNullableType: sql.NullString
@@ -404,6 +454,7 @@ mappings:
     goType: string
     gqlType: String
     jsonType: Text
+    tsType: string
     protobufType: bytes
     gureguType: 'interface{}'
     goNullableType: sql.NullString
@@ -412,6 +463,7 @@ mappings:
     goType: uint
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -420,6 +472,7 @@ mappings:
     goType: uint
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -428,6 +481,7 @@ mappings:
     goType: uint
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -436,6 +490,7 @@ mappings:
     goType: uint
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: uint32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -444,6 +499,7 @@ mappings:
     goType: uint64
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: uint64
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -452,6 +508,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -460,6 +517,7 @@ mappings:
     goType: float64
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -468,6 +526,7 @@ mappings:
     goType: float32
     gqlType: Float
     jsonType: Float
+    tsType: number
     protobufType: float
     gureguType: null.Float
     goNullableType: sql.NullFloat64
@@ -478,6 +537,7 @@ mappings:
     goType: int32
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -488,6 +548,7 @@ mappings:
     goType: int32
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64
@@ -498,6 +559,7 @@ mappings:
     goType: int32
     gqlType: Int
     jsonType: Integer
+    tsType: number
     protobufType: int32
     gureguType: null.Int
     goNullableType: sql.NullInt64

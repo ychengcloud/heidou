@@ -1,8 +1,14 @@
 package heidou
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
+	"os"
+	"path/filepath"
+	"strings"
+	"syscall"
+	"text/template"
 
 	"gopkg.in/yaml.v2"
 )
@@ -10,24 +16,28 @@ import (
 const (
 	AssetsRoot = "_assets"
 )
+
 type Generator struct {
 	Config    *Config
 	Data      *Data
 	Loader    Loader
+	Assets    fs.FS
 	MetaTypes map[string]MetaType
 }
 
 type Data struct {
-	PkgPath         string
+	ProjectName     string
+	Extra           interface{}
 	HasTimeField    bool
 	IsImportStrings bool
 
 	Tables []*Table
 }
 
-func NewGenerator(cfg *Config, loader Loader) *Generator {
+func NewGenerator(cfg *Config, loader Loader) (*Generator, error) {
 	data := &Data{
-		PkgPath: cfg.PkgPath,
+		ProjectName: cfg.ProjectName,
+		Extra:       cfg.Extra,
 	}
 
 	gen := &Generator{
@@ -36,13 +46,25 @@ func NewGenerator(cfg *Config, loader Loader) *Generator {
 		Loader: loader,
 	}
 
+	var err error
+
+	if len(cfg.TemplatesPath) > 0 {
+		gen.Assets = os.DirFS(cfg.TemplatesPath)
+	} else {
+		gen.Assets, err = fs.Sub(Assets, AssetsRoot)
+		if err != nil {
+			return nil, err
+		}
+
+	}
+
 	mappings := must(loadMappings("mappings.yaml"))
 
 	gen.MetaTypes = make(map[string]MetaType, len(mappings.MetaTypes))
 	for _, v := range mappings.MetaTypes {
 		gen.MetaTypes[v.SQLType] = v
 	}
-	return gen
+	return gen, nil
 }
 
 // getTable 根据表名，查找表对象
@@ -132,13 +154,13 @@ func (g *Generator) Generate() error {
 		}
 
 		table.genName()
-		table.PkgPath = g.Data.PkgPath
 		if table.HasTimeField {
 			g.Data.HasTimeField = true
 		}
 		if table.IsImportStrings {
 			g.Data.IsImportStrings = true
 		}
+		table.Extra = g.Data.Extra
 		g.Data.Tables = append(g.Data.Tables, table)
 	}
 
@@ -151,22 +173,74 @@ func (g *Generator) Generate() error {
 	return nil
 }
 
-func GenProject(dest string, pkgPath string) error {
+// suffix不为空时，去掉生成文件的匹配后缀名
+func (g *Generator) build(dir fs.FS, root, dest string, data interface{}) error {
 
-	err := genSkeleton(dest, pkgPath)
+	walkFn := func(path string, entry fs.DirEntry, err error) error {
+
+		if err != nil {
+			return err
+		}
+
+		mask := syscall.Umask(0)
+		defer syscall.Umask(mask)
+
+		relPath, err := filepath.Rel(root, path)
+		if err != nil {
+			return err
+		}
+		target := filepath.Join(dest, relPath)
+		// target := filepath.Join(dest, path)
+		if entry.IsDir() {
+			err = os.MkdirAll(target, 0744)
+			if err != nil {
+				fmt.Println("parse fs1:", dir, path)
+				return err
+			}
+		} else {
+			t := template.New(filepath.Base(path)).Funcs(Funcs)
+			t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
+			tmpl, err := t.ParseFS(dir, path)
+			if err != nil {
+				fmt.Println("parse fs2:", dir, path)
+				return err
+			}
+
+			//如果后缀以 .tmpl .tpl结尾，则约定需要自动去除后缀
+			suffix := filepath.Ext(target)
+			if suffix == ".tmpl" || suffix == ".tpl" {
+				target = strings.TrimSuffix(target, suffix)
+			}
+
+			b := bytes.NewBuffer(nil)
+			if err := tmpl.Execute(b, data); err != nil {
+				fmt.Println("parse fs3:", dir, path)
+				return err
+			}
+
+			if err := format(target, b.Bytes()); err != nil {
+				fmt.Println("parse fs4:", dir, path)
+				return err
+			}
+			return nil
+
+		}
+		return nil
+	}
+
+	// err := vfsutil.Walk(fs, root, walkFn)
+	err := fs.WalkDir(dir, root, walkFn)
 	if err != nil {
+		fmt.Printf("parse fs5: %#v %s %#v\n", dir, root, err)
+
 		return err
 	}
 
 	return nil
 }
 
-func genSkeleton(dest string, data interface{}) error {
-	sub, err := fs.Sub(Assets, AssetsRoot)
-	if err != nil {
-		return err
-	}
-	err = build(sub, "skeleton", dest, false, data)
+func (g *Generator) genSkeleton(assets fs.FS, dest string, data interface{}) error {
+	err := g.build(assets, "skeleton", dest, data)
 	if err != nil {
 		fmt.Println("err:", err, dest)
 		return err
@@ -175,25 +249,27 @@ func genSkeleton(dest string, data interface{}) error {
 }
 
 func (g *Generator) gen() error {
-	sub, err := fs.Sub(Assets, AssetsRoot)
+	err := g.genSkeleton(g.Assets, "./", g.Data)
 	if err != nil {
 		return err
-	}
-	for _, node := range parseBaseList {
-		err := node.ParseExecute(sub, "", g.Data)
-		if err != nil {
-			return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
-		}
 	}
 
 	for _, table := range g.Data.Tables {
 		tableName := table.Name
 		//generate model from table
-		for _, node := range parseRepeatList {
-			err := node.ParseExecute(sub, tableName, table)
+		for _, template := range g.Config.Templates {
+			path := fmt.Sprintf(template.NameFormat, tableName)
+
+			err := g.build(g.Assets, "templates/"+template.Path, path, table)
 			if err != nil {
-				return fmt.Errorf("parse [%s] template failed with error : %s", node.NameFormat, err)
+				fmt.Println("err:", err, path)
+				return err
 			}
+
+			// err := template.ParseExecute(g.Assets, tableName, table)
+			// if err != nil {
+			// 	return fmt.Errorf("parse [%s] template failed with error : %s", template.NameFormat, err)
+			// }
 		}
 	}
 	return nil

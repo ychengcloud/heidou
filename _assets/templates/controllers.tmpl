@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	"{{.PkgPath}}/internal/gen/models"
-	"{{.PkgPath}}/internal/gen/services"
+	"{{ .Extra.pkgpath }}/internal/gen/models"
+	"{{ .Extra.pkgpath }}/internal/gen/services"
 )
 
 {{- $primaryKeyField := .PrimaryKeyField}}

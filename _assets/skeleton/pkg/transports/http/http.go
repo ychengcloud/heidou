@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"time"
 
@@ -16,9 +17,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 
-	"{{ . }}/assets"
-	"{{ . }}/pkg/transports/http/middlewares/ginprom"
-	netutil "{{ . }}/pkg/utils"
+	"{{ .Extra.pkgpath }}/assets"
+	"{{ .Extra.pkgpath }}/pkg/transports/http/middlewares/ginprom"
+	netutil "{{ .Extra.pkgpath }}/pkg/utils"
 )
 
 var (
@@ -56,7 +57,7 @@ type Server struct {
 type BaseInitControllers func(r *gin.Engine)
 type InitControllers func(r *gin.Engine)
 
-func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseInit BaseInitControllers, init InitControllers) *gin.Engine {
+func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseInit BaseInitControllers, init InitControllers) (*gin.Engine, error) {
 	if len(o.AllowMethods) == 0 {
 		o.AllowMethods = DefaultAllowMethods
 	}
@@ -92,8 +93,13 @@ func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseIn
 	}
 
 	if o.Doc {
-		r.StaticFS("doc", assets.Swagger)
+		sub, err := fs.Sub(assets.Swagger, "doc")
+		if err != nil {
+			return nil, err
+		}
+		r.StaticFS("/doc/", http.FS(sub))
 	}
+
 
 	if o.Pprof {
 		pprof.Register(r)
@@ -102,7 +108,7 @@ func NewRouter(o *Options, logger *zap.Logger, tracer opentracing.Tracer, baseIn
 	baseInit(r)
 	init(r)
 
-	return r
+	return r, nil
 }
 
 func New(o *Options, logger *zap.Logger, router *gin.Engine) (*Server, error) {
