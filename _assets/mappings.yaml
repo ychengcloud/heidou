@@ -460,7 +460,7 @@ mappings:
     goNullableType: sql.NullString
     swaggerType: string
   - sqlType: utinyint
-    goType: uint
+    goType: int
     gqlType: Int
     jsonType: Integer
     tsType: number
@@ -469,7 +469,7 @@ mappings:
     goNullableType: sql.NullInt64
     swaggerType: integer
   - sqlType: usmallint
-    goType: uint
+    goType: int
     gqlType: Int
     jsonType: Integer
     tsType: number
@@ -478,7 +478,7 @@ mappings:
     goNullableType: sql.NullInt64
     swaggerType: integer
   - sqlType: umediumint
-    goType: uint
+    goType: int
     gqlType: Int
     jsonType: Integer
     tsType: number
@@ -487,7 +487,7 @@ mappings:
     goNullableType: sql.NullInt64
     swaggerType: integer
   - sqlType: uint
-    goType: uint
+    goType: int
     gqlType: Int
     jsonType: Integer
     tsType: number
@@ -496,7 +496,7 @@ mappings:
     goNullableType: sql.NullInt64
     swaggerType: integer
   - sqlType: ubigint
-    goType: uint64
+    goType: int
     gqlType: Int
     jsonType: Integer
     tsType: number
