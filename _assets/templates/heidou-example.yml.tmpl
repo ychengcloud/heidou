@@ -1,6 +1,8 @@
 
 projectName: {{.}}
 
+loader: memory
+
 # Extra 为用户自定义变量，以 map 结构读取，golang 中 map的key 不区分大小写，所以引用时全部以小写形式引用，例如 ： .Extra.pkgpath
 extra:
   pkgPath: github.com/ychengcloud/auth

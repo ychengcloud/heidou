@@ -14,7 +14,7 @@ const (
 	DialectMysql = "mysql"
 )
 
-type Options struct {
+type MysqlSchemaLoaderOptions struct {
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
 	Host     string `yaml:"host"`
@@ -23,14 +23,14 @@ type Options struct {
 }
 
 type MysqlSchemaLoader struct {
-	*Options
+	*MysqlSchemaLoaderOptions
 	SchemaName string
 }
 
-func NewMysqlSchemaLoader(o *Options, schemaName string) *MysqlSchemaLoader {
+func NewMysqlSchemaLoader(o *MysqlSchemaLoaderOptions, schemaName string) *MysqlSchemaLoader {
 	return &MysqlSchemaLoader{
-		Options:    o,
-		SchemaName: schemaName,
+		MysqlSchemaLoaderOptions: o,
+		SchemaName:               schemaName,
 	}
 }
 
