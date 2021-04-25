@@ -35,23 +35,24 @@ const (
 )
 
 type Field struct {
-	Name           string   `yaml:"name"`
-	Alias          string   `yaml:"alias"`
-	Description    string   `yaml:"description"`
-	Tags           string   `yaml:"tags"`
-	IsSkip         bool     `yaml:"isSkip"`
-	IsRequired     bool     `yaml:"isRequired"`
-	IsPrimaryKey   bool     `yaml:"isPrimaryKey"`
-	IsSortable     bool     `yaml:"isSortable"`
-	IsFilterable   bool     `yaml:"isFilterable"`
-	JoinType       JoinType `yaml:"joinType"`
-	TableName      string   `yaml:"tableName"`
-	JoinTableName  string   `yaml:"JoinTableName"`
-	ForeignKey     string   `yaml:"foreignKey"`
-	References     string   `yaml:"references"`
-	JoinForeignKey string   `yaml:"joinForeignKey"`
-	JoinReferences string   `yaml:"joinReferences"`
-	Operations     []string `yaml:"operations"`
+	Name            string   `yaml:"name"`
+	Alias           string   `yaml:"alias"`
+	Description     string   `yaml:"description"`
+	Tags            string   `yaml:"tags"`
+	IsSkip          bool     `yaml:"isSkip"`
+	IsRequired      bool     `yaml:"isRequired"`
+	IsPrimaryKey    bool     `yaml:"isPrimaryKey"`
+	IsAutoIncrement bool     `yaml:"isAutoIncrement"`
+	IsSortable      bool     `yaml:"isSortable"`
+	IsFilterable    bool     `yaml:"isFilterable"`
+	JoinType        JoinType `yaml:"joinType"`
+	TableName       string   `yaml:"tableName"`
+	JoinTableName   string   `yaml:"JoinTableName"`
+	ForeignKey      string   `yaml:"foreignKey"`
+	References      string   `yaml:"references"`
+	JoinForeignKey  string   `yaml:"joinForeignKey"`
+	JoinReferences  string   `yaml:"joinReferences"`
+	Operations      []string `yaml:"operations"`
 
 	MetaType  MetaType
 	TagsHTML  template.HTML
@@ -120,26 +121,29 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 	maxLength := parseColumnLength(column.Type)
 
 	field := &Field{
-		Name:        column.Name,
-		Description: column.Comment,
-		MetaType:    metaTypes[columnType], //meta
-		MaxLength:   maxLength,
-		JoinType:    JoinTypeNone,
+		Name:            column.Name,
+		Description:     column.Comment,
+		MetaType:        metaTypes[columnType], //meta
+		MaxLength:       maxLength,
+		JoinType:        JoinTypeNone,
+		IsPrimaryKey:    column.IsPrimaryKey,
+		IsAutoIncrement: column.IsAutoIncrement,
 	}
 
 	field.genName()
 	field.handleTags()
-
-	if strings.ToUpper(column.Key) == "PRI" {
-		field.IsPrimaryKey = true
-		field.IsRequired = true
-	}
 
 	return field
 }
 
 func (f *Field) handleTags() {
 	tags := `json:"` + f.NameLowerCamel + `" gorm:"` + f.NameLowerCamel
+	if f.IsPrimaryKey {
+		tags += ";primaryKey"
+	}
+	if f.IsAutoIncrement {
+		tags += ";autoIncrement"
+	}
 	if f.MetaType.GoType == "time.Time" {
 		tags += ";default: '1970-01-01 00:00:00'"
 	}
@@ -176,7 +180,7 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	}
 
 	field.JoinType = fieldInCfg.JoinType
-	
+
 	if fieldInCfg.IsSkip {
 		field.IsSkip = fieldInCfg.IsSkip
 	}

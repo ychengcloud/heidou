@@ -54,11 +54,14 @@ func (m *MetaType) String() interface{} {
 }
 
 type Column struct {
-	Name     string
-	Type     string
-	DataType string
-	Comment  string
-	Key      string
+	Name            string
+	Type            string
+	DataType        string
+	Comment         string
+	Key             string
+	Extra           string
+	IsPrimaryKey    bool `yaml:"isPrimaryKey"`
+	IsAutoIncrement bool `yaml:"isAutoIncrement"`
 }
 type MetaTable struct {
 	Name    string

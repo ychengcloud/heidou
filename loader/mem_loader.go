@@ -18,11 +18,14 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 			Name: "user",
 			Columns: []*heidou.Column{
 				{
-					Name:     "id",
-					DataType: "bigint",
-					Type:     "bigint unsigned",
-					Comment:  "id",
-					Key:      "PRI",
+					Name:            "id",
+					DataType:        "bigint",
+					Type:            "bigint unsigned",
+					Comment:         "id",
+					Key:             "PRI",
+					Extra:           "auto_increment",
+					IsPrimaryKey:    true,
+					IsAutoIncrement: true,
 				},
 				{
 					Name:     "name",
@@ -44,11 +47,14 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 			Name: "pet",
 			Columns: []*heidou.Column{
 				{
-					Name:     "id",
-					DataType: "bigint",
-					Type:     "bigint unsigned",
-					Comment:  "id",
-					Key:      "PRI",
+					Name:            "id",
+					DataType:        "bigint",
+					Type:            "bigint unsigned",
+					Comment:         "id",
+					Key:             "PRI",
+					Extra:           "auto_increment",
+					IsPrimaryKey:    true,
+					IsAutoIncrement: true,
 				},
 				{
 					Name:     "owner_id",
@@ -70,11 +76,14 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 			Name: "group",
 			Columns: []*heidou.Column{
 				{
-					Name:     "id",
-					DataType: "bigint",
-					Type:     "bigint unsigned",
-					Comment:  "id",
-					Key:      "PRI",
+					Name:            "id",
+					DataType:        "bigint",
+					Type:            "bigint unsigned",
+					Comment:         "id",
+					Key:             "PRI",
+					Extra:           "auto_increment",
+					IsPrimaryKey:    true,
+					IsAutoIncrement: true,
 				},
 				{
 					Name:     "admin_id",
