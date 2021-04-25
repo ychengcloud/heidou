@@ -218,6 +218,10 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}) error 
 				return err
 			}
 
+			if err := os.WriteFile(target, b.Bytes(), 0644); err != nil {
+				fmt.Println("WriteFile fail:", target)
+				return err
+			}
 			if err := format(target, b.Bytes()); err != nil {
 				fmt.Println("parse fs4:", dir, path)
 				return err

@@ -38,15 +38,35 @@ templates:
     Path:   "locale_zh.ts.tmpl"
   - NameFormat: "mock/%s.ts"
     Path:   "mock.ts.tmpl"
-# templates:
-#   - NameFormat: "internal/gen/controllers/%s.go"
-#     Path:   "controllers.tmpl"
-#   - NameFormat: "internal/gen/models/%s.go"
-#     Path:   "models.tmpl"
-#   - NameFormat: "internal/gen/repositories/%s.go"
-#     Path:   "repositories.tmpl"
-#   - NameFormat: "internal/gen/services/%s.go"
-#     Path:   "services.tmpl"
+#templates:
+#  - nameFormat: "internal/models/%s.go"
+#    path:   "models/model.go.tmpl"
+#  - nameFormat: "internal/resolvers/%s.go"
+#    path:   "resolvers/resolver.go.tmpl"
+#  - nameFormat: "internal/schemas/%s.gql"
+#    path:   "schemas/schema.gql.tmpl"
+#  - nameFormat: "internal/services/%s.go"
+#    path:   "services/service.go.tmpl"
+
+# tables:
+#  - name: user
+#    fields:
+#      - name: id
+#        isRequired: true
+#        isFilterable: true
+#        operations: ["Eq", "In"]
+#      - name: name
+#        isRequired: true
+#        isSortable: true
+         tags: 'binding:"required,max=32"'
+#      - name: pet
+#        joinType: "HasMany"
+#        tableName: pet
+#        foreignKey: "owner_id"
+#      - name: friend
+#        joinType: "ManyToMany"
+#        tableName: user
+#        joinTableName: user_friends
 
 tables:
   - name: project

@@ -15,7 +15,7 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 
 	tables := []*heidou.MetaTable{
 		{
-			Name: "post",
+			Name: "user",
 			Columns: []*heidou.Column{
 				{
 					Name:     "id",
@@ -25,23 +25,23 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 					Key:      "PRI",
 				},
 				{
-					Name:     "title",
+					Name:     "name",
 					DataType: "varchar",
 					Type:     "varchar(32)",
-					Comment:  "title",
+					Comment:  "name",
 					Key:      "",
 				},
 				{
-					Name:     "content",
-					DataType: "text",
-					Type:     "text",
-					Comment:  "content",
+					Name:     "age",
+					DataType: "int",
+					Type:     "int",
+					Comment:  "age",
 					Key:      "",
 				},
 			},
 		},
 		{
-			Name: "comment",
+			Name: "pet",
 			Columns: []*heidou.Column{
 				{
 					Name:     "id",
@@ -51,10 +51,43 @@ func (ml *MemoryLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 					Key:      "PRI",
 				},
 				{
-					Name:     "content",
-					DataType: "text",
-					Type:     "text",
-					Comment:  "content",
+					Name:     "owner_id",
+					DataType: "bigint",
+					Type:     "bigint unsigned",
+					Comment:  "owner_id",
+					Key:      "",
+				},
+				{
+					Name:     "name",
+					DataType: "varchar",
+					Type:     "varchar(32)",
+					Comment:  "name",
+					Key:      "",
+				},
+			},
+		},
+		{
+			Name: "group",
+			Columns: []*heidou.Column{
+				{
+					Name:     "id",
+					DataType: "bigint",
+					Type:     "bigint unsigned",
+					Comment:  "id",
+					Key:      "PRI",
+				},
+				{
+					Name:     "admin_id",
+					DataType: "bigint",
+					Type:     "bigint unsigned",
+					Comment:  "admin_id",
+					Key:      "",
+				},
+				{
+					Name:     "name",
+					DataType: "varchar",
+					Type:     "varchar(32)",
+					Comment:  "name",
 					Key:      "",
 				},
 			},

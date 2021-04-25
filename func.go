@@ -14,6 +14,8 @@ import (
 
 var (
 	Funcs = template.FuncMap{
+		"ToUpper":  strings.ToUpper,
+		"ToLower":  strings.ToLower,
 		"receiver": receiver,
 	}
 )
