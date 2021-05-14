@@ -113,13 +113,14 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 
 	isUnsigned := strings.Contains(column.Type, " unsigned") || strings.Contains(column.Type, " UNSIGNED")
 
-	columnType := strings.ToLower(column.DataType)
+	columnType := strings.ToLower(column.Type)
 	if isUnsigned {
 		columnType = "u" + columnType
 	}
 
-	maxLength := parseColumnLength(column.Type)
-
+	// maxLength := parseColumnLength(column.Type)
+	//TODO
+	maxLength := 0
 	field := &Field{
 		Name:            column.Name,
 		Description:     column.Comment,

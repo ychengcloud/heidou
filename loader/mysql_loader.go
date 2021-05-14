@@ -43,7 +43,7 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	}
 	defer db.Close()
 
-	rawSql := "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`, `EXTRA` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ?"
+	rawSql := "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`, `EXTRA`, `IS_NULLABLE` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? ORDER BY table_name ASC, ordinal_position ASC"
 	rows, err := db.Query(rawSql, msl.SchemaName)
 	if err != nil {
 		return nil, err
@@ -53,16 +53,16 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	tablesIndex := make(map[string]*heidou.MetaTable)
 
 	for rows.Next() {
-		var tableName, columnName, dataType, columnType, columnComment, columnKey, extra string
+		var tableName, columnName, dataType, columnType, columnComment, columnKey, extra, nullable string
 
-		if rows.Scan(&tableName, &columnName, &dataType, &columnType, &columnComment, &columnKey, &extra) == nil {
+		if rows.Scan(&tableName, &columnName, &dataType, &columnType, &columnComment, &columnKey, &extra, &nullable) == nil {
 			c := &heidou.Column{
-				Name:     columnName,
-				DataType: dataType,
-				Type:     columnType,
-				Comment:  columnComment,
-				Key:      columnKey,
-				Extra:    extra,
+				Name: columnName,
+				// DataType: dataType,
+				Type:    dataType,
+				Comment: columnComment,
+				// Key:     columnKey,
+				// Extra:   extra,
 			}
 
 			if strings.ToUpper(columnKey) == "PRI" {

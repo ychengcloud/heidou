@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	AssetsRoot = "_assets"
+	AssetsRoot   = "_assets"
+	TmplBasePath = "templates/"
 )
 
 type Generator struct {
@@ -60,8 +61,20 @@ func NewGenerator(cfg *Config, loader Loader) (*Generator, error) {
 
 	mappings := must(loadMappings("mappings.yaml"))
 
-	gen.MetaTypes = make(map[string]MetaType, len(mappings.MetaTypes))
-	for _, v := range mappings.MetaTypes {
+	var metaTypes []MetaType
+	for _, m := range mappings.MetaTypeInfos {
+		if m.Dialect == cfg.Loader {
+			metaTypes = m.MetaTypes
+			break
+		}
+	}
+
+	if len(metaTypes) == 0 {
+		return nil, fmt.Errorf("%s Meta type mapping can't be found ", cfg.Loader)
+	}
+
+	gen.MetaTypes = make(map[string]MetaType, len(metaTypes))
+	for _, v := range metaTypes {
 		gen.MetaTypes[v.SQLType] = v
 	}
 	return gen, nil
@@ -260,13 +273,56 @@ func (g *Generator) gen() error {
 
 	for _, table := range g.Data.Tables {
 		tableName := table.Name
+		switch g.Config.TmplNameFormat {
+		case "camel":
+			tableName = table.NameCamel
+		case "lowerCamel":
+			tableName = table.NameLowerCamel
+		case "camelPlural":
+			tableName = table.NameCamelPlural
+		case "lowerCamelPlural":
+			tableName = table.NameLowerCamelPlural
+		case "snake":
+			tableName = table.NameSnake
+
+		}
+
 		//generate model from table
 		for _, template := range g.Config.Templates {
-			path := fmt.Sprintf(template.NameFormat, tableName)
+			dest := fmt.Sprintf(template.NameFormat, tableName)
+			tmplPath := template.Path
 
-			err := g.build(g.Assets, "templates/"+template.Path, path, table)
+			//根据TypeName生成实际模板路径
+			if table.TypeName != "" {
+				paths := strings.SplitN(tmplPath, ".", 2)
+				if paths != nil {
+					tmplPath = paths[0] + "_" + table.TypeName
+					if len(paths) == 2 {
+						tmplPath = tmplPath + "." + paths[1]
+					}
+				} else {
+					tmplPath = "_" + table.TypeName
+				}
+
+				tmplPath = TmplBasePath + tmplPath
+				//不存在则使用默认的模板
+				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
+					fmt.Println("tmplPath not exists:", table.Name, tmplPath, err)
+					tmplPath = TmplBasePath + template.Path
+				}
+			} else {
+				tmplPath = TmplBasePath + tmplPath
+				//不存在则不生成
+				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
+					fmt.Println("tmplPath not exists:", table.Name, tmplPath, err)
+					continue
+				}
+			}
+
+			fmt.Println("tmplPath:", tmplPath)
+			err := g.build(g.Assets, tmplPath, dest, table)
 			if err != nil {
-				fmt.Println("err:", err, path)
+				fmt.Println("err:", err, dest)
 				return err
 			}
 
@@ -278,7 +334,7 @@ func (g *Generator) gen() error {
 	}
 	return nil
 }
-func must(sm *MetaTypes, err error) *MetaTypes {
+func must(sm *MetaTypeMapping, err error) *MetaTypeMapping {
 	if err != nil {
 		panic(err)
 	}
@@ -286,7 +342,7 @@ func must(sm *MetaTypes, err error) *MetaTypes {
 }
 
 // 加载 SQL 类型映射文件数据
-func loadMappings(mappingFileName string) (*MetaTypes, error) {
+func loadMappings(mappingFileName string) (*MetaTypeMapping, error) {
 	sub, err := fs.Sub(Assets, AssetsRoot)
 	if err != nil {
 		return nil, err
@@ -302,8 +358,8 @@ func loadMappings(mappingFileName string) (*MetaTypes, error) {
 }
 
 // 处理 SQL 类型映射
-func processMappings(mappingContent []byte) (*MetaTypes, error) {
-	mappings := &MetaTypes{}
+func processMappings(mappingContent []byte) (*MetaTypeMapping, error) {
+	mappings := &MetaTypeMapping{}
 	err := yaml.Unmarshal(mappingContent, mappings)
 	if err != nil {
 		fmt.Printf("Error unmarshalling yaml error: %v\n", err)

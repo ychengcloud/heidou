@@ -30,23 +30,24 @@ db:
 # NameFormat 目标路径
 # Path 模板路径名，以 templates为相对路径
 templates:
-  - NameFormat: "src/pages/%s"
-    Path:   "pages"
-  - NameFormat: "src/locales/en-us/%s.ts"
-    Path:   "locale_en.ts.tmpl"
-  - NameFormat: "src/locales/zh-cn/%s.ts"
-    Path:   "locale_zh.ts.tmpl"
-  - NameFormat: "mock/%s.ts"
-    Path:   "mock.ts.tmpl"
+  - nameFormat: "internal/generated/models/%s.go"
+    path:   "models/model.go.tmpl"
+  - nameFormat: "internal/resolvers/%s.go"
+    path:   "resolvers/resolver.go.tmpl"
+  - nameFormat: "internal/generated/schemas/%s.gql"
+    path:   "schemas/schema.gql.tmpl"
+  - nameFormat: "internal/generated/services/%s.go"
+    path:   "services/service.go.tmpl"
 #templates:
-#  - nameFormat: "internal/models/%s.go"
-#    path:   "models/model.go.tmpl"
-#  - nameFormat: "internal/resolvers/%s.go"
-#    path:   "resolvers/resolver.go.tmpl"
-#  - nameFormat: "internal/schemas/%s.gql"
-#    path:   "schemas/schema.gql.tmpl"
-#  - nameFormat: "internal/services/%s.go"
-#    path:   "services/service.go.tmpl"
+#  - NameFormat: "src/pages/%s"
+#    Path:   "pages"
+#  - NameFormat: "src/locales/en-us/%s.ts"
+#    Path:   "locale_en.ts.tmpl"
+#  - NameFormat: "src/locales/zh-cn/%s.ts"
+#    Path:   "locale_zh.ts.tmpl"
+#  - NameFormat: "mock/%s.ts"
+#    Path:   "mock.ts.tmpl"
+
 
 # tables:
 #  - name: user
@@ -58,7 +59,7 @@ templates:
 #      - name: name
 #        isRequired: true
 #        isSortable: true
-         tags: 'binding:"required,max=32"'
+#         tags: 'binding:"required,max=32"'
 #      - name: pet
 #        joinType: "HasMany"
 #        tableName: pet

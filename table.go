@@ -12,8 +12,13 @@ type ErrorCode string
 type Method string
 
 // MetaTypes mappings for sql types to json, go etc
-type MetaTypes struct {
-	MetaTypes []MetaType `yaml:"mappings"`
+type MetaTypeMapping struct {
+	MetaTypeInfos []MetaTypeInfo `yaml:"mappings"`
+}
+
+type MetaTypeInfo struct {
+	Dialect   string     `yaml:"dialect"`
+	MetaTypes []MetaType `yaml:"types"`
 }
 
 // MetaType mapping
@@ -54,12 +59,13 @@ func (m *MetaType) String() interface{} {
 }
 
 type Column struct {
-	Name            string
-	Type            string
-	DataType        string
-	Comment         string
-	Key             string
-	Extra           string
+	Name string
+	Type string
+	// DataType string
+	Comment string
+	// Key      string
+	// Extra    string
+
 	IsPrimaryKey    bool `yaml:"isPrimaryKey"`
 	IsAutoIncrement bool `yaml:"isAutoIncrement"`
 }
@@ -79,6 +85,7 @@ type Table struct {
 	Name        string      `yaml:"name"`
 	Description string      `yaml:"description"`
 	IsSkip      bool        `yaml:"isSkip"`
+	TypeName    string      `yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
 	Extra       interface{} `yaml:"extra"`
 
 	Fields     []*Field    `yaml:"fields"`
@@ -137,12 +144,10 @@ func MergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 			continue
 		}
 		table.handleFlags(field, metaTypes)
-		fmt.Println("merge :", field, fieldInCfg)
 		table.Fields = append(table.Fields, field)
 	}
 	table.Methods = DefaultMethods
 
-	fmt.Println("handleCfgInfo:", table.Name, tableInCfg)
 	table.handleCfgInfo(tableInCfg)
 	return table
 }
@@ -175,6 +180,9 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 	if tableInCfg == nil {
 		return
 	}
+
+	t.TypeName = tableInCfg.TypeName
+
 	if len(tableInCfg.ErrorCodes) > 0 {
 		t.HasErrorCode = true
 		t.ErrorCodes = append(t.ErrorCodes, tableInCfg.ErrorCodes...)
