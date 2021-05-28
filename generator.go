@@ -187,7 +187,7 @@ func (g *Generator) Generate() error {
 }
 
 // suffix不为空时，去掉生成文件的匹配后缀名
-func (g *Generator) build(dir fs.FS, root, dest string, data interface{}) error {
+func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwrite bool) error {
 
 	walkFn := func(path string, entry fs.DirEntry, err error) error {
 
@@ -211,18 +211,28 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}) error 
 				return err
 			}
 		} else {
+			//如果后缀以 .tmpl .tpl结尾，则约定需要自动去除后缀
+			suffix := filepath.Ext(target)
+			if suffix == ".tmpl" || suffix == ".tpl" {
+				target = strings.TrimSuffix(target, suffix)
+			}
+
+			// 根据 overwrite 标志决定是否覆盖已有文件
+			if !overwrite {
+				_, err := os.Stat(target)
+
+				// 文件存在则返回，两种情况表示文件是存在的，1 err 为nil, 2 返回的err不包含不存在的标志
+				if err == nil || !os.IsNotExist(err) {
+					return err
+				}
+			}
+
 			t := template.New(filepath.Base(path)).Funcs(Funcs)
 			t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
 			tmpl, err := t.ParseFS(dir, path)
 			if err != nil {
 				fmt.Println("parse fs2:", dir, path)
 				return err
-			}
-
-			//如果后缀以 .tmpl .tpl结尾，则约定需要自动去除后缀
-			suffix := filepath.Ext(target)
-			if suffix == ".tmpl" || suffix == ".tpl" {
-				target = strings.TrimSuffix(target, suffix)
 			}
 
 			b := bytes.NewBuffer(nil)
@@ -257,7 +267,7 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}) error 
 }
 
 func (g *Generator) genSkeleton(assets fs.FS, dest string, data interface{}) error {
-	err := g.build(assets, "skeleton", dest, data)
+	err := g.build(assets, "skeleton", dest, data, g.Config.Overwrite)
 	if err != nil {
 		fmt.Println("err:", err, dest)
 		return err
@@ -320,7 +330,7 @@ func (g *Generator) gen() error {
 			}
 
 			fmt.Println("tmplPath:", tmplPath)
-			err := g.build(g.Assets, tmplPath, dest, table)
+			err := g.build(g.Assets, tmplPath, dest, table, g.Config.Overwrite)
 			if err != nil {
 				fmt.Println("err:", err, dest)
 				return err

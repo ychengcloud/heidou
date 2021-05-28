@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/AlecAivazis/survey/v2"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,12 +27,38 @@ var generateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := loadConfig(configPath)
 		logrus.Println(cfg, cfg.DBConfig, cfg.Tables)
+
+		cfg.TemplatesPath = tplPath
+
+		if cfg.Overwrite {
+			prompt := &survey.Confirm{
+				Message: `[Warning]
+The overwrite flag (Overwrite is True) is specified in the configuration file. If Yes is selected, the generated file will overwrite the existing file. 
+Are you sure to continue?
+				
+配置文件中指定了覆写标志(Overwrite is True)，如果选择 Yes， 生成的文件将覆盖已有文件。
+确认继续吗?`,
+			}
+
+			overwrite := false
+			// ask the question
+			err := survey.AskOne(prompt, &overwrite)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				return
+			}
+			fmt.Println("overwrite: ", overwrite)
+
+			if err != nil || !overwrite {
+				return
+			}
+		}
+
 		for _, table := range cfg.Tables {
 			logrus.Println(table)
 		}
-		if len(tplPath) > 0 {
-			cfg.TemplatesPath = tplPath
-		}
+
 		err := api.Generate(cfg)
 		if err != nil {
 			log.Fatal("gen:", err)
@@ -44,6 +71,7 @@ func init() {
 	generateCmd.Flags().StringVarP(&configPath, "config", "c", "./config.yml", "config file path")
 	generateCmd.Flags().StringVarP(&tplPath, "templates", "t", "", "template path")
 
+	generateCmd.MarkFlagRequired("templates")
 	cobra.OnInitialize()
 	rootCmd.AddCommand(generateCmd)
 

@@ -1,9 +1,0 @@
-package services
-
-import "github.com/google/wire"
-
-var BaseProviderSet = wire.NewSet(
-    {{- range .Tables}}
-    New{{.NameCamel}}Service,
-    {{- end}}
-)

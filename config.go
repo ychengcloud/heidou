@@ -4,6 +4,7 @@ import "text/template"
 
 type Config struct {
 	ProjectName    string      `yaml:"projectName"`
+	Overwrite      bool        `yaml:"overwrite"`
 	Loader         string      `yaml:"loader"`
 	Extra          interface{} `yaml:"extra"`
 	DBConfig       DBConfig    `yaml:"db" mapstructure:"db"`

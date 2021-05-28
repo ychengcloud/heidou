@@ -65,7 +65,7 @@ func genConfig(projectName, cfgName string) error {
 		return fmt.Errorf("unable to create config dir: " + err.Error())
 	}
 
-	path := "_assets/templates/heidou-example.yml.tmpl"
+	path := "_assets/heidou-example.yml.tmpl"
 	tmpl := template.New(filepath.Base(path))
 
 	configTemplate := template.Must(tmpl.ParseFS(heidou.Assets, path))
