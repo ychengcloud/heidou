@@ -111,12 +111,12 @@ func parseColumnLength(columnType string) (maxLength int) {
 
 func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 
-	isUnsigned := strings.Contains(column.Type, " unsigned") || strings.Contains(column.Type, " UNSIGNED")
+	// isUnsigned := strings.Contains(column.Type, " unsigned") || strings.Contains(column.Type, " UNSIGNED")
 
 	columnType := strings.ToLower(column.Type)
-	if isUnsigned {
-		columnType = "u" + columnType
-	}
+	// if isUnsigned {
+	// 	columnType = "u" + columnType
+	// }
 
 	// maxLength := parseColumnLength(column.Type)
 	//TODO
