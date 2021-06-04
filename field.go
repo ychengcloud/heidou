@@ -138,16 +138,17 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 }
 
 func (f *Field) handleTags() {
-	tags := `json:"` + f.NameLowerCamel + `" gorm:"` + f.NameLowerCamel
+	tags := `json:"` + f.NameLowerCamel + `" gorm:"column:` + f.NameSnake
 	if f.IsPrimaryKey {
 		tags += ";primaryKey"
 	}
 	if f.IsAutoIncrement {
 		tags += ";autoIncrement"
 	}
-	if f.MetaType.GoType == "time.Time" {
-		tags += ";default: '1970-01-01 00:00:00'"
-	}
+	// 设置了 default tag, gorm的createdat updatedat 逻辑会失效
+	// if f.MetaType.GoType == "time.Time" {
+	// 	tags += ";default: '1970-01-01 00:00:00'"
+	// }
 	if f.MaxLength > 0 {
 		tags += ";size:" + strconv.Itoa(f.MaxLength)
 	}
