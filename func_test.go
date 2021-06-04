@@ -7,12 +7,12 @@ import (
 func TestPascal(t *testing.T) {
 	id := pascal("ID")
 	t.Log(id)
-	if id != "ID" {
+	if id != "Id" {
 		t.Error()
 	}
 	id = pascal("user_id")
 	t.Log(id)
-	if id != "UserID" {
+	if id != "UserId" {
 		t.Error()
 	}
 }
@@ -32,7 +32,7 @@ func TestCamel(t *testing.T) {
 
 	id = camel("user_id")
 	t.Log(id)
-	if id != "userID" {
+	if id != "userId" {
 		t.Error()
 	}
 }

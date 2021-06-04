@@ -103,7 +103,7 @@ func (g *Generator) getTable(name string) *Table {
 }
 
 //生成many2many的反向引用
-func (g *Generator) handleBackReference(table *Table, backReferenceTable *Table) {
+func handleBackReference(table *Table, backReferenceTable *Table) {
 
 	backReferenceInfo := &BackReferenceInfo{
 		Name:                 table.Name,
@@ -129,6 +129,16 @@ func (g *Generator) handleBackReference(table *Table, backReferenceTable *Table)
 	return
 }
 
+//关联外键
+func handleAssociationForeignKey(table *Table, foreignKey string) {
+	for _, field := range table.Fields {
+		if field.NameCamel == foreignKey {
+			field.IsForeignKey = true
+		}
+	}
+	return
+}
+
 // 所有元表信息生成后，再处理关联字段的模型信息
 func (g *Generator) handleAssociation() error {
 	for _, table := range g.Data.Tables {
@@ -141,7 +151,24 @@ func (g *Generator) handleAssociation() error {
 				return fmt.Errorf("Something wrong, can't find1 : %#v\n", field)
 			}
 			if field.JoinType == JoinTypeManyToMany {
-				g.handleBackReference(table, field.JoinTable)
+				handleBackReference(table, field.JoinTable)
+			}
+
+			// 更新相应外键字段信息
+			if field.JoinType == JoinTypeBelongTo {
+				foreignKey := field.NameCamel + "Id"
+				if len(field.ForeignKey) > 0 {
+					foreignKey = field.ForeignKey
+				}
+				handleAssociationForeignKey(table, foreignKey)
+			}
+
+			if field.JoinType == JoinTypeHasOne || field.JoinType == JoinTypeHasMany {
+				foreignKey := field.NameCamel + "Id"
+				if len(field.ForeignKey) > 0 {
+					foreignKey = field.ForeignKey
+				}
+				handleAssociationForeignKey(field.JoinTable, foreignKey)
 			}
 
 		}

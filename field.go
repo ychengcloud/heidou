@@ -42,6 +42,7 @@ type Field struct {
 	IsSkip          bool     `yaml:"isSkip"`
 	IsRequired      bool     `yaml:"isRequired"`
 	IsPrimaryKey    bool     `yaml:"isPrimaryKey"`
+	IsForeignKey    bool     `yaml:"isForeignKey"`
 	IsAutoIncrement bool     `yaml:"isAutoIncrement"`
 	IsSortable      bool     `yaml:"isSortable"`
 	IsFilterable    bool     `yaml:"isFilterable"`
