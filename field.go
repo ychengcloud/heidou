@@ -198,7 +198,11 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	}
 	if fieldInCfg.IsFilterable {
 		field.IsFilterable = fieldInCfg.IsFilterable
-		field.Operations = fieldInCfg.Operations
+		operations := fieldInCfg.Operations
+		if len(operations) == 0 {
+			operations = append(operations, "Eq")
+		}
+		field.Operations = operations
 	}
 	if fieldInCfg.ForeignKey != "" {
 		field.ForeignKey = fieldInCfg.ForeignKey
