@@ -19,3 +19,6 @@ __debug*
 
 cmd/heidou/heidou
 assets/project_vfsdata.go
+
+/test/tests.*
+/test/coverage.*
