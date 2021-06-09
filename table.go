@@ -99,6 +99,7 @@ type Table struct {
 	Sortable           bool
 	HasErrorCode       bool
 	HasTimeField       bool
+	HasJoinField       bool
 	IsImportStrings    bool
 
 	NameSnake            string

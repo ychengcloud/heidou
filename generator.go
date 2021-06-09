@@ -146,6 +146,7 @@ func (g *Generator) handleAssociation() error {
 			if field.JoinType == JoinTypeNone {
 				continue
 			}
+			table.HasJoinField = true
 			field.JoinTable = g.getTable(field.TableName)
 			if field.JoinTable == nil {
 				return fmt.Errorf("Something wrong, can't find1 : %#v\n", field)
