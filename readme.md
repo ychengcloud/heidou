@@ -19,7 +19,7 @@
 
 ## 编译
 
-    make build
+    make
 
 ## 安装
 

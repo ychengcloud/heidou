@@ -24,6 +24,9 @@ all: fmt vet | $(BIN) ; $(info $(M) building executable…) @ ## Build program b
 		-ldflags '-X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' \
 		-o $(BIN)/$(APPNAME) ./cmd/$(APPNAME)/
 
+install: ; $(info $(M) installing …) @ ## Install program binary
+	$(GO) install ./cmd/$(APPNAME)/
+
 # Tests
 
 TEST_TARGETS := test-default test-bench test-short test-verbose test-race
