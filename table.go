@@ -82,6 +82,7 @@ type BackReferenceInfo struct {
 	JoinTableName        string
 }
 type Table struct {
+	//从配置文件读取的数据
 	Name        string      `yaml:"name"`
 	Description string      `yaml:"description"`
 	IsSkip      bool        `yaml:"isSkip"`
@@ -92,6 +93,7 @@ type Table struct {
 	ErrorCodes []ErrorCode `yaml:"errorCodes"`
 	Methods    []string    `yaml:"methods"`
 
+	//生成的数据
 	PrimaryKeyField *Field
 	//反向引用字段集
 	BackReferenceInfos []*BackReferenceInfo

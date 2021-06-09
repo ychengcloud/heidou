@@ -31,10 +31,6 @@ cover: test
 		$(gocmd) tool cover -html=dist/cover-$$app.out; \
 	done
 
-.PHONY: mock
-mock:
-	mockery --all
-
 .PHONY: lint
 lint:
 	$(gocmd) vet ./... | grep -v assets/ && exit 1 || exit 0

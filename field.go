@@ -35,30 +35,32 @@ const (
 )
 
 type Field struct {
-	Name            string   `yaml:"name"`
-	Alias           string   `yaml:"alias"`
-	Description     string   `yaml:"description"`
-	Tags            string   `yaml:"tags"`
-	IsSkip          bool     `yaml:"isSkip"`
-	IsRequired      bool     `yaml:"isRequired"`
-	IsPrimaryKey    bool     `yaml:"isPrimaryKey"`
-	IsForeignKey    bool     `yaml:"isForeignKey"`
-	IsAutoIncrement bool     `yaml:"isAutoIncrement"`
-	IsSortable      bool     `yaml:"isSortable"`
-	IsFilterable    bool     `yaml:"isFilterable"`
-	JoinType        JoinType `yaml:"joinType"`
-	TableName       string   `yaml:"tableName"`
-	JoinTableName   string   `yaml:"JoinTableName"`
-	ForeignKey      string   `yaml:"foreignKey"`
-	References      string   `yaml:"references"`
-	JoinForeignKey  string   `yaml:"joinForeignKey"`
-	JoinReferences  string   `yaml:"joinReferences"`
-	Operations      []string `yaml:"operations"`
+	//从配置文件读取的数据
+	Name           string   `yaml:"name"`
+	Alias          string   `yaml:"alias"`
+	Description    string   `yaml:"description"`
+	Tags           string   `yaml:"tags"`
+	IsSkip         bool     `yaml:"isSkip"`
+	IsRequired     bool     `yaml:"isRequired"`
+	IsSortable     bool     `yaml:"isSortable"`
+	IsFilterable   bool     `yaml:"isFilterable"`
+	JoinType       JoinType `yaml:"joinType"`
+	TableName      string   `yaml:"tableName"`
+	JoinTableName  string   `yaml:"JoinTableName"`
+	ForeignKey     string   `yaml:"foreignKey"`
+	References     string   `yaml:"references"`
+	JoinForeignKey string   `yaml:"joinForeignKey"`
+	JoinReferences string   `yaml:"joinReferences"`
+	Operations     []string `yaml:"operations"`
 
-	MetaType  MetaType
-	TagsHTML  template.HTML
-	JoinTable *Table
-	MaxLength int
+	//生成的数据
+	IsPrimaryKey    bool
+	IsForeignKey    bool
+	IsAutoIncrement bool
+	MetaType        MetaType
+	TagsHTML        template.HTML
+	JoinTable       *Table
+	MaxLength       int
 
 	NameSnake            string
 	NameSnakePlural      string
