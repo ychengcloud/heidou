@@ -11,7 +11,7 @@
 **.log
 
 # build/ folder should be present, but the contents not, just .keep this one
-dist/*
+dist
 !dist/.keep
 
 # Ignore debug executable created by vscode
