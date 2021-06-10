@@ -12,6 +12,17 @@
 - 表结构更改可重复生成代码
 - 资源内嵌，一个二进制文件即可启动
 
+## 文档
+
+[简介](docs/guide/what-is-heidou.md)
+
+[搭建环境](docs/guide/setup.md)
+
+[配置](docs/guide/config.md)
+
+[模板](docs/guide/template.md)
+
+
 ## 依赖
 
 - make
@@ -41,7 +52,7 @@ mv heidou-example.yaml heidou.yaml
 
 ### 生成项目代码
 
-    heidou generate -t <path/to/template> [-c heidou.yml] 
+    heidou generate -t <path/to/template> [-c heidou.yaml] 
 
 ## 生成配置项说明
 
@@ -52,8 +63,8 @@ mv heidou-example.yaml heidou.yaml
 | name    | 数据表名               | string | -                                                     | product            |
 | isSkip  | 是否生成相应代码       | bool   | false                                                 | false              |
 | extra   | 扩展配置               | map    | -                                                     |
-| fields  | 字段数组               | Fields | -                                                     | -                  |
-| errorCodes | 错误码 | string array | - |
+| fields  | 字段数组               | array | -                                                     | -                  |
+| errorCodes | 错误码 | array | - |
 | methods | 支持的 Api 方法 | array  | ["list", "update", "delete", "bulkGet", "bulkDelete"] | ["list", "update"] |
 
 字段配置项 : fields:
@@ -66,7 +77,7 @@ mv heidou-example.yaml heidou.yaml
 | isRequired     | 是否必填字段                                              | bool   | false  | true                      |
 | isSortable   | 是否可按此字段排序                                            | bool   | false  | true                      |
 | isFilterable   | 是否可按此字段过滤                                            | bool   | false  | true                      |
-| operations   | 排序时的可用操作                                            | enum   | false  | true                      |
+| operations   | 排序时的可用操作                                            | array   | -  | true                      |
 | tags           | 扩展 struct tags                                          | string | ""     | binding:"required,max=64" |
 | joinType       | 关联类型,取值 None, BelongTo, HasOne, HasMany, ManyToMany | enum   | None   | ManyToMany                |
 | tableName      | 指定关联表表名                                            | string | ""     | category                  |
@@ -79,41 +90,6 @@ mv heidou-example.yaml heidou.yaml
 
 关联关系相关字段 (foreignKey, references, joinForeignKey, joinReferences）的配置与 Gorm 保持一致，详见：[Gorm](https://gorm.io/zh_CN/docs) 的关联说明
 
-
-
-## 模板
-
-### 目录结构
-
-```console
-.
-└── root
-    ├── skeleton  
-    └── templates
-```
-
-- skeleton，此目录下文件替换模板变量后会原样复制到目标目录,以.tmpl 或 .tpl为后缀的文件，生成的文件会自动去除后缀
-
-- template，此目录下文件会根据数据表，每个表相应生成一个文件
-
-## 官方模板
-
-### Server
-
-- [ ] [graphql-golang-server](https://github.com/ychengcloud/graphql-golang-server-template) 符合 Golang 设计哲学的工程框架，基于 GqlGen、GORM、Gin, 包括基础功能(JWT, OpenTracing, ZapLog, Promtheus)
-
-- [ ] [restful-golang-server](https://github.com/ychengcloud/restful-golang-server-template) 符合 Golang 设计哲学的工程框架，基于 GORM、Gin, 包括基础功能(JWT, OpenTracing, ZapLog, Promtheus)
-
-- [ ] [grpc-microservice-server]()
-
-### React
-
-- [ ] [graphql-react-admin-typescript-vite](https://github.com/ychengcloud/graphql-react-admin-template) 
-
-
-## 社区模板
-
-等待你的添加
 
 ## 鸣谢
 
