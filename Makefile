@@ -13,6 +13,8 @@ APPNAME = heidou
 BIN      = $(CURDIR)/dist
 
 GO      = go
+RELEASER = goreleaser
+
 TIMEOUT = 15
 
 M = $(shell printf "\033[34;1m▶\033[0m")
@@ -26,6 +28,9 @@ all: fmt vet | $(BIN) ; $(info $(M) building executable…) @ ## Build program b
 
 install: ; $(info $(M) installing …) @ ## Install program binary
 	$(GO) install ./cmd/$(APPNAME)/
+
+release: ; $(info $(M) releasing ...) @
+	$(RELEASER) release --rm-dist
 
 # Tests
 
