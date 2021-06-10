@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
@@ -223,8 +222,8 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			return err
 		}
 
-		mask := syscall.Umask(0)
-		defer syscall.Umask(mask)
+		mask := Umask(0)
+		defer Umask(mask)
 
 		relPath, err := filepath.Rel(root, path)
 		if err != nil {
