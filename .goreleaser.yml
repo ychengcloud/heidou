@@ -31,4 +31,4 @@ changelog:
       - '^test:'
 env_files:
   # use only one or release will fail!
-  github_token: ~/.releaser/github_token
+  github_token: ~/.config/goreleaser/github_token
