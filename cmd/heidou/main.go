@@ -10,8 +10,9 @@ import (
 var (
 	// Version contains the current version.
 	Version = "dev"
+	Commit  = ""
 	// BuildDate contains a string with the build date.
-	BuildDate = "unknown"
+	Date = "unknown"
 )
 
 var rootCmd = &cobra.Command{
@@ -26,10 +27,11 @@ var rootCmd = &cobra.Command{
 }
 
 var versionTemplate = `
-	{{with .Name}}{{printf "%s " .}}{{end}}
+	{{with .Name}}{{printf "%s: " .}}{{end}}
 	{{printf "version %s" .Version}}
-	Build Date ` + BuildDate + `
-	
+	Commit: ` + Commit + `
+	Build Date: ` + Date + `
+
 `
 
 func init() {
