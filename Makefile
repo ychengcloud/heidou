@@ -23,7 +23,7 @@ M = $(shell printf "\033[34;1m▶\033[0m")
 all: fmt vet | $(BIN) ; $(info $(M) building executable…) @ ## Build program binary
 	$(GO) build \
 		-tags release \
-		-ldflags '-X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' \
+		-ldflags '-X main.version=$(VERSION) -X main.date=$(DATE)' \
 		-o $(BIN)/$(APPNAME) ./cmd/$(APPNAME)/
 
 install: ; $(info $(M) installing …) @ ## Install program binary

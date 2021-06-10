@@ -8,16 +8,15 @@ import (
 )
 
 var (
-	// Version contains the current version.
-	Version = "dev"
-	Commit  = ""
-	// BuildDate contains a string with the build date.
-	Date = "unknown"
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
 )
 
 var rootCmd = &cobra.Command{
 	Use:     "Heidou",
-	Version: Version,
+	Version: version,
 	Run: func(cmd *cobra.Command, args []string) {
 		for i, arg := range args {
 			fmt.Printf("arg %d : %s\n", i, arg)
@@ -29,8 +28,8 @@ var rootCmd = &cobra.Command{
 var versionTemplate = `
 	{{with .Name}}{{printf "%s: " .}}{{end}}
 	{{printf "version %s" .Version}}
-	Commit: ` + Commit + `
-	Build Date: ` + Date + `
+	Commit: ` + commit + `
+	Build Date: ` + date + `
 
 `
 
