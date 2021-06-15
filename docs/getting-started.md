@@ -113,15 +113,15 @@ tables:
 - 下载 `graphql-server` 模板
 
 ```bash
-mkdir -p $HOME/.heidou
-git clone https://github.com/ychengcloud/contrib $HOME/.heidou
+mkdir -p $HOME/.heidou/graphql-server-template
+git clone https://github.com/ychengcloud/graphql-server-template $HOME/.heidou/graphql-server-template
 
 ```
 
 - 基于模板和配置文件生成代码
 
 ```bash
-heidou generate -t $HOME/.heidou/contrib/graphql-server-template/ -c ./heidou.yml
+heidou generate -t $HOME/.heidou/graphql-server-template/ -c ./heidou.yml
 ```
 
 ## 构建
@@ -189,7 +189,7 @@ auth:
   skip: true
 
 log:
-  filename: "/tmp/.log"
+  filename: "/tmp/todo.log"
   maxSize: 500
   maxBackups: 3
   maxAge: 3
