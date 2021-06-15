@@ -1,2 +1,2 @@
 * [中文](/)
-* [English](/en_US)
+* [English](/en_US/README)

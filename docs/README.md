@@ -14,4 +14,4 @@ Heidou 是一个代码生成框架，用于高效生成各种业务代码，主�
 
 ## 文档
 
-[中文](https://docs.ycheng.pro/heidou/README) | [English](https://docs.ycheng.pro/heidou/en_US/README)
+[中文](/README) | [English](/en_US/README)
