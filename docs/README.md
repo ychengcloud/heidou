@@ -15,3 +15,10 @@ Heidou 是一个代码生成框架，用于高效生成各种业务代码，主�
 ## 文档
 
 [中文](/README) | [English](/en_US/README)
+
+## 模板
+
+- 官方模板
+  
+  - [x] [graphql-server-template](https://github.com/ychengcloud/graphql-server-template) - 符合 Golang 设计哲学的工程框架,支持查询过滤、排序、分页、指定返回字段、批量查询、批量更新、批量删除。自动生成 Graphql 文档。
+  - [ ] [react-antd-graphql-template]()
