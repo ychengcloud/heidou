@@ -1,8 +1,10 @@
-
+# 项目名称
 projectName: {{.}}
 
+# 是否自动覆盖已有文件
 overwrite: false
 
+# 数据库类型
 loader: memory
 
 # Extra 为用户自定义变量，以 map 结构读取，golang 中 map的key 不区分大小写，所以引用时全部以小写形式引用，例如 ： .Extra.pkgpath
@@ -71,6 +73,7 @@ templates:
 #        tableName: user
 #        joinTableName: user_friends
 
+# 数据表配置
 tables:
   - name: project
     fields:
