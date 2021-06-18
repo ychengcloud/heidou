@@ -20,7 +20,7 @@
 CREATE DATABASE `todo` DEFAULT CHARACTER SET = `utf8mb4`;
 
 USE `todo`;
-DROP TABLE IF NOT EXISTS `todos`;
+DROP TABLE IF EXISTS `todos`;
 CREATE TABLE `todos` (
   `id` char(36) NOT NULL,
   `title` varchar(32) NOT NULL DEFAULT '' COMMENT '标题',
@@ -178,8 +178,8 @@ db:
   autoMigrate: false
 
   mysql:
-    user: "root"
-    password: ""
+    user: "<user>"
+    password: "<password>"
     host: "127.0.0.1"
     port: 3306
     name: "todo"
