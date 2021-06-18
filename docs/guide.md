@@ -4,26 +4,26 @@
 
 - 数据表配置项 : tables
 
-| 名称    | 说明                   | 类型   | 默认值                                                | 例子               |
-| ------- | ---------------------- | ------ | ----------------------------------------------------- | ------------------ |
-| name    | 数据表名               | string | -                                                     | product            |
-| isSkip  | 是否生成相应代码       | bool   | false                                                 | false              |
-| extra   | 扩展配置               | map    | -                                                     |
-| fields  | 字段数组               | array | -                                                     | -                  |
-| errorCodes | 错误码 | array | - |
-| methods | 支持的 Api 方法 | array  | ["list", "update", "delete", "bulkGet", "bulkDelete"] | ["list", "update"] |
+| 名称       | 说明             | 类型   | 默认值                                                | 例子               |
+| ---------- | ---------------- | ------ | ----------------------------------------------------- | ------------------ |
+| name       | 数据表名         | string | -                                                     | product            |
+| isSkip     | 是否生成相应代码 | bool   | false                                                 | false              |
+| extra      | 扩展配置         | map    | -                                                     |
+| fields     | 字段数组         | array  | -                                                     | -                  |
+| errorCodes | 错误码           | array  | -                                                     |
+| methods    | 支持的 Api 方法  | array  | ["list", "update", "delete", "bulkGet", "bulkDelete"] | ["list", "update"] |
 
 - 字段配置项 : fields:
 
 | 名称           | 说明                                                      | 类型   | 默认值 | 例子                      |
 | -------------- | --------------------------------------------------------- | ------ | ------ | ------------------------- |
 | name           | 字段名                                                    | string | -      | id                        |
-| alias           | 别名                                                    | string | -      | nameAlias                        |
-| isSkip     | 是否忽略此字段                                              | bool   | false  | true                      |
+| alias          | 别名                                                      | string | -      | nameAlias                 |
+| isSkip         | 是否忽略此字段                                            | bool   | false  | true                      |
 | isRequired     | 是否必填字段                                              | bool   | false  | true                      |
-| isSortable   | 是否可按此字段排序                                            | bool   | false  | true                      |
-| isFilterable   | 是否可按此字段过滤                                            | bool   | false  | true                      |
-| operations   | 排序时的可用操作                                            | array   | -  | true                      |
+| isSortable     | 是否可按此字段排序                                        | bool   | false  | true                      |
+| isFilterable   | 是否可按此字段过滤                                        | bool   | false  | true                      |
+| operations     | 排序时的可用操作                                          | array  | -      | true                      |
 | tags           | 扩展 struct tags                                          | string | ""     | binding:"required,max=64" |
 | joinType       | 关联类型,取值 None, BelongTo, HasOne, HasMany, ManyToMany | enum   | None   | ManyToMany                |
 | tableName      | 指定关联表表名                                            | string | ""     | category                  |

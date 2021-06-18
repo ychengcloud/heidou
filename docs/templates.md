@@ -39,3 +39,57 @@ templates
 
 ## 模板变量
 
+- 根变量
+
+| 名称        | 说明       | 类型   | 默认值 | 例子 |
+| ----------- | ---------- | ------ | ------ | ---- |
+| ProjectName | 项目名     | string | -      | -    |
+| Extra       | 扩展信息   | map    | -      | -    |
+| Tables      | 数据表信息 | array  | -      | -    |
+
+- 数据表和字段都会导出的变量
+
+| 名称                 | 说明     | 类型   | 默认值 | 例子           |
+| -------------------- | -------- | ------ | ------ | -------------- |
+| Name                 | 数据表名 | string | -      | product_table  |
+| NameSnake            | 数据表名 | string | -      | product_table  |
+| NameSnakePlural      | 数据表名 | string | -      | product_tables |
+| NameCamel            | 数据表名 | string | -      | ProductTable   |
+| NameCamelPlural      | 数据表名 | string | -      | ProductTables  |
+| NameLowerCamel       | 数据表名 | string | -      | productTable   |
+| NameLowerCamelPlural | 数据表名 | string | -      | productTables  |
+
+- 数据表导出变量
+
+| 名称            | 说明               | 类型   | 默认值 | 例子          |
+| --------------- | ------------------ | ------ | ------ | ------------- |
+| Name            | 数据表名           | string | -      | product_table |
+| Description     | 数据表描述信息     | string | -      | -             |
+| Extra           | 扩展配置           | map    | -      |
+| Fields          | 字段数组           | array  | -      | -             |
+| ErrorCodes      | 错误码             | array  | -      |
+| PrimaryKeyField | 错误码             | Field  | -      |
+| Filterable      | 是否有过滤字段     | bool   | false  | true          |
+| Sortable        | 是否有排序字段     | bool   | false  | true          |
+| HasErrorCode    | 是否有自定义错误码 | bool   | false  | true          |
+| HasJoinField    | 是否有关联字段     | bool   | false  | true          |
+
+
+- 字段导出变量
+
+| 名称            | 说明                                                                              | 类型          | 默认值 | 例子      |
+| --------------- | --------------------------------------------------------------------------------- | ------------- | ------ | --------- |
+| Name            | 字段名                                                                            | string        | -      | id        |
+| Alias           | 别名                                                                              | string        | -      | nameAlias |
+| Description     | 描述信息                                                                          | string        | -      | -         |
+| IsRequired      | 是否必填字段                                                                      | bool          | false  | true      |
+| IsSortable      | 是否可按此字段排序                                                                | bool          | false  | true      |
+| IsFilterable    | 是否可按此字段过滤                                                                | bool          | false  | true      |
+| Operations      | 排序时的可用操作,取值 Eq,In,Gt,Gte,Lt,Lte,Contains,StartsWith,EndsWith,AND,OR,NOT | enum          | -      | true      | tags | 扩展 struct tags | string | "" | binding:"required,max=64" |
+| IsPrimaryKey    | 是否主键                                                                          | bool          | false  | true      |
+| IsForeignKey    | 是否外键                                                                          | bool          | false  | true      |
+| IsAutoIncrement | 主键是否自增类型                                                                  | bool          | false  | true      |
+| MetaType        | 字段类型元信息                                                                    | map           | -      |
+| TagsHTML        | 字段标签信息                                                                      | template.HTML | -      |
+| JoinTable       | 关联表                                                                            | Table         | -      | -         |
+| MaxLength       | 字段最大长度                                                                      | number        | 0      | -         |
