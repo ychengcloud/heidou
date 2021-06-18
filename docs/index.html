@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Document</title>
@@ -8,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
 </head>
+
 <body>
   <div id="app"></div>
   <script>
@@ -17,7 +19,23 @@
       loadSidebar: true,
       loadNavbar: true,
       autoHeader: true,
+      mergeNavbar: true,
       fallbackLanguages: ['en_US', 'zh_CN'],
+      maxLevel: 4,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        noData: '没有结果!',
+        paths: 'auto',
+        placeholder: '搜索',
+      },
+      darkMode: {
+        light: {
+          toggleBtnBg: '#42b983',
+        },
+      },
+      formatUpdated: '{MM}/{DD} {HH}:{mm}',
+      sidebarDisplayLevel: 1, // set sidebar display level
     }
   </script>
   <!-- Docsify v4 -->
@@ -27,5 +45,10 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-sql.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-graphql.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-graphql.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
+  <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
 </body>
+
 </html>

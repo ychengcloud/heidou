@@ -31,6 +31,14 @@ db:
   name: test
   charset: utf8mb4
 
+# 生成名称格式，用于指定 templates.nameFormat 配置项中动态替换部分的名称格式，默认使用数据库表名相同的格式，可选值如下：
+# camel eg: VariableName
+# lowerCamel eg: variableName
+# camelPlural  eg: VariableNames
+# lowerCamelPlural  eg: variableNames
+# snake  eg: variable_name
+tmplNameFormat: "lowerCamel"
+
 # NameFormat 目标路径
 # Path 模板路径名，以 templates为相对路径
 templates:
@@ -97,14 +105,12 @@ tables:
       tableName: category  
       joinTableName: product_category_relation
   - name: employee
-    methods: ["list", "update", "delete", "bulkGet", "bulkDelete"]
     fields:
     - name: role
       joinType: "ManyToMany"
       tableName: role  
       joinTableName: employee_role_relation
   - name: role
-    methods: ["list", "get", "bulkGet", "bulkDelete"]
     fields:
     - name: action
       joinType: "ManyToMany"

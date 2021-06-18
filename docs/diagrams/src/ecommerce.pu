@@ -1,0 +1,58 @@
+@startuml
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "User" as user {
+  *id : number <<generated>>
+  --
+  *name : text
+  description : text
+}
+
+entity "Group" as group {
+  *e2_id : number <<generated>>
+  --
+  *user_id : number <<FK>>
+  *name : text
+  description : text
+}
+
+entity "UserGroup" as userGroup {
+  *id : number <<generated>>
+  --
+  *user_id : number <<FK>>
+  *group_id : number <<FK>>
+}
+
+entity "Product" as product {
+  *id : number <<generated>>
+  --
+  user_id : number <<FK>>
+  *name : text
+  description : text
+}
+
+entity "Order" as order {
+  *id : number <<generated>>
+  --
+  user_id : number <<FK>>
+}
+
+entity "OrderItem" as orderItem {
+  *id : number <<generated>>
+  --
+  product_id : number <<FK>>
+  order_id : number <<FK>>
+}
+
+
+user }o..o{ userGroup
+group }o..o{ userGroup
+order ||..|{ orderItem
+order }o..|| user
+orderItem |o..|| product
+@enduml

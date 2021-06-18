@@ -15,3 +15,30 @@ curl -sfL https://raw.githubusercontent.com/ychengcloud/heidou/main/scripts/inst
 ```bash
 heidou -v
 ```
+
+## 命令行用法
+
+- init
+
+初始化命令， 会在当前目录生成项目目录和样例配置文件
+
+- generate
+
+生成命令，根据指定模板生成相应项目
+
+```bash
+heidou -h
+
+Usage:
+  heidou [flags]
+  heidou [command]
+
+Available Commands:
+  generate    generate go code for the database schema
+  help        Help about any command
+  init        initialize framework for project
+
+Flags:
+  -h, --help      help for Heidou
+  -v, --version   version for Heidou
+```

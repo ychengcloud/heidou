@@ -15,7 +15,7 @@ var (
 )
 
 var rootCmd = &cobra.Command{
-	Use:     "Heidou",
+	Use:     "heidou",
 	Version: version,
 	Run: func(cmd *cobra.Command, args []string) {
 		for i, arg := range args {
