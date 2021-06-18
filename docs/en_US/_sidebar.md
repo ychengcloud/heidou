@@ -3,6 +3,7 @@
 * [Introduce](en_US/README.md)
 * [Setup](en_US/setup-local.md)
 * [Getting Stated](en_US/getting-started.md)
+* [Guide](en_US/guide.md)
 * Tutorial
   * [Introduce](en_US/tutorial.md)
   * [Database](en_US/tutorial-db.md)
