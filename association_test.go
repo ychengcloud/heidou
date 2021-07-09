@@ -22,3 +22,34 @@ func TestForeignKey(t *testing.T) {
 	}
 
 }
+
+func TestForeignKeyForHasMany(t *testing.T) {
+
+	field := &Field{
+		Name:     "many",
+		JoinType: JoinTypeHasMany,
+	}
+	field.genName()
+
+	table := &Table{
+		Fields: []*Field{
+			field,
+		},
+	}
+	field.JoinTable = table
+
+	assField := &Field{
+		Name: "many_id",
+	}
+	assField.genName()
+
+	assTable := &Table{
+		Fields: []*Field{
+			assField,
+		},
+	}
+	handleAssociationForeignKey(assTable, "ManyId")
+	if !assField.IsForeignKey {
+		t.Fail()
+	}
+}

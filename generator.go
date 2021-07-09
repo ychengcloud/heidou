@@ -157,7 +157,7 @@ func (g *Generator) handleAssociation() error {
 
 			// 更新相应外键字段信息
 			if field.JoinType == JoinTypeBelongTo {
-				foreignKey := field.NameCamel + "Id"
+				foreignKey := table.NameCamel + "Id"
 				if len(field.ForeignKey) > 0 {
 					foreignKey = field.ForeignKey
 				}
@@ -165,7 +165,7 @@ func (g *Generator) handleAssociation() error {
 			}
 
 			if field.JoinType == JoinTypeHasOne || field.JoinType == JoinTypeHasMany {
-				foreignKey := field.NameCamel + "Id"
+				foreignKey := table.NameCamel + "Id"
 				if len(field.ForeignKey) > 0 {
 					foreignKey = field.ForeignKey
 				}
