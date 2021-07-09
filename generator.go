@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"gopkg.in/yaml.v2"
 )
 
@@ -254,7 +255,7 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				}
 			}
 
-			t := template.New(filepath.Base(path)).Funcs(Funcs)
+			t := template.New(filepath.Base(path)).Funcs(Funcs).Funcs(sprig.GenericFuncMap())
 			t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
 			tmpl, err := t.ParseFS(dir, path)
 			if err != nil {
