@@ -239,10 +239,34 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				return err
 			}
 		} else {
+			var content []byte
 			//如果后缀以 .tmpl .tpl结尾，则约定需要自动去除后缀
-			suffix := filepath.Ext(target)
+			suffix := filepath.Ext(path)
 			if suffix == ".tmpl" || suffix == ".tpl" {
 				target = strings.TrimSuffix(target, suffix)
+				b := bytes.NewBuffer(nil)
+
+				t := template.New(filepath.Base(path)).Funcs(Funcs).Funcs(sprig.GenericFuncMap())
+				t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
+				tmpl, err := t.ParseFS(dir, path)
+				if err != nil {
+					fmt.Println("parse fs2:", dir, path)
+					return err
+				}
+
+				if err := tmpl.Execute(b, data); err != nil {
+					fmt.Println("parse fs3:", dir, path)
+					return err
+				}
+
+				content = b.Bytes()
+
+			} else {
+				content, err = fs.ReadFile(dir, path)
+				if err != nil {
+					fmt.Println("parse fs2:", dir, path)
+					return err
+				}
 			}
 
 			// 根据 overwrite 标志决定是否覆盖已有文件
@@ -255,27 +279,18 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				}
 			}
 
-			t := template.New(filepath.Base(path)).Funcs(Funcs).Funcs(sprig.GenericFuncMap())
-			t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
-			tmpl, err := t.ParseFS(dir, path)
-			if err != nil {
-				fmt.Println("parse fs2:", dir, path)
-				return err
-			}
-
-			b := bytes.NewBuffer(nil)
-			if err := tmpl.Execute(b, data); err != nil {
-				fmt.Println("parse fs3:", dir, path)
-				return err
-			}
-
-			if err := os.WriteFile(target, b.Bytes(), 0644); err != nil {
+			if err := os.WriteFile(target, content, 0644); err != nil {
 				fmt.Println("WriteFile fail:", target)
 				return err
 			}
-			if err := format(target, b.Bytes()); err != nil {
-				fmt.Println("parse fs4:", dir, path)
-				return err
+
+			suffix = filepath.Ext(target)
+			if suffix == ".go" {
+
+				if err := format(target, content); err != nil {
+					fmt.Println("parse fs4:", dir, path)
+					return err
+				}
 			}
 			return nil
 
