@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
-var DefaultMethods = []string{"list", "create", "get", "update", "delete", "bulkGet", "bulkDelete"}
+var DefaultMethods = []string{"list", "create", "get", "update", "delete", "batchCreate", "batchGet", "batchUpdate", "batchDelete"}
 
 type ErrorCode string
 type Method string
