@@ -2,6 +2,7 @@ package loader
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -43,10 +44,22 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	}
 	defer db.Close()
 
-	rawSql := "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`, `EXTRA`, `IS_NULLABLE` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? ORDER BY table_name ASC, ordinal_position ASC"
+	rawSql := "SELECT COUNT(*) FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? "
+	row := db.QueryRow(rawSql, msl.SchemaName)
+	count := 0
+	err = row.Scan(&count)
+	if err != nil {
+		return nil, err
+	}
+
+	rawSql = "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`, `EXTRA`, `IS_NULLABLE` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? ORDER BY table_name ASC, ordinal_position ASC"
 	rows, err := db.Query(rawSql, msl.SchemaName)
 	if err != nil {
 		return nil, err
+	}
+
+	if count == 0 {
+		return nil, errors.New(fmt.Sprintf("can't find table %s's meta data", msl.SchemaName))
 	}
 
 	tables := make([]*heidou.MetaTable, 0)
