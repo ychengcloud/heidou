@@ -36,6 +36,34 @@ func NewMysqlSchemaLoader(o *MysqlSchemaLoaderOptions, schemaName string) *Mysql
 	}
 }
 
+func (msl *MysqlSchemaLoader) loadIndexes(db *sql.DB, table *heidou.MetaTable) error {
+
+	rawSql := "SELECT `INDEX_NAME`, `COLUMN_NAME`,`NON_UNIQUE`, `SEQ_IN_INDEX` FROM `STATISTICS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ? ORDER BY table_name ASC, SEQ_IN_INDEX ASC"
+	fmt.Printf("load index:%s\n", rawSql)
+	rows, err := db.Query(rawSql, msl.SchemaName, table.Name)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var indexName, columnName string
+		var nonUnique, seq int
+		if rows.Scan(&indexName, &columnName, &nonUnique, &seq) == nil {
+			index := &heidou.Index{
+				Name:       indexName,
+				ColumnName: columnName,
+				Unique:     nonUnique == 0,
+				Seq:        seq,
+			}
+
+			table.Indexes = append(table.Indexes, index)
+
+		} else {
+			logrus.Errorf("get %s database %s table's index info failed", msl.SchemaName, table.Name)
+		}
+	}
+	return nil
+}
+
 func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/INFORMATION_SCHEMA?charset=%s", msl.User, msl.Password, msl.Host, msl.Port, msl.Charset)
 	db, err := sql.Open(DialectMysql, dsn)
@@ -52,7 +80,7 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 		return nil, err
 	}
 
-	rawSql = "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`,`COLUMN_KEY`, `EXTRA`, `IS_NULLABLE` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? ORDER BY table_name ASC, ordinal_position ASC"
+	rawSql = "SELECT `TABLE_NAME`, `COLUMN_NAME`,`DATA_TYPE`,`COLUMN_TYPE`,`COLUMN_COMMENT`, `EXTRA`, `IS_NULLABLE` FROM `COLUMNS` WHERE `TABLE_SCHEMA` = ? ORDER BY table_name ASC, ordinal_position ASC"
 	rows, err := db.Query(rawSql, msl.SchemaName)
 	if err != nil {
 		return nil, err
@@ -66,20 +94,15 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 	tablesIndex := make(map[string]*heidou.MetaTable)
 
 	for rows.Next() {
-		var tableName, columnName, dataType, columnType, columnComment, columnKey, extra, nullable string
+		var tableName, columnName, dataType, columnType, columnComment, extra, nullable string
 
-		if rows.Scan(&tableName, &columnName, &dataType, &columnType, &columnComment, &columnKey, &extra, &nullable) == nil {
+		if rows.Scan(&tableName, &columnName, &dataType, &columnType, &columnComment, &extra, &nullable) == nil {
 			c := &heidou.Column{
 				Name: columnName,
 				// DataType: dataType,
 				Type:    dataType,
 				Comment: columnComment,
-				// Key:     columnKey,
 				// Extra:   extra,
-			}
-
-			if strings.ToUpper(columnKey) == "PRI" {
-				c.IsPrimaryKey = true
 			}
 
 			if strings.Contains(extra, "auto_increment") {
@@ -101,6 +124,32 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 
 		} else {
 			logrus.Errorf("get %s database column info failed", msl.SchemaName)
+		}
+	}
+
+	for _, table := range tables {
+		err := msl.loadIndexes(db, table)
+		if err != nil {
+			return nil, err
+		}
+		for _, column := range table.Columns {
+			fmt.Printf("%s %#v\n", table.Name, column)
+			for _, index := range table.Indexes {
+				fmt.Printf("%s %s\n", index.ColumnName, column.Name)
+				if index.ColumnName == column.Name {
+					fmt.Printf("%#v\n", index)
+					column.IsIndex = true
+
+					if index.Unique {
+						column.IsUnique = true
+					}
+					if index.Name == "PRIMARY" {
+						column.IsPrimaryKey = true
+					}
+				}
+
+			}
+
 		}
 	}
 	return tables, nil

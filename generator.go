@@ -189,6 +189,13 @@ func (g *Generator) Generate() error {
 		// 	continue
 		// }
 		tableInCfg := g.getTableInCfg(metaTable.Name)
+
+		//不支持联合主键或联合索引，如果表中定义了联合主键或联合索引，必须显式配置忽略相应的表
+		if metaTable.hasCompositeKeys() {
+			if tableInCfg == nil || !tableInCfg.IsSkip {
+				return fmt.Errorf("Must be skip if it has composite keys: %s", metaTable.Name)
+			}
+		}
 		table := MergeTable(metaTable, tableInCfg, g.MetaTypes)
 		if table == nil || table.IsSkip {
 			continue

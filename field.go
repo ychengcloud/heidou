@@ -57,6 +57,8 @@ type Field struct {
 	IsPrimaryKey    bool
 	IsForeignKey    bool
 	IsAutoIncrement bool
+	IsUnique        bool `yaml:"isUnique"`
+	IsIndex         bool `yaml:"isIndex"`
 	MetaType        MetaType
 	TagsHTML        template.HTML
 	JoinTable       *Table
@@ -132,6 +134,8 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 		JoinType:        JoinTypeNone,
 		IsPrimaryKey:    column.IsPrimaryKey,
 		IsAutoIncrement: column.IsAutoIncrement,
+		IsUnique:        column.IsUnique,
+		IsIndex:         column.IsIndex,
 	}
 
 	field.genName()

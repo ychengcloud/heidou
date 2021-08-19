@@ -68,10 +68,21 @@ type Column struct {
 
 	IsPrimaryKey    bool `yaml:"isPrimaryKey"`
 	IsAutoIncrement bool `yaml:"isAutoIncrement"`
+	IsUnique        bool `yaml:"isUnique"`
+	IsIndex         bool `yaml:"isIndex"`
 }
 type MetaTable struct {
 	Name    string
 	Columns []*Column
+	Indexes []*Index
+}
+
+type Index struct {
+	//Name 如果是主键，mysql中始终为 PRIMARY
+	Name       string
+	ColumnName string
+	Unique     bool
+	Seq        int
 }
 
 type BackReferenceInfo struct {
@@ -213,4 +224,17 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 
 		t.Fields = append(t.Fields, field)
 	}
+}
+
+func (t *MetaTable) hasCompositeKeys() bool {
+	indexMap := make(map[string]*Index, 0)
+	for _, index := range t.Indexes {
+		//如果map中已经存在，表明是联合索引
+		if _, ok := indexMap[index.Name]; ok {
+			return true
+		}
+		indexMap[index.Name] = index
+	}
+
+	return false
 }
