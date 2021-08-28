@@ -26,7 +26,6 @@ var generateCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := loadConfig(configPath)
-		logrus.Println(cfg, cfg.DBConfig, cfg.Tables)
 
 		cfg.TemplatesPath = tplPath
 
@@ -48,15 +47,10 @@ Are you sure to continue?
 				fmt.Println(err.Error())
 				return
 			}
-			fmt.Println("overwrite: ", overwrite)
 
 			if err != nil || !overwrite {
 				return
 			}
-		}
-
-		for _, table := range cfg.Tables {
-			logrus.Println(table)
 		}
 
 		err := api.Generate(cfg)

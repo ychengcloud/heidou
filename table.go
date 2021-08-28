@@ -94,15 +94,19 @@ type BackReferenceInfo struct {
 }
 type Table struct {
 	//从配置文件读取的数据
-	Name        string      `yaml:"name"`
-	Description string      `yaml:"description"`
-	IsSkip      bool        `yaml:"isSkip"`
-	TypeName    string      `yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
-	Extra       interface{} `yaml:"extra"`
+	Name string `mapstructure:"name" yaml:"name"`
 
-	Fields     []*Field    `yaml:"fields"`
-	ErrorCodes []ErrorCode `yaml:"errorCodes"`
-	Methods    []string    `yaml:"methods"`
+	//别名 配置后,生成时不再处理单复数形式,以Alias为准
+	Alias string `mapstructure:"alias" yaml:"alias"`
+
+	Description string      `mapstructure:"description" yaml:"description"`
+	IsSkip      bool        `mapstructure:"isSkip" yaml:"isSkip"`
+	TypeName    string      `mapstructure:"typeName" yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
+	Extra       interface{} `mapstructure:"extra" yaml:"extra"`
+
+	Fields     []*Field    `mapstructure:"fields" yaml:"fields"`
+	ErrorCodes []ErrorCode `mapstructure:"errorCodes" yaml:"errorCodes"`
+	Methods    []string    `mapstructure:"methods" yaml:"methods"`
 
 	//生成的数据
 	PrimaryKeyField *Field
@@ -127,6 +131,9 @@ type Table struct {
 
 func (t *Table) genName() {
 	name := inflection.Singular(t.Name)
+	if t.Alias != "" {
+		name = t.Alias
+	}
 	t.NameSnake = snake(name)
 	t.NameSnakePlural = inflection.Plural(t.NameSnake)
 	t.NameKebab = snake(name)
@@ -157,6 +164,8 @@ func MergeTable(metaTable *MetaTable, tableInCfg *Table, metaTypes map[string]Me
 		if field.IsSkip {
 			continue
 		}
+		field.handleOperations()
+		field.Table = table
 		table.handleFlags(field, metaTypes)
 		table.Fields = append(table.Fields, field)
 	}
@@ -195,6 +204,7 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 		return
 	}
 
+	t.Alias = tableInCfg.Alias
 	t.TypeName = tableInCfg.TypeName
 
 	if len(tableInCfg.ErrorCodes) > 0 {
@@ -205,19 +215,16 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 	// 配置了跳过，则不生成此表的信息
 	t.IsSkip = tableInCfg.IsSkip
 
-	if t.IsSkip {
-		fmt.Println("IsSkip:", t.Name)
-	}
 	if len(tableInCfg.Methods) > 0 {
 		t.Methods = tableInCfg.Methods
 	}
 
 	// 生成配置中关联类型的字段
 	for _, field := range tableInCfg.Fields {
-		fmt.Println("handleCfgInfo :", field)
 		if field.JoinType == JoinTypeNone {
 			continue
 		}
+		field.Table = t
 
 		field.genName()
 		field.HandleAssociation()

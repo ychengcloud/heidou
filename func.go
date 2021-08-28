@@ -17,6 +17,9 @@ var (
 		"ToUpper":  strings.ToUpper,
 		"ToLower":  strings.ToLower,
 		"receiver": receiver,
+		"snake":    snake,
+		"pascal":   pascal,
+		"camel":    camel,
 	}
 )
 

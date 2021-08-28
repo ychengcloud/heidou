@@ -1,7 +1,6 @@
 package heidou
 
 import (
-	"fmt"
 	"html/template"
 	"strconv"
 	"strings"
@@ -36,33 +35,54 @@ const (
 
 type Field struct {
 	//从配置文件读取的数据
-	Name           string   `yaml:"name"`
-	Alias          string   `yaml:"alias"`
-	Description    string   `yaml:"description"`
-	Tags           string   `yaml:"tags"`
-	IsSkip         bool     `yaml:"isSkip"`
-	IsRequired     bool     `yaml:"isRequired"`
-	IsSortable     bool     `yaml:"isSortable"`
-	IsFilterable   bool     `yaml:"isFilterable"`
-	JoinType       JoinType `yaml:"joinType"`
-	TableName      string   `yaml:"tableName"`
-	JoinTableName  string   `yaml:"JoinTableName"`
-	ForeignKey     string   `yaml:"foreignKey"`
-	References     string   `yaml:"references"`
-	JoinForeignKey string   `yaml:"joinForeignKey"`
-	JoinReferences string   `yaml:"joinReferences"`
-	Operations     []string `yaml:"operations"`
+	Name         string   `mapstructure:"name" yaml:"name"`
+	Alias        string   `mapstructure:"alias" yaml:"alias"`
+	Description  string   `mapstructure:"description" yaml:"description"`
+	Tags         string   `mapstructure:"tags" yaml:"tags"`
+	IsSkip       bool     `mapstructure:"isSkip" yaml:"isSkip"`
+	IsRequired   bool     `mapstructure:"isRequired" yaml:"isRequired"`
+	IsSortable   bool     `mapstructure:"isSortable" yaml:"isSortable"`
+	IsFilterable bool     `mapstructure:"isFilterable" yaml:"isFilterable"`
+	JoinType     JoinType `mapstructure:"joinType" yaml:"joinType"`
+
+	//Default: {field_name}
+	RefTableName string `mapstructure:"refTableName" yaml:"refTableName"`
+
+	//Default: {table}_{ref_table}
+	JoinTableName string `mapstructure:"joinTableName" yaml:"joinTableName"`
+
+	//Default: {ref_table}_id
+	ForeignKey string `mapstructure:"foreignKey" yaml:"foreignKey"`
+
+	//Default: id
+	References string `mapstructure:"references" yaml:"references"`
+
+	//Default: {table}_id
+	JoinForeignKey string `mapstructure:"joinForeignKey" yaml:"joinForeignKey"`
+
+	//Default: {ref_table}_id
+	JoinReferences string   `mapstructure:"joinReferences" yaml:"joinReferences"`
+	Operations     []string `mapstructure:"operations" yaml:"operations"`
 
 	//生成的数据
 	IsPrimaryKey    bool
 	IsForeignKey    bool
 	IsAutoIncrement bool
-	IsUnique        bool `yaml:"isUnique"`
-	IsIndex         bool `yaml:"isIndex"`
+	IsUnique        bool
+	IsIndex         bool
 	MetaType        MetaType
 	TagsHTML        template.HTML
-	JoinTable       *Table
-	MaxLength       int
+
+	//字段所在表
+	Table *Table
+
+	//引用表
+	RefTable *Table
+
+	//如果是M2M关联字段，字段对应的联接表
+	JoinTable *Table
+
+	MaxLength int
 
 	NameSnake            string
 	NameSnakePlural      string
@@ -139,33 +159,8 @@ func shiftMetaField(column *Column, metaTypes map[string]MetaType) *Field {
 	}
 
 	field.genName()
-	field.handleTags()
 
 	return field
-}
-
-func (f *Field) handleTags() {
-	tags := `json:"` + f.NameLowerCamel + `" gorm:"column:` + f.NameSnake
-	if f.IsPrimaryKey {
-		tags += ";primaryKey"
-	}
-	if f.IsAutoIncrement {
-		tags += ";autoIncrement"
-	}
-	// 设置了 default tag, gorm的createdat updatedat 逻辑会失效
-	// if f.MetaType.GoType == "time.Time" {
-	// 	tags += ";default: '1970-01-01 00:00:00'"
-	// }
-	if f.MaxLength > 0 {
-		tags += ";size:" + strconv.Itoa(f.MaxLength)
-	}
-	tags += `"`
-	if len(f.Tags) > 0 {
-		tags = tags + " " + f.Tags
-	}
-
-	// fmt.Println("tags:", tags)
-	f.TagsHTML = template.HTML(tags)
 }
 
 func mergeField(field *Field, fieldInCfg *Field) *Field {
@@ -174,56 +169,26 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 		return field
 	}
 
-	if fieldInCfg.Alias != "" {
-		field.Alias = fieldInCfg.Alias
-	}
+	field.Alias = fieldInCfg.Alias
+	field.Description = fieldInCfg.Description
+	field.Tags = fieldInCfg.Tags
 
-	if fieldInCfg.Description != "" {
-		field.Description = fieldInCfg.Description
-	}
-	if fieldInCfg.Tags != "" {
-		field.Tags = fieldInCfg.Tags
-	}
 	if fieldInCfg.JoinType == "" {
 		fieldInCfg.JoinType = JoinTypeNone
+	} else {
+		field.JoinType = fieldInCfg.JoinType
 	}
 
-	field.JoinType = fieldInCfg.JoinType
-
-	if fieldInCfg.IsSkip {
-		field.IsSkip = fieldInCfg.IsSkip
-	}
-	if fieldInCfg.IsRequired {
-		field.IsRequired = fieldInCfg.IsRequired
-	}
-	if fieldInCfg.IsPrimaryKey {
-		field.IsPrimaryKey = fieldInCfg.IsPrimaryKey
-	}
-	if fieldInCfg.IsSortable {
-		field.IsSortable = fieldInCfg.IsSortable
-	}
-	if fieldInCfg.IsFilterable {
-		field.IsFilterable = fieldInCfg.IsFilterable
-		operations := fieldInCfg.Operations
-		if len(operations) == 0 {
-			operations = append(operations, "Eq")
-		}
-		field.Operations = operations
-	}
-	if fieldInCfg.ForeignKey != "" {
-		field.ForeignKey = fieldInCfg.ForeignKey
-	}
-	if fieldInCfg.References != "" {
-		field.References = fieldInCfg.References
-	}
-	if fieldInCfg.JoinForeignKey != "" {
-		field.JoinForeignKey = fieldInCfg.JoinForeignKey
-	}
-	if fieldInCfg.JoinReferences != "" {
-		field.JoinReferences = fieldInCfg.JoinReferences
-	}
-
-	field.handleTags()
+	field.IsSkip = fieldInCfg.IsSkip
+	field.IsRequired = fieldInCfg.IsRequired
+	field.IsPrimaryKey = fieldInCfg.IsPrimaryKey
+	field.IsSortable = fieldInCfg.IsSortable
+	field.IsFilterable = fieldInCfg.IsFilterable
+	field.Operations = fieldInCfg.Operations
+	field.ForeignKey = fieldInCfg.ForeignKey
+	field.References = fieldInCfg.References
+	field.JoinForeignKey = fieldInCfg.JoinForeignKey
+	field.JoinReferences = fieldInCfg.JoinReferences
 
 	return field
 }
@@ -233,29 +198,53 @@ func (f *Field) HandleAssociation() {
 		return
 	}
 
-	tags := `json:"` + f.NameLowerCamel + `" gorm:"` + f.NameLowerCamel
+	if f.RefTableName == "" {
+		f.RefTableName = f.Name
+	}
+	var defaultForeignKey, defaultReferences, defaultJoinForeignKey, defaultJoinReferences string
+	switch f.JoinType {
+	case JoinTypeBelongTo:
+		defaultForeignKey = f.RefTableName + "_id"
+		defaultReferences = "id"
+	case JoinTypeHasOne:
+		defaultForeignKey = f.Table.Name + "_id"
+		defaultReferences = f.RefTableName + "_id"
+	case JoinTypeHasMany:
+		defaultForeignKey = f.Table.Name + "_id"
+		defaultReferences = "id"
+	case JoinTypeManyToMany:
+		defaultForeignKey = "id"
+		defaultReferences = "id"
+		defaultJoinForeignKey = f.Table.Name + "_id"
+		defaultJoinReferences = f.RefTableName + "_id"
+	}
 
-	if f.JoinType == JoinTypeManyToMany || f.JoinType == JoinTypeHasMany {
-		tags = `json:"` + f.NameLowerCamelPlural + `" gorm:"` + f.NameLowerCamelPlural
+	if f.ForeignKey == "" {
+		f.ForeignKey = defaultForeignKey
+	}
+	if f.References == "" {
+		f.References = defaultReferences
+	}
 
-	}
-	if f.JoinTableName != "" {
-		tags += ";many2many:" + f.JoinTableName
-	}
-	if f.ForeignKey != "" {
-		tags += ";foreignKey:" + f.ForeignKey
-	}
-	if f.References != "" {
-		tags += ";references:" + f.References
-	}
-	if f.JoinForeignKey != "" {
-		tags += ";joinForeignKey:" + f.JoinForeignKey
-	}
-	if f.JoinReferences != "" {
-		tags += ";joinReferences:" + f.JoinReferences
-	}
-	tags += `"`
+	if f.JoinType == JoinTypeManyToMany {
+		if f.JoinTableName == "" {
+			f.JoinTableName = f.Table.Name + "_" + f.RefTableName
+		}
 
-	fmt.Println("tags:", tags)
-	f.TagsHTML = template.HTML(tags)
+		if f.JoinForeignKey == "" {
+			f.JoinForeignKey = defaultJoinForeignKey
+		}
+		if f.JoinReferences == "" {
+			f.JoinReferences = defaultJoinReferences
+		}
+	}
+
+}
+
+func (f *Field) handleOperations() {
+	if f.IsIndex || f.IsFilterable {
+		if len(f.Operations) == 0 {
+			f.Operations = []string{OpEq}
+		}
+	}
 }

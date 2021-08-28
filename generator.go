@@ -116,7 +116,7 @@ func handleBackReference(table *Table, backReferenceTable *Table) {
 	//配置了此表的反向多对多关联
 	find := false
 	for _, fieldInCfg := range backReferenceTable.Fields {
-		if fieldInCfg.JoinType == JoinTypeManyToMany && fieldInCfg.TableName == table.Name {
+		if fieldInCfg.JoinType == JoinTypeManyToMany && fieldInCfg.RefTableName == table.Name {
 			find = true
 			break
 		}
@@ -147,29 +147,26 @@ func (g *Generator) handleAssociation() error {
 				continue
 			}
 			table.HasJoinField = true
-			field.JoinTable = g.getTable(field.TableName)
-			if field.JoinTable == nil {
-				return fmt.Errorf("Something wrong, can't find1 : %#v\n", field)
+			field.RefTable = g.getTable(field.RefTableName)
+			if field.RefTable == nil {
+				return fmt.Errorf("Something wrong, can't find RefTable : %#v\n", field)
 			}
 			if field.JoinType == JoinTypeManyToMany {
-				handleBackReference(table, field.JoinTable)
+				handleBackReference(table, field.RefTable)
+			}
+
+			foreignKey := table.NameCamel + "Id"
+			if len(field.ForeignKey) > 0 {
+				foreignKey = pascal(field.ForeignKey)
 			}
 
 			// 更新相应外键字段信息
 			if field.JoinType == JoinTypeBelongTo {
-				foreignKey := table.NameCamel + "Id"
-				if len(field.ForeignKey) > 0 {
-					foreignKey = field.ForeignKey
-				}
 				handleAssociationForeignKey(table, foreignKey)
 			}
 
 			if field.JoinType == JoinTypeHasOne || field.JoinType == JoinTypeHasMany {
-				foreignKey := table.NameCamel + "Id"
-				if len(field.ForeignKey) > 0 {
-					foreignKey = field.ForeignKey
-				}
-				handleAssociationForeignKey(field.JoinTable, foreignKey)
+				handleAssociationForeignKey(field.RefTable, foreignKey)
 			}
 
 		}
@@ -242,7 +239,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 		if entry.IsDir() {
 			err = os.MkdirAll(target, 0744)
 			if err != nil {
-				fmt.Println("parse fs1:", dir, path)
 				return err
 			}
 		} else {
@@ -257,12 +253,10 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
 				tmpl, err := t.ParseFS(dir, path)
 				if err != nil {
-					fmt.Println("parse fs2:", dir, path)
 					return err
 				}
 
 				if err := tmpl.Execute(b, data); err != nil {
-					fmt.Println("parse fs3:", dir, path)
 					return err
 				}
 
@@ -271,7 +265,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			} else {
 				content, err = fs.ReadFile(dir, path)
 				if err != nil {
-					fmt.Println("parse fs2:", dir, path)
 					return err
 				}
 			}
@@ -287,7 +280,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			}
 
 			if err := os.WriteFile(target, content, 0644); err != nil {
-				fmt.Println("WriteFile fail:", target)
 				return err
 			}
 
@@ -295,7 +287,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			if suffix == ".go" {
 
 				if err := format(target, content); err != nil {
-					fmt.Println("parse fs4:", dir, path)
 					return err
 				}
 			}
@@ -308,8 +299,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 	// err := vfsutil.Walk(fs, root, walkFn)
 	err := fs.WalkDir(dir, root, walkFn)
 	if err != nil {
-		fmt.Printf("parse fs5: %#v %s %#v\n", dir, root, err)
-
 		return err
 	}
 
@@ -319,7 +308,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 func (g *Generator) genSkeleton(assets fs.FS, dest string, data interface{}) error {
 	err := g.build(assets, "skeleton", dest, data, g.Config.Overwrite)
 	if err != nil {
-		fmt.Println("err:", err, dest)
 		return err
 	}
 	return nil
@@ -367,23 +355,19 @@ func (g *Generator) gen() error {
 				tmplPath = TmplBasePath + tmplPath
 				//不存在则使用默认的模板
 				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
-					fmt.Println("tmplPath not exists:", table.Name, tmplPath, err)
 					tmplPath = TmplBasePath + template.Path
 				}
 			} else {
 				tmplPath = TmplBasePath + tmplPath
 				//不存在则不生成
 				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
-					fmt.Println("tmplPath not exists:", table.Name, tmplPath, err)
 					continue
 				}
 			}
 
-			fmt.Println("tmplPath:", tmplPath)
 			err := g.build(g.Assets, tmplPath, dest, table, g.Config.Overwrite)
 			if err != nil {
-				fmt.Println("err:", err, dest)
-				return err
+				return fmt.Errorf("parse [%s] template failed with error : %s", table.Name, err.Error())
 			}
 
 			// err := template.ParseExecute(g.Assets, tableName, table)

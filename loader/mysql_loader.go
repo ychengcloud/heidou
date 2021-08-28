@@ -39,7 +39,6 @@ func NewMysqlSchemaLoader(o *MysqlSchemaLoaderOptions, schemaName string) *Mysql
 func (msl *MysqlSchemaLoader) loadIndexes(db *sql.DB, table *heidou.MetaTable) error {
 
 	rawSql := "SELECT `INDEX_NAME`, `COLUMN_NAME`,`NON_UNIQUE`, `SEQ_IN_INDEX` FROM `STATISTICS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ? ORDER BY table_name ASC, SEQ_IN_INDEX ASC"
-	fmt.Printf("load index:%s\n", rawSql)
 	rows, err := db.Query(rawSql, msl.SchemaName, table.Name)
 	if err != nil {
 		return err
@@ -133,11 +132,8 @@ func (msl *MysqlSchemaLoader) LoadMetaTable() ([]*heidou.MetaTable, error) {
 			return nil, err
 		}
 		for _, column := range table.Columns {
-			fmt.Printf("%s %#v\n", table.Name, column)
 			for _, index := range table.Indexes {
-				fmt.Printf("%s %s\n", index.ColumnName, column.Name)
 				if index.ColumnName == column.Name {
-					fmt.Printf("%#v\n", index)
 					column.IsIndex = true
 
 					if index.Unique {
