@@ -235,7 +235,6 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			return err
 		}
 		target := filepath.Join(dest, relPath)
-		// target := filepath.Join(dest, path)
 		if entry.IsDir() {
 			err = os.MkdirAll(target, 0744)
 			if err != nil {
@@ -275,6 +274,19 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 
 				// 文件存在则返回，两种情况表示文件是存在的，1 err 为nil, 2 返回的err不包含不存在的标志
 				if err == nil || !os.IsNotExist(err) {
+					return err
+				}
+			}
+
+			// 如果目录不在在则创建
+			targetDir := filepath.Dir(target)
+			_, err = os.Stat(targetDir)
+			if err != nil {
+				if !os.IsNotExist(err) {
+					return err
+				}
+				err = os.MkdirAll(targetDir, 0744)
+				if err != nil {
 					return err
 				}
 			}
@@ -319,61 +331,54 @@ func (g *Generator) gen() error {
 		return err
 	}
 
-	for _, table := range g.Data.Tables {
-		tableName := table.Name
-		switch g.Config.TmplNameFormat {
-		case "camel":
-			tableName = table.NameCamel
-		case "lowerCamel":
-			tableName = table.NameLowerCamel
-		case "camelPlural":
-			tableName = table.NameCamelPlural
-		case "lowerCamelPlural":
-			tableName = table.NameLowerCamelPlural
-		case "snake":
-			tableName = table.NameSnake
+	//generate model from table
+	for _, template := range g.Config.Templates {
+		count := strings.Count(template.NameFormat, "%s")
+		if count > 1 {
+			return fmt.Errorf("NameFormat format is not correct, at most one '%%s' : %s", template.NameFormat)
+		}
+		dest := template.NameFormat
 
+		tmplPath := template.Path
+
+		tmplPath = TmplBasePath + tmplPath
+		//不存在则不生成
+		if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
+			continue
 		}
 
-		//generate model from table
-		for _, template := range g.Config.Templates {
-			dest := fmt.Sprintf(template.NameFormat, tableName)
-			tmplPath := template.Path
-
-			//根据TypeName生成实际模板路径
-			if table.TypeName != "" {
-				paths := strings.SplitN(tmplPath, ".", 2)
-				if paths != nil {
-					tmplPath = paths[0] + "_" + table.TypeName
-					if len(paths) == 2 {
-						tmplPath = tmplPath + "." + paths[1]
-					}
-				} else {
-					tmplPath = "_" + table.TypeName
-				}
-
-				tmplPath = TmplBasePath + tmplPath
-				//不存在则使用默认的模板
-				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
-					tmplPath = TmplBasePath + template.Path
-				}
-			} else {
-				tmplPath = TmplBasePath + tmplPath
-				//不存在则不生成
-				if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
-					continue
-				}
+		if template.Type == "schema" {
+			if count == 1 {
+				dest = fmt.Sprintf(template.NameFormat, g.Config.ProjectName)
 			}
-
-			err := g.build(g.Assets, tmplPath, dest, table, g.Config.Overwrite)
+			err := g.build(g.Assets, tmplPath, dest, g.Data, g.Config.Overwrite)
 			if err != nil {
-				return fmt.Errorf("parse [%s] template failed with error : %s", table.Name, err.Error())
+				return fmt.Errorf("parse template [%s] failed with error : %s", template.Path, err.Error())
 			}
+		} else {
+			for _, table := range g.Data.Tables {
+				tableName := table.Name
+				switch g.Config.TmplNameFormat {
+				case "camel":
+					tableName = table.NameCamel
+				case "lowerCamel":
+					tableName = table.NameLowerCamel
+				case "camelPlural":
+					tableName = table.NameCamelPlural
+				case "lowerCamelPlural":
+					tableName = table.NameLowerCamelPlural
+				case "snake":
+					tableName = table.NameSnake
 
-			// err := template.ParseExecute(g.Assets, tableName, table)
-			// if err != nil {
-			// 	return fmt.Errorf("parse [%s] template failed with error : %s", template.NameFormat, err)
-			// }
+				}
+				if count == 1 {
+					dest = fmt.Sprintf(template.NameFormat, tableName)
+				}
+				err := g.build(g.Assets, tmplPath, dest, table, g.Config.Overwrite)
+				if err != nil {
+					return fmt.Errorf("parse template [%s] with table [%s] failed with error : %s", template.Path, table.Name, err.Error())
+				}
+			}
 		}
 	}
 	return nil
