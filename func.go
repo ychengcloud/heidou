@@ -14,12 +14,11 @@ import (
 
 var (
 	Funcs = template.FuncMap{
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
 		"receiver": receiver,
 		"snake":    snake,
 		"pascal":   pascal,
 		"camel":    camel,
+		"ops":      ops,
 	}
 )
 
@@ -64,4 +63,39 @@ func pascal(s string) string {
 
 func camel(s string) string {
 	return strcase.ToLowerCamel(s)
+}
+
+func contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
+}
+
+// ops returns all operations for given field.
+func ops(f *Field) (operations []string) {
+	var ops []string
+	switch f.MetaType.GqlType {
+	case "Boolean":
+		ops = boolOps
+	case "Int":
+		ops = numericOps
+	case "String":
+		ops = numericOps
+	case "Time":
+		ops = numericOps
+	default:
+		ops = numericOps
+	}
+
+	for _, op := range f.Operations {
+		if contains(ops, op) {
+			operations = append(operations, op)
+		}
+	}
+
+	return operations
 }

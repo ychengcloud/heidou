@@ -10,17 +10,30 @@ import (
 
 const (
 	OpEq         = "Eq"
+	OpNeq        = "Neq"
 	OpIn         = "In"
+	OpNotIn      = "NotIn"
 	OpGt         = "Gt"
 	OpGte        = "Gte"
 	OpLt         = "Lt"
 	OpLte        = "Lte"
+	OpIsNil      = "IsNil"
+	OpNotNil     = "NotNil"
 	OpContains   = "Contains"
 	OpStartsWith = "StartsWith"
 	OpEndsWith   = "EndsWith"
 	OpAnd        = "AND"
 	OpOr         = "OR"
 	OpNot        = "NOT"
+)
+
+var (
+	// operations collection.
+	boolOps     = []string{OpEq, OpNeq}
+	enumOps     = append(boolOps, OpIn, OpNotIn)
+	numericOps  = append(enumOps, OpGt, OpGte, OpLt, OpLte)
+	stringOps   = append(numericOps, OpContains, OpStartsWith, OpEndsWith)
+	nillableOps = []string{OpIsNil, OpNotNil}
 )
 
 type JoinType string
@@ -35,15 +48,18 @@ const (
 
 type Field struct {
 	//从配置文件读取的数据
-	Name         string   `mapstructure:"name" yaml:"name"`
-	Alias        string   `mapstructure:"alias" yaml:"alias"`
-	Description  string   `mapstructure:"description" yaml:"description"`
-	Tags         string   `mapstructure:"tags" yaml:"tags"`
-	IsSkip       bool     `mapstructure:"isSkip" yaml:"isSkip"`
-	IsRequired   bool     `mapstructure:"isRequired" yaml:"isRequired"`
-	IsSortable   bool     `mapstructure:"isSortable" yaml:"isSortable"`
-	IsFilterable bool     `mapstructure:"isFilterable" yaml:"isFilterable"`
-	JoinType     JoinType `mapstructure:"joinType" yaml:"joinType"`
+	Name        string `mapstructure:"name" yaml:"name"`
+	Alias       string `mapstructure:"alias" yaml:"alias"`
+	Description string `mapstructure:"description" yaml:"description"`
+	Tags        string `mapstructure:"tags" yaml:"tags"`
+
+	//用于扩展字段定义
+	Annotations  interface{} `mapstructure:"annotations" yaml:"annotations"`
+	IsSkip       bool        `mapstructure:"isSkip" yaml:"isSkip"`
+	IsRequired   bool        `mapstructure:"isRequired" yaml:"isRequired"`
+	IsSortable   bool        `mapstructure:"isSortable" yaml:"isSortable"`
+	IsFilterable bool        `mapstructure:"isFilterable" yaml:"isFilterable"`
+	JoinType     JoinType    `mapstructure:"joinType" yaml:"joinType"`
 
 	//Default: {field_name}
 	RefTableName string `mapstructure:"refTableName" yaml:"refTableName"`
@@ -172,6 +188,7 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	field.Alias = fieldInCfg.Alias
 	field.Description = fieldInCfg.Description
 	field.Tags = fieldInCfg.Tags
+	field.Annotations = fieldInCfg.Annotations
 
 	if fieldInCfg.JoinType == "" {
 		fieldInCfg.JoinType = JoinTypeNone
@@ -179,11 +196,21 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 		field.JoinType = fieldInCfg.JoinType
 	}
 
-	field.IsSkip = fieldInCfg.IsSkip
-	field.IsRequired = fieldInCfg.IsRequired
-	field.IsPrimaryKey = fieldInCfg.IsPrimaryKey
-	field.IsSortable = fieldInCfg.IsSortable
-	field.IsFilterable = fieldInCfg.IsFilterable
+	if fieldInCfg.IsSkip {
+		field.IsSkip = fieldInCfg.IsSkip
+	}
+	if fieldInCfg.IsPrimaryKey {
+		field.IsPrimaryKey = fieldInCfg.IsPrimaryKey
+	}
+	if fieldInCfg.IsRequired {
+		field.IsRequired = fieldInCfg.IsRequired
+	}
+	if fieldInCfg.IsSortable {
+		field.IsSortable = fieldInCfg.IsSortable
+	}
+	if fieldInCfg.IsFilterable {
+		field.IsFilterable = fieldInCfg.IsFilterable
+	}
 	field.Operations = fieldInCfg.Operations
 	field.ForeignKey = fieldInCfg.ForeignKey
 	field.References = fieldInCfg.References
