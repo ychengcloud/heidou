@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	AssetsRoot   = "_assets"
-	TmplBasePath = "templates/"
+	AssetsRoot    = "_assets"
+	TmplBasePath  = "templates/"
+	ScenesPattern = "_scenes/**/*"
 )
 
 type Generator struct {
@@ -250,7 +251,13 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 
 				t := template.New(filepath.Base(path)).Funcs(Funcs).Funcs(sprig.GenericFuncMap())
 				t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
-				tmpl, err := t.ParseFS(dir, path)
+
+				patterns := make([]string, 0)
+				patterns = append(patterns, path)
+				for _, pattern := range g.Config.Templates.References {
+					patterns = append(patterns, filepath.Join(TmplBasePath, pattern))
+				}
+				tmpl, err := t.ParseFS(dir, patterns...)
 				if err != nil {
 					return err
 				}
@@ -331,13 +338,16 @@ func (g *Generator) gen() error {
 		return err
 	}
 
+	if g.Config.Templates == nil {
+		return nil
+	}
 	//generate model from table
-	for _, template := range g.Config.Templates {
-		count := strings.Count(template.NameFormat, "%s")
+	for _, template := range g.Config.Templates.InfoList {
+		count := strings.Count(template.NamePattern, "%s")
 		if count > 1 {
-			return fmt.Errorf("NameFormat format is not correct, at most one '%%s' : %s", template.NameFormat)
+			return fmt.Errorf("NamePattern format is not correct, at most one '%%s' : %s", template.NamePattern)
 		}
-		dest := template.NameFormat
+		dest := template.NamePattern
 
 		tmplPath := template.Path
 
@@ -349,7 +359,7 @@ func (g *Generator) gen() error {
 
 		if template.Type == "schema" {
 			if count == 1 {
-				dest = fmt.Sprintf(template.NameFormat, g.Config.ProjectName)
+				dest = fmt.Sprintf(template.NamePattern, g.Config.ProjectName)
 			}
 			err := g.build(g.Assets, tmplPath, dest, g.Data, g.Config.Overwrite)
 			if err != nil {
@@ -358,7 +368,7 @@ func (g *Generator) gen() error {
 		} else {
 			for _, table := range g.Data.Tables {
 				tableName := table.Name
-				switch g.Config.TmplNameFormat {
+				switch g.Config.Templates.NameStyle {
 				case "camel":
 					tableName = table.NameCamel
 				case "lowerCamel":
@@ -372,7 +382,7 @@ func (g *Generator) gen() error {
 
 				}
 				if count == 1 {
-					dest = fmt.Sprintf(template.NameFormat, tableName)
+					dest = fmt.Sprintf(template.NamePattern, tableName)
 				}
 				err := g.build(g.Assets, tmplPath, dest, table, g.Config.Overwrite)
 				if err != nil {
