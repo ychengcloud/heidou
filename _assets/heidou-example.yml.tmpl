@@ -51,14 +51,18 @@ templates:
   - nameFormat: "internal/generated/services/%s.go"
     path:   "services/service.go.tmpl"
 #templates:
-#  - NameFormat: "src/pages/%s"
-#    Path:   "pages"
-#  - NameFormat: "src/locales/en-us/%s.ts"
-#    Path:   "locale_en.ts.tmpl"
-#  - NameFormat: "src/locales/zh-cn/%s.ts"
-#    Path:   "locale_zh.ts.tmpl"
-#  - NameFormat: "mock/%s.ts"
-#    Path:   "mock.ts.tmpl"
+#  nameStyle: "lowerCamel"
+#  # 生成的模板
+#  # NamePattern 目标路径，支持简单的字符串替换
+#  # Path 模板路径名，以 templates为相对路径
+#  info:
+#    - NamePattern: "src/pages/%s"
+#      Path:   "pages"
+#    - NamePattern: "src/mocks/%s.ts"
+#      Path:   "mock.ts.tmpl"
+#  # 引用的模板，只会被主模板引用，不会单独生成，支持golang glob pattern
+#  references:
+#    - references/*
 
 
 # tables:
@@ -122,32 +126,6 @@ tables:
       tableName: resource  
       joinTableName: role_resource_relation
       errorCodes: [E1, E2]
-  - name: casbin_rules
-    isSkip: true
   - name: employee_role_relation
     isSkip: true
-  - name: migrations
-    isSkip: true
-  - name: product_attribute_value_relation
-    isSkip: true
-  - name: product_category_relation
-    isSkip: true
-  - name: product_collection_relation
-    isSkip: true
-  - name: product_midea_file_relation
-    isSkip: true
-  - name: product_type_variant_attribute_relation
-    isSkip: true
-  - name: product_variant_attribute_value_relation
-    isSkip: true
-  - name: role_action_relation
-    isSkip: true
-  - name: role_resource_relation
-    isSkip: true
-  - name: user_group_relation
-    isSkip: true
-  - name: user_org_node_relation
-    isSkip: true
-  - name: event_logs
-    isSkip: true
-  
+

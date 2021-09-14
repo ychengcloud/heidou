@@ -99,10 +99,14 @@ type Table struct {
 	//别名 配置后,生成时不再处理单复数形式,以Alias为准
 	Alias string `mapstructure:"alias" yaml:"alias"`
 
-	Description string      `mapstructure:"description" yaml:"description"`
-	IsSkip      bool        `mapstructure:"isSkip" yaml:"isSkip"`
-	TypeName    string      `mapstructure:"typeName" yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
-	Extra       interface{} `mapstructure:"extra" yaml:"extra"`
+	Description string `mapstructure:"description" yaml:"description"`
+
+	//用于扩展表定义
+	Annotations interface{} `mapstructure:"annotations" yaml:"annotations"`
+
+	IsSkip   bool        `mapstructure:"isSkip" yaml:"isSkip"`
+	TypeName string      `mapstructure:"typeName" yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
+	Extra    interface{} `mapstructure:"extra" yaml:"extra"`
 
 	Fields     []*Field    `mapstructure:"fields" yaml:"fields"`
 	ErrorCodes []ErrorCode `mapstructure:"errorCodes" yaml:"errorCodes"`
@@ -206,6 +210,7 @@ func (t *Table) handleCfgInfo(tableInCfg *Table) {
 
 	t.Alias = tableInCfg.Alias
 	t.TypeName = tableInCfg.TypeName
+	t.Annotations = tableInCfg.Annotations
 
 	if len(tableInCfg.ErrorCodes) > 0 {
 		t.HasErrorCode = true
