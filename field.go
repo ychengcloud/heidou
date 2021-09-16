@@ -54,12 +54,17 @@ type Field struct {
 	Tags        string `mapstructure:"tags" yaml:"tags"`
 
 	//用于扩展字段定义
-	Annotations  interface{} `mapstructure:"annotations" yaml:"annotations"`
-	IsSkip       bool        `mapstructure:"isSkip" yaml:"isSkip"`
-	IsRequired   bool        `mapstructure:"isRequired" yaml:"isRequired"`
-	IsSortable   bool        `mapstructure:"isSortable" yaml:"isSortable"`
-	IsFilterable bool        `mapstructure:"isFilterable" yaml:"isFilterable"`
-	JoinType     JoinType    `mapstructure:"joinType" yaml:"joinType"`
+	Annotations interface{} `mapstructure:"annotations" yaml:"annotations"`
+
+	IsSkip       bool `mapstructure:"isSkip" yaml:"isSkip"`
+	IsRequired   bool `mapstructure:"isRequired" yaml:"isRequired"`
+	IsSortable   bool `mapstructure:"isSortable" yaml:"isSortable"`
+	IsFilterable bool `mapstructure:"isFilterable" yaml:"isFilterable"`
+	IsForeignKey bool `mapstructure:"isForeignKey" yaml:"isForeignKey"`
+
+	//非本服务定义的字段
+	IsRemote bool     `mapstructure:"isRemote" yaml:"isRemote"`
+	JoinType JoinType `mapstructure:"joinType" yaml:"joinType"`
 
 	//Default: {field_name}
 	RefTableName string `mapstructure:"refTableName" yaml:"refTableName"`
@@ -82,7 +87,6 @@ type Field struct {
 
 	//生成的数据
 	IsPrimaryKey    bool
-	IsForeignKey    bool
 	IsAutoIncrement bool
 	IsUnique        bool
 	IsIndex         bool
@@ -96,7 +100,7 @@ type Field struct {
 	RefTable *Table
 
 	//如果是M2M关联字段，字段对应的联接表
-	JoinTable *Table
+	JoinTable *JoinTable
 
 	MaxLength int
 
@@ -211,6 +215,9 @@ func mergeField(field *Field, fieldInCfg *Field) *Field {
 	if fieldInCfg.IsFilterable {
 		field.IsFilterable = fieldInCfg.IsFilterable
 	}
+	field.IsForeignKey = fieldInCfg.IsForeignKey
+	field.IsRemote = fieldInCfg.IsRemote
+
 	field.Operations = fieldInCfg.Operations
 	field.ForeignKey = fieldInCfg.ForeignKey
 	field.References = fieldInCfg.References
@@ -225,9 +232,6 @@ func (f *Field) HandleAssociation() {
 		return
 	}
 
-	if f.RefTableName == "" {
-		f.RefTableName = f.Name
-	}
 	var defaultForeignKey, defaultReferences, defaultJoinForeignKey, defaultJoinReferences string
 	switch f.JoinType {
 	case JoinTypeBelongTo:
@@ -243,7 +247,7 @@ func (f *Field) HandleAssociation() {
 		defaultForeignKey = "id"
 		defaultReferences = "id"
 		defaultJoinForeignKey = f.Table.Name + "_id"
-		defaultJoinReferences = f.RefTableName + "_id"
+		defaultJoinReferences = f.Name + "_id"
 	}
 
 	if f.ForeignKey == "" {
@@ -255,7 +259,7 @@ func (f *Field) HandleAssociation() {
 
 	if f.JoinType == JoinTypeManyToMany {
 		if f.JoinTableName == "" {
-			f.JoinTableName = f.Table.Name + "_" + f.RefTableName
+			f.JoinTableName = f.Table.Name + "_" + f.Name
 		}
 
 		if f.JoinForeignKey == "" {

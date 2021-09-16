@@ -31,13 +31,6 @@ func TestForeignKeyForHasMany(t *testing.T) {
 	}
 	field.genName()
 
-	table := &Table{
-		Fields: []*Field{
-			field,
-		},
-	}
-	field.JoinTable = table
-
 	assField := &Field{
 		Name: "many_id",
 	}

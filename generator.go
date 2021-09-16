@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	AssetsRoot    = "_assets"
-	TmplBasePath  = "templates/"
-	ScenesPattern = "_scenes/**/*"
+	AssetsRoot   = "_assets"
+	TmplBasePath = "templates"
 )
 
 type Generator struct {
@@ -33,7 +32,12 @@ type Data struct {
 	HasTimeField    bool
 	IsImportStrings bool
 
-	Tables []*Table
+	tables       []*Table
+	skipedTables []*Table
+}
+
+func (d *Data) Tables() []*Table {
+	return d.tables
 }
 
 func NewGenerator(cfg *Config, loader Loader) (*Generator, error) {
@@ -95,7 +99,18 @@ func (g *Generator) getTableInCfg(name string) *Table {
 // getTable 根据表名，查找表对象
 func (g *Generator) getTable(name string) *Table {
 
-	for _, table := range g.Data.Tables {
+	for _, table := range g.Data.Tables() {
+		if table.Name == name {
+			return table
+		}
+	}
+	return nil
+}
+
+// getSkipedTable 根据表名，查找表对象
+func (g *Generator) getSkipedTable(name string) *Table {
+
+	for _, table := range g.Data.skipedTables {
 		if table.Name == name {
 			return table
 		}
@@ -142,20 +157,37 @@ func handleAssociationForeignKey(table *Table, foreignKey string) {
 
 // 所有元表信息生成后，再处理关联字段的模型信息
 func (g *Generator) handleAssociation() error {
-	for _, table := range g.Data.Tables {
+	for _, table := range g.Data.Tables() {
 		for _, field := range table.Fields {
 			if field.JoinType == JoinTypeNone {
 				continue
 			}
 			table.HasJoinField = true
-			field.RefTable = g.getTable(field.RefTableName)
-			if field.RefTable == nil {
-				return fmt.Errorf("Something wrong, can't find RefTable : %#v\n", field)
-			}
-			if field.JoinType == JoinTypeManyToMany {
-				handleBackReference(table, field.RefTable)
-			}
 
+			if field.RefTableName != "" {
+				field.RefTable = g.getTable(field.RefTableName)
+				if field.RefTable == nil {
+					return fmt.Errorf("Something wrong, can't find RefTable : %#v\n", field)
+				}
+				if field.JoinType == JoinTypeManyToMany {
+					handleBackReference(table, field.RefTable)
+				}
+			}
+			if field.JoinTableName != "" {
+				t := g.getSkipedTable(field.JoinTableName)
+				if t == nil {
+					return fmt.Errorf("Something wrong, can't find JoinTable : %#v\n", field)
+				}
+				field.JoinTable = &JoinTable{Name: field.JoinTableName, Table: t}
+				for _, f := range t.Fields {
+					if f.Name == field.JoinForeignKey {
+						field.JoinTable.ForeignKey = f
+					}
+					if f.Name == field.JoinReferences {
+						field.JoinTable.References = f
+					}
+				}
+			}
 			foreignKey := table.NameCamel + "Id"
 			if len(field.ForeignKey) > 0 {
 				foreignKey = pascal(field.ForeignKey)
@@ -183,9 +215,6 @@ func (g *Generator) Generate() error {
 	}
 
 	for _, metaTable := range metaTables {
-		// if metaTable.Name != "product" && metaTable.Name != "category" && metaTable.Name != "product_variant" {
-		// 	continue
-		// }
 		tableInCfg := g.getTableInCfg(metaTable.Name)
 
 		//不支持联合主键或联合索引，如果表中定义了联合主键或联合索引，必须显式配置忽略相应的表
@@ -195,7 +224,7 @@ func (g *Generator) Generate() error {
 			}
 		}
 		table := MergeTable(metaTable, tableInCfg, g.MetaTypes)
-		if table == nil || table.IsSkip {
+		if table == nil {
 			continue
 		}
 
@@ -207,7 +236,11 @@ func (g *Generator) Generate() error {
 			g.Data.IsImportStrings = true
 		}
 		table.Extra = g.Data.Extra
-		g.Data.Tables = append(g.Data.Tables, table)
+		if table.IsSkip {
+			g.Data.skipedTables = append(g.Data.skipedTables, table)
+		} else {
+			g.Data.tables = append(g.Data.tables, table)
+		}
 	}
 
 	if err := g.handleAssociation(); err != nil {
@@ -249,7 +282,7 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				target = strings.TrimSuffix(target, suffix)
 				b := bytes.NewBuffer(nil)
 
-				t := template.New(filepath.Base(path)).Funcs(Funcs).Funcs(sprig.GenericFuncMap())
+				t := template.New(filepath.Base(path)).Funcs(sprig.GenericFuncMap()).Funcs(Funcs)
 				t.Delims(g.Config.Delim.Left, g.Config.Delim.Right)
 
 				patterns := make([]string, 0)
@@ -259,11 +292,11 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 				}
 				tmpl, err := t.ParseFS(dir, patterns...)
 				if err != nil {
-					return err
+					return fmt.Errorf("build: parseFS [dir: %s, patterns: %v] with err: %s", dir, patterns, err.Error())
 				}
 
 				if err := tmpl.Execute(b, data); err != nil {
-					return err
+					return fmt.Errorf("build: Execute with err: %s", err.Error())
 				}
 
 				content = b.Bytes()
@@ -299,14 +332,14 @@ func (g *Generator) build(dir fs.FS, root, dest string, data interface{}, overwr
 			}
 
 			if err := os.WriteFile(target, content, 0644); err != nil {
-				return err
+				return fmt.Errorf("build: WriteFile with err: %s", err.Error())
 			}
 
 			suffix = filepath.Ext(target)
 			if suffix == ".go" {
 
 				if err := format(target, content); err != nil {
-					return err
+					return fmt.Errorf("build: format with err: %s", err.Error())
 				}
 			}
 			return nil
@@ -335,7 +368,7 @@ func (g *Generator) genSkeleton(assets fs.FS, dest string, data interface{}) err
 func (g *Generator) gen() error {
 	err := g.genSkeleton(g.Assets, "./", g.Data)
 	if err != nil {
-		return err
+		return fmt.Errorf("genSkeleton failed : %s", err.Error())
 	}
 
 	if g.Config.Templates == nil {
@@ -351,7 +384,7 @@ func (g *Generator) gen() error {
 
 		tmplPath := template.Path
 
-		tmplPath = TmplBasePath + tmplPath
+		tmplPath = filepath.Join(TmplBasePath, tmplPath)
 		//不存在则不生成
 		if _, err := fs.Stat(g.Assets, tmplPath); os.IsNotExist(err) {
 			continue
@@ -366,7 +399,7 @@ func (g *Generator) gen() error {
 				return fmt.Errorf("parse template [%s] failed with error : %s", template.Path, err.Error())
 			}
 		} else {
-			for _, table := range g.Data.Tables {
+			for _, table := range g.Data.Tables() {
 				tableName := table.Name
 				switch g.Config.Templates.NameStyle {
 				case "camel":

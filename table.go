@@ -104,13 +104,22 @@ type Table struct {
 	//用于扩展表定义
 	Annotations interface{} `mapstructure:"annotations" yaml:"annotations"`
 
-	IsSkip   bool        `mapstructure:"isSkip" yaml:"isSkip"`
-	TypeName string      `mapstructure:"typeName" yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
-	Extra    interface{} `mapstructure:"extra" yaml:"extra"`
+	IsSkip bool `mapstructure:"isSkip" yaml:"isSkip"`
+
+	//是否连接表
+	IsJoinTable bool        `mapstructure:"isJoinTable" yaml:"isJoinTable"`
+	TypeName    string      `mapstructure:"typeName" yaml:"typeName"` //表类型，可根据此配置选择不同的模板类型
+	Extra       interface{} `mapstructure:"extra" yaml:"extra"`
 
 	Fields     []*Field    `mapstructure:"fields" yaml:"fields"`
 	ErrorCodes []ErrorCode `mapstructure:"errorCodes" yaml:"errorCodes"`
 	Methods    []string    `mapstructure:"methods" yaml:"methods"`
+
+	//IsJoinTable为true时以下字段有效
+	JoinFromName   string
+	JoinFromFKName string
+	JoinToName     string
+	JoinToFKName   string
 
 	//生成的数据
 	PrimaryKeyField *Field
@@ -131,6 +140,16 @@ type Table struct {
 	NameCamelPlural      string
 	NameLowerCamel       string
 	NameLowerCamelPlural string
+}
+
+type JoinTable struct {
+	Name  string
+	Table *Table
+	//ForeignKey Join ForeignKey field
+	ForeignKey *Field `mapstructure:"foreignKey" yaml:"foreignKey"`
+
+	//References Join References field
+	References *Field `mapstructure:"references" yaml:"references"`
 }
 
 func (t *Table) genName() {

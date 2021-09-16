@@ -10,6 +10,7 @@ import (
 	"text/template"
 
 	"github.com/iancoleman/strcase"
+	"github.com/jinzhu/inflection"
 )
 
 var (
@@ -18,6 +19,8 @@ var (
 		"snake":    snake,
 		"pascal":   pascal,
 		"camel":    camel,
+		"plural":   plural,
+		"singular": singular,
 		"ops":      ops,
 	}
 )
@@ -63,6 +66,17 @@ func pascal(s string) string {
 
 func camel(s string) string {
 	return strcase.ToLowerCamel(s)
+}
+
+func plural(s string) string {
+	p := inflection.Plural(s)
+	if p == s {
+		p += "Slice"
+	}
+	return p
+}
+func singular(s string) string {
+	return inflection.Singular(s)
 }
 
 func contains(s []string, str string) bool {
