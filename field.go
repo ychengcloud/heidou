@@ -232,6 +232,9 @@ func (f *Field) HandleAssociation() {
 		return
 	}
 
+	if f.RefTableName == "" {
+		f.RefTableName = f.Name
+	}
 	var defaultForeignKey, defaultReferences, defaultJoinForeignKey, defaultJoinReferences string
 	switch f.JoinType {
 	case JoinTypeBelongTo:
@@ -239,7 +242,7 @@ func (f *Field) HandleAssociation() {
 		defaultReferences = "id"
 	case JoinTypeHasOne:
 		defaultForeignKey = f.Table.Name + "_id"
-		defaultReferences = f.RefTableName + "_id"
+		defaultReferences = "id"
 	case JoinTypeHasMany:
 		defaultForeignKey = f.Table.Name + "_id"
 		defaultReferences = "id"
@@ -247,7 +250,7 @@ func (f *Field) HandleAssociation() {
 		defaultForeignKey = "id"
 		defaultReferences = "id"
 		defaultJoinForeignKey = f.Table.Name + "_id"
-		defaultJoinReferences = f.Name + "_id"
+		defaultJoinReferences = f.RefTableName + "_id"
 	}
 
 	if f.ForeignKey == "" {
