@@ -164,7 +164,7 @@ func (g *Generator) handleAssociation() error {
 			}
 			table.HasJoinField = true
 
-			if field.RefTableName != "" {
+			if field.RefTableName != "" && !field.IsRemote {
 				field.RefTable = g.getTable(field.RefTableName)
 				if field.RefTable == nil {
 					return fmt.Errorf("Something wrong, can't find RefTable : %#v\n", field)
