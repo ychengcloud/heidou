@@ -28,10 +28,10 @@ templates
 
 ## 官方模板
 
-- [x] [graphql-server-template](templates-graphql-server.md) - 符合 Golang 设计哲学的工程框架,支持查询过滤、排序、分页、指定返回字段、批量查询、批量更新、批量删除。自动生成 Graphql 文档。
+- [x] [grpc-microservice-server](https://github.com/ychengcloud/grpc-server-template) - 符合 Golang 设计哲学的工程框架,支持查询过滤、排序、分页、指定返回字段、批量创建、批量查询、批量更新、批量删除
 - [x] [react-admin-template](templates-react-admin.md) - 全新技术栈的后台管理系统模板，自动生成具有CRUD功能的项目框架。
+- [x] [graphql-server-template](templates-graphql-server.md) - 符合 Golang 设计哲学的工程框架,支持查询过滤、排序、分页、指定返回字段、批量查询、批量更新、批量删除。自动生成 Graphql 文档。
 - [ ] [restful-server-template]()
-- [ ] [grpc-microservice-server]()
 
 ## 社区模板
 
@@ -89,7 +89,9 @@ templates
 | IsPrimaryKey    | 是否主键                                                                          | bool          | false  | true      |
 | IsForeignKey    | 是否外键                                                                          | bool          | false  | true      |
 | IsAutoIncrement | 主键是否自增类型                                                                  | bool          | false  | true      |
+| IsRemote        | 是否远程关联字段                                                                  | bool          | false  | true      |
 | MetaType        | 字段类型元信息                                                                    | map           | -      |
 | TagsHTML        | 字段标签信息                                                                      | template.HTML | -      |
-| JoinTable       | 关联表                                                                            | Table         | -      | -         |
+| RefTable        | 引用表                                                                            | Table         | -      | -         |
+| JoinTable       | 关联表                                                                            | JoinTable     | -      | -         |
 | MaxLength       | 字段最大长度                                                                      | number        | 0      | -         |
